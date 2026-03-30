@@ -1,6 +1,7 @@
 import React from 'react';
 import HeroSection from '../components/HeroSection';
 import TrustBar from '../components/TrustBar';
+import OfficialChannelNotice from '../components/OfficialChannelNotice';
 import ProductGrid from '../components/ProductGrid';
 import ValueProp from '../components/ValueProp';
 import ContactMe from '../components/ContactMe';
@@ -11,6 +12,7 @@ const Home = () => {
     <>
       <HeroSection />
       <TrustBar />
+      <OfficialChannelNotice />
       <ProductGrid />
       <ValueProp />
       <ContactMe />

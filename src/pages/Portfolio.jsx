@@ -52,9 +52,9 @@ const Portfolio = () => {
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statPurity')}</span>
                                 </div>
                             </div>
-                            <a className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" href="#">
+                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post">
                                 {t('portfolioPage.viewSpecs')} <span className="material-symbols-outlined">arrow_forward</span>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -69,125 +69,113 @@ const Portfolio = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Card 1 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Koperasi Tani Makmur" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGI8z4Cif84fvn4L8F2iXeDvKkmqK2mF-K3897R7bl_q35gOfxFrO6iSXhLHzkanC-llyFdbLgdsobbIzVKPKf8DDh2vX0HB9Vyv3NyJbW9L1oUcaoV3xpRvj1ZjyLyZAbJ4b9Ocn4CmPb2xOCMpOflIqm1Dfgf_6MSWCiSV9W4xqQgfT1X8ffHB2yOa5gOda7D5W7uIjICY4OxWeP59deDm2tA1na0v8l0aX3QFLfixRH4sEGopUD6SxNd12inbYBA_hwZlIIkkc" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">Efficiency +15%</span>
-                                    <span className="material-symbols-outlined text-outline-variant">settings_suggest</span>
+                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">Efficiency +15%</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">Oct 14, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Koperasi Tani Makmur</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Subang, West Java</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">2 Ton/Jam capacity unit installed for local cooperative processing.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Koperasi Tani Makmur</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">2 Ton/Jam capacity unit installed for local cooperative processing.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Subang, West Java</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         {/* Card 2 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Mitra Sejahtera Rice" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0We1Z7JjDMFlQ22PnZXly1UWLzdAE6ttRkraknL7dgac41Kx_nLsmbPY97Feiu6fKc44USzKcU2uCVBgbQiHH6LKg7QyiIxCeTZA4Z4lKVHn5h5IM2p9VT4Ofzlxyap-zXIm7sxcje7nOZ_ihBxb5ohzeonIUShavFZz-OUMfFwvQUOr7I2ek2mldOknfMr8EvxGvY7HrI9dmBrYJz-lbdM9O3hGwoPcHfhGpcx8gQB6QQ-7BY6aKQsNURh1fzfyDO0v-uoi63Ug" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">Export Grade</span>
-                                    <span className="material-symbols-outlined text-outline-variant">verified</span>
+                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">Export Grade</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">Sep 28, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Mitra Sejahtera Rice</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Sidrap, South Sulawesi</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">Full automation line for premium jasmine rice processing.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Mitra Sejahtera Rice</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">Full automation line for premium jasmine rice processing.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Sidrap, South Sulawesi</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         {/* Card 3 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Lombok Mandiri Plant" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuADYc9c7-b8uNrPkdLnhbZJmCEMHhByvti3MFpHqXubVF3dCyZVny2PLogKvVrij2CZ6BfYTYsGzkDJ7NkNzoZUjmGF6ivqe8i-_06_S6OIPJrsI4NNAfsIm4pHC_mPaNR2mx0OdSpVOK8z78d7AZCE7ydJ8SjQkQ6Sls7JySuUmWbKchcFPiVLcm-vGHKwI2_v0NaOzO_lKmfipMVN9mCPJvjdqsTqFx-4fPb7goh_Ikir2pVlWtOyS68ySTaxFmOvMq26gEUcF3c" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">Optimized Energy</span>
-                                    <span className="material-symbols-outlined text-outline-variant">bolt</span>
+                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">Optimized Energy</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">Aug 15, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Lombok Mandiri Plant</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Mataram, NTB</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">Compact RMU design for high-efficiency regional production.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Lombok Mandiri Plant</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">Compact RMU design for high-efficiency regional production.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Mataram, NTB</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         {/* Card 4 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Borneo Grain Hub" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2wWzcLKLISn0dDcJoNG_vWUpYAq7zEuOe8oERf1y2wXa2EkJcPNQCBSU2IpPK6u28n71U8G1CfCOTdUg8myLbdxhrJehCydHxkuDhq6f1gEuyih0VTDk8Q85tSB5EzOmMdmcvtd1aDmiUTvTSk5tyTORg-zJD6UxBKAeGrlX-70WohmA6gYAjtQkTKPMLDrJnkP8wCOfIpciKFy6YPpmJf9WgZZp7IvzhxgSnZp5safcD_2fmGBgGgh6sxravUBy3XQYPysacgo0" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">High Capacity</span>
-                                    <span className="material-symbols-outlined text-outline-variant">data_thresholding</span>
+                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">High Capacity</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">Jul 02, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Borneo Grain Hub</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Banjarmasin, South Kalimantan</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">Strategic storage and milling integration for 10 Ton/Hr output.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Borneo Grain Hub</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">Strategic storage and milling integration for 10 Ton/Hr output.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Banjarmasin, South Kalimantan</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         {/* Card 5 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Sumatra Rice Solutions" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuAug36A14cskbaqrlos38YjokhEdEXHpfEt07cAby2s6bKeO3c3yFFxary7pXINVbge9U4RfflyMa0p1x53mHwoxEnv-FFvdMXdg4WeSZIlzcrf_GrLs0HVN76YbQdAGo1Q46VxSh601_lIlwkGeis9AB9xheoMPI3JdglRuBGvQdCrbrK6POv_ItPMyvhqLA_wwh5MXR07w-92yyEyv0UMxkYlRXGaGD0S_iJ_RfteQ8VSYsiHlQbjCesrvCiws5GHsHVTuRBII90" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">Precision Polishing</span>
-                                    <span className="material-symbols-outlined text-outline-variant">star</span>
+                                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">Precision Polishing</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">Jun 19, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Sumatra Rice Solutions</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Medan, North Sumatra</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">Advanced polishing technology installation for silky grain finish.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Sumatra Rice Solutions</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">Advanced polishing technology installation for silky grain finish.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Medan, North Sumatra</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         {/* Card 6 */}
-                        <div className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl transition-shadow duration-500">
+                        <Link to="/post" className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img alt="Papua Agri-Center" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrAy1Q-_pzbfkE90wImNHkB0zFX2OIx6NfxUzS0bjvFCcJ1BSgk0KYuzlw_zMt5FRqlLGBp_hERizeTO5u07CV0DpEO035f72tOKcXOfILquM3fmlIAFOSgT0kH2lNSwBJhLStG9m88fglMii9HjTHfbVHjleFA-IEUxJbLrvJlZ2QPKjIACu104uWkTWDkBr72UmxeE7_XV_brxJnZdB2amTdcTFLV8tgXuQMtpJecdpq-PyiMBoJqP6A2-ZMvpCP1cQf4P8y2us" />
                             </div>
-                            <div className="p-6">
+                            <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 uppercase tracking-tighter">Remote Operation</span>
-                                    <span className="material-symbols-outlined text-outline-variant">wifi</span>
+                                    <span className="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">Remote Operation</span>
+                                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">May 05, 2024</span>
                                 </div>
-                                <h3 className="font-headline font-bold text-lg text-primary mb-2">Papua Agri-Center</h3>
-                                <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
-                                    <span className="material-symbols-outlined text-sm">location_on</span><span>Merauke, Papua</span>
-                                </div>
-                                <div className="pt-4 border-t border-outline-variant/10">
-                                    <span className="text-xs font-label text-on-surface-variant font-medium">Low-maintenance setup designed for remote agricultural regions.</span>
+                                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">Papua Agri-Center</h3>
+                                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">Low-maintenance setup designed for remote agricultural regions.</p>
+                                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                                    <span className="material-symbols-outlined text-sm">location_on</span><span className="truncate">Merauke, Papua</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
             </section>

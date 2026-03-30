@@ -4,6 +4,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatbotWidget from './components/ChatbotWidget';
+import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import Home from './pages/Home';
@@ -11,11 +12,13 @@ import Products from './pages/Products';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Portfolio from './pages/Portfolio';
+import Post from './pages/Post';
 
 function App() {
   return (
     <LanguageProvider>
       <div className="relative flex flex-col min-h-screen">
+        <ScrollToTop />
         <Navbar />
         
         {/* Route Content Container */}
@@ -26,6 +29,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/post" element={<Post />} />
           </Routes>
         </div>
 

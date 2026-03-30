@@ -54,27 +54,33 @@ const Portfolio = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {projects.slice(0, 3).map((project, idx) => (
-            <div key={idx} className="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="aspect-video overflow-hidden">
+            <Link to="/post" key={idx} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
+              <div className="aspect-[4/3] overflow-hidden">
                 <img 
                   alt={project.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   src={project.img}
                 />
               </div>
-              <div className="p-6 space-y-3">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-headline font-bold text-primary text-lg">{project.title}</h3>
-                  <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider min-w-fit ml-4 mt-1">
+              <div className="p-6 flex flex-col flex-grow">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
                     {project.tag}
                   </span>
+                  <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                    {project.date || "2024"}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-on-surface-variant text-sm border-t border-outline-variant/10 pt-3 mt-3">
-                  <span className="material-symbols-outlined text-base">location_on</span>
-                  {project.location}
+                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">{project.title}</h3>
+                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">
+                  {project.desc || "Modern agricultural processing facility installation with integrated technology."}
+                </p>
+                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                  <span className="material-symbols-outlined text-sm">location_on</span>
+                  <span className="truncate">{project.location}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         
