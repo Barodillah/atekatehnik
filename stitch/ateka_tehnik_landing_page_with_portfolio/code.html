@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ATEKA TEHNIK | Modernisasi Penggilingan Padi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary": "#240400",
+              "on-surface-variant": "#444650",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-dim": "#d9dadb",
+              "on-tertiary-fixed-variant": "#76321f",
+              "primary-fixed-dim": "#b3c5ff",
+              "outline": "#757681",
+              "surface-variant": "#e1e3e4",
+              "secondary": "#904d00",
+              "on-primary-fixed-variant": "#2d4480",
+              "inverse-surface": "#2e3132",
+              "surface-container-highest": "#e1e3e4",
+              "error": "#ba1a1a",
+              "on-tertiary-container": "#ca745c",
+              "secondary-fixed-dim": "#ffb77d",
+              "inverse-on-surface": "#f0f1f2",
+              "surface": "#f8f9fa",
+              "primary": "#000c2e",
+              "on-surface": "#191c1d",
+              "secondary-fixed": "#ffdcc3",
+              "on-error-container": "#93000a",
+              "on-error": "#ffffff",
+              "secondary-container": "#ffa454",
+              "on-secondary-container": "#713b00",
+              "inverse-primary": "#b3c5ff",
+              "on-primary": "#ffffff",
+              "surface-container": "#edeeef",
+              "surface-container-low": "#f3f4f5",
+              "on-secondary-fixed": "#2f1500",
+              "surface-tint": "#465c99",
+              "tertiary-fixed": "#ffdbd1",
+              "primary-container": "#001f5b",
+              "surface-container-high": "#e7e8e9",
+              "outline-variant": "#c5c6d1",
+              "on-primary-fixed": "#00184a",
+              "on-secondary-fixed-variant": "#6e3900",
+              "tertiary-fixed-dim": "#ffb5a0",
+              "surface-bright": "#f8f9fa",
+              "tertiary-container": "#481002",
+              "on-tertiary-fixed": "#3b0900",
+              "primary-fixed": "#dbe1ff",
+              "on-background": "#191c1d",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#7389ca",
+              "background": "#f8f9fa",
+              "error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .industrial-gradient {
+        background: linear-gradient(135deg, #000c2e 0%, #001f5b 100%);
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#000c2e]/80 backdrop-blur-md shadow-[0_32px_32px_rgba(25,28,29,0.04)]">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
+<div class="text-2xl font-black tracking-tighter text-[#001f5b] dark:text-white font-headline">
+                ATEKA TEHNIK
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-headline font-bold tracking-tight text-[#904d00] border-b-2 border-[#904d00] pb-1" href="#">Home</a>
+<a class="font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300" href="#">Products</a>
+<a class="font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300" href="#">About</a>
+<a class="font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300" href="#">E-LKPP</a>
+<a class="font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary-container text-white px-6 py-2 rounded-sm font-bold scale-95 active:scale-90 transition-transform">
+                    Get Quote
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-surface">
+<div class="max-w-7xl mx-auto px-8 relative z-10">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-sm text-xs font-bold tracking-widest uppercase">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        Industrial Leader Since 2004
+                    </div>
+<h1 class="text-5xl lg:text-7xl font-headline font-extrabold text-primary leading-[1.1] tracking-tight">
+                        Modernisasi Penggilingan Padi: <span class="text-secondary">Solusi Presisi</span> untuk Hasil Beras Premium
+                    </h1>
+<p class="text-lg text-on-surface-variant max-w-xl leading-relaxed">
+                        Lebih dari 20 tahun memimpin manufaktur dan instalasi Rice Milling Unit (RMU) berstandar nasional. Kami hadirkan teknologi efisien untuk ketahanan pangan Indonesia.
+                    </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="bg-secondary-container text-on-secondary-container px-8 py-4 rounded-sm font-bold flex items-center gap-2 hover:bg-secondary transition-colors duration-300">
+                            Konsultasi Rencana Usaha
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="border-2 border-outline-variant text-primary px-8 py-4 rounded-sm font-bold hover:bg-surface-container-low transition-colors duration-300">
+                            Lihat Katalog E-LKPP
+                        </button>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-square bg-surface-container-highest rounded-sm overflow-hidden shadow-2xl">
+<img alt="Industrial Machinery" class="w-full h-full object-cover mix-blend-multiply opacity-90" data-alt="Close-up of high-precision stainless steel industrial rice milling gears and machinery in a clean factory setting with dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWkg7S98AvUe_mO9EkZmakk1mEyKxQIvTgcVFrJhyauTjmSz-cO6RXJXLEin9V8ap-4XpR5Exx7yHVS4yiG6pPwsMS75o4pscHyCcm3oM8XGk7daOSJ1jttrh59RZjoZNKOmDIQSDTCNybiKYb3PzUMvQpHDycKARpwti5SdXJwpQjVInGEr-OWTUXX6XSO_C2wo6uY9VeMcbf8kJyyTWUdqxRnIKb01otat--toe8otwwFobOOSfU5ITTem54BzSUWkP-TYmgV0s"/>
+</div>
+<!-- Floating Stat Card -->
+<div class="absolute -bottom-6 -left-6 bg-primary-container text-white p-6 rounded-sm shadow-xl hidden md:block">
+<div class="text-4xl font-black font-headline">20+</div>
+<div class="text-xs uppercase tracking-widest text-secondary-container">Years Experience</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Trust Bar -->
+<section class="bg-surface-container-low py-12 border-y border-outline-variant/10">
+<div class="max-w-7xl mx-auto px-8">
+<p class="text-center font-label text-xs tracking-widest text-on-surface-variant mb-8 uppercase">Didukung oleh Mitra Strategis &amp; Bersertifikasi Nasional</p>
+<div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+<span class="text-xl font-bold font-headline">LKPP E-Katalog</span>
+<span class="text-xl font-bold font-headline italic">YANMAR</span>
+<span class="text-xl font-bold font-headline">SATAKE</span>
+<span class="text-xl font-bold font-headline">Indotrading Verified</span>
+</div>
+</div>
+</section>
+<!-- Product Grid -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-2xl">
+<h2 class="text-4xl font-headline font-bold text-primary mb-4">Rice Milling Unit Solutions</h2>
+<p class="text-on-surface-variant">Teknologi fabrikasi presisi untuk berbagai skala usaha penggilingan padi, dari kapasitas menengah hingga industri ekspor.</p>
+</div>
+<a class="text-secondary font-bold flex items-center gap-2 group" href="#">
+                    Explore All Products 
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">trending_flat</span>
+</a>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="group bg-surface-container-lowest rounded-sm overflow-hidden hover:shadow-[0_32px_32px_rgba(0,0,0,0.06)] transition-all duration-500">
+<div class="aspect-[4/3] overflow-hidden bg-surface-container">
+<img alt="Paket Industri Menengah" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Industrial rice milling machine assembly with Yanmar diesel engine in a spacious warehouse facility with natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI8t0vOJKPIrvin0qyxZRJGp141cIJpFmxHXEN-sMQvBz2GLuOsHuFqa-rajcYKZrv9Fq5VyfqDH4sw5fbtcnwcYUdM6UsxWEQVKtWJQs7r2C1mDSctJN1RHhMubJnNEsD2t-SZ96oi844PQz75LRdyDD6Y-6dp1KG3knKfbWIU0UXJDJi-VeFAtvw6_tQbEdUIEtHC8NKEjg9iat2ovUDV5OMPW4BBM7o-4eXZOtloaGqfckGAWJ2_rllCgWq-dKU8ECtr0j9dOE"/>
+</div>
+<div class="p-8 space-y-4">
+<div class="text-xs font-bold text-secondary tracking-widest uppercase">1-2 Ton/Jam</div>
+<h3 class="text-xl font-headline font-bold text-primary">Paket Industri Menengah</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Optimalkan Produksi Harian Anda. Sistem tangguh dengan kombinasi Huller Yanmar legendaris.</p>
+<div class="pt-4 border-t border-outline-variant/10">
+<button class="text-primary font-bold text-sm flex items-center gap-2">Detail Spesifikasi <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-lowest rounded-sm overflow-hidden hover:shadow-[0_32px_32px_rgba(0,0,0,0.06)] transition-all duration-500">
+<div class="aspect-[4/3] overflow-hidden bg-surface-container">
+<img alt="Paket Beras Premium" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Modern high-tech Satake rice polisher unit with digital control panel in a clinical industrial food processing environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgILXK9U4G8ZJGd1_wlsYs9y2iPaabtS6FmUeZ4xFx--vrqQnadbC-BXkCirspeb8whqrTKBwHwoUhcdOR9OyeMKMmrY_xLh_PRBgQvt8b2OX51vWr36PF6tq_7JZog8JwBRzzUT9vPzjFYLMBEsrPbHgOSLt-DR1SFNFVojzLg4cfh1YGp-24c7mMurwU1F5TNbDiELZnFVuqSDX0e7n-S_mrr70xgwwmollCxLiJXx2qfsDk8e_POU7UD7JXjlJgAh0kFxw23n4"/>
+</div>
+<div class="p-8 space-y-4">
+<div class="text-xs font-bold text-secondary tracking-widest uppercase">Teknologi Satake</div>
+<h3 class="text-xl font-headline font-bold text-primary">Paket Beras Premium &amp; Ekspor</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Hasilkan Beras Kualitas Tertinggi. Integrasi Polisher Satake memastikan derajat sosoh sempurna.</p>
+<div class="pt-4 border-t border-outline-variant/10">
+<button class="text-primary font-bold text-sm flex items-center gap-2">Detail Spesifikasi <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-lowest rounded-sm overflow-hidden hover:shadow-[0_32px_32px_rgba(0,0,0,0.06)] transition-all duration-500">
+<div class="aspect-[4/3] overflow-hidden bg-surface-container">
+<img alt="Mobile RMU" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A rugged mobile rice milling unit mounted on a heavy-duty truck chassis parked near a lush Indonesian rice field at sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpT9fasxTg1WWYPowOVt8OaryvNdajqYZxKDFGXbgeggEM1aNOq0QKuIuTCNBl2YMtbTTzJFtiCeToaGu8SvEKkpuBqfcI-qIXP7lbBJ8QDXbz76kwYDILWHaCHrGFc7Xr_bXyWoFziqE0Uf5BxrkVyI71lT9XClQ3Imw4AaFxzb7lzkgEEDfGqx3RVJF-6AVp1hK6kAYenJN_CiOzDCSpq7IURu8MIg4v1O1WWFpm0TG-EKFWLUY07xld4JGNUd9m9MvFNeeugZg"/>
+</div>
+<div class="p-8 space-y-4">
+<div class="text-xs font-bold text-secondary tracking-widest uppercase">Inovasi Selepan Keliling</div>
+<h3 class="text-xl font-headline font-bold text-primary">Paket Mobile RMU</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Layanan Jemput Bola ke Petani. Dirancang dengan sasis kuat untuk medan geografis Indonesia.</p>
+<div class="pt-4 border-t border-outline-variant/10">
+<button class="text-primary font-bold text-sm flex items-center gap-2">Detail Spesifikasi <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Value Proposition -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid md:grid-cols-3 gap-12">
+<div class="space-y-4">
+<div class="w-12 h-12 bg-primary-container text-white flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined" data-icon="engineering">engineering</span>
+</div>
+<h4 class="text-xl font-headline font-bold text-primary">Tenaga Spesialis Ahli</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Setiap unit dirakit oleh teknisi berpengalaman dengan kontrol kualitas yang ketat untuk memastikan presisi operasional.</p>
+</div>
+<div class="space-y-4">
+<div class="w-12 h-12 bg-secondary text-white flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</div>
+<h4 class="text-xl font-headline font-bold text-primary">Pelatihan Operator Gratis</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Kami memberikan modul pelatihan intensif agar tim Anda dapat mengoperasikan mesin dengan efisiensi maksimal sejak hari pertama.</p>
+</div>
+<div class="space-y-4">
+<div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<h4 class="text-xl font-headline font-bold text-primary">Garansi &amp; Purnajual</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Dukungan ketersediaan suku cadang asli dan layanan purnajual responsif di seluruh wilayah operasional Anda.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Standardisation Blueprint -->
+<section class="py-24 bg-surface overflow-hidden">
+<div class="max-w-7xl mx-auto px-8">
+<div class="bg-surface-container-lowest p-8 lg:p-16 rounded-sm relative shadow-sm border border-outline-variant/10">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="order-2 lg:order-1 relative">
+<img alt="Technical Blueprint" class="w-full h-auto opacity-20 grayscale" data-alt="Technical line drawing blueprint of a complex industrial rice milling assembly on a white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqk7T-qEi0yO0iARTBPyxQdR8H2bvhs2VyAP0KaekuaDw4SvBo2wHWGTqLjbA-Uhb66qmVQ6OWelQ7BqjP2-m4pw_A6Gh4YCc7YUCI35MZA9KMtPiRmFfgW4g9T-B0s-glbfCWbmaE2X3QwfPVnHgSE2L1hYGmph8KG41S2Z-sR_BeyuQLoCvfykU9PXxDN-t3q9PicZ3GRl5m5-C5qRymj2MepICvjekztj4FV8kmmiwOy3BGJR9vCft0XIiTgaVeJomFANE-RAk"/>
+<!-- Hotspots -->
+<div class="absolute top-1/4 left-1/3 group cursor-pointer">
+<div class="w-4 h-4 bg-secondary rounded-full animate-pulse"></div>
+<div class="absolute top-6 left-0 bg-white p-2 shadow-lg border border-outline-variant opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+<span class="font-label text-[10px] font-bold">DIGITAL CONTROL PANEL v2.0</span>
+</div>
+</div>
+<div class="absolute bottom-1/3 right-1/4 group cursor-pointer">
+<div class="w-4 h-4 bg-secondary rounded-full animate-pulse"></div>
+<div class="absolute top-6 left-0 bg-white p-2 shadow-lg border border-outline-variant opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+<span class="font-label text-[10px] font-bold">REINFORCED STEEL HOUSING</span>
+</div>
+</div>
+</div>
+<div class="order-1 lg:order-2 space-y-6">
+<h2 class="text-4xl font-headline font-extrabold text-primary">Standardisasi Industri</h2>
+<p class="text-on-surface-variant leading-relaxed">Setiap rancang bangun di Ateka Tehnik mengikuti standar manufaktur yang telah teruji selama dua dekade. Kami memastikan setiap komponen memiliki durabilitas tinggi untuk beban kerja 24/7.</p>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 bg-surface rounded-sm">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-bold text-primary">Sertifikasi SNI Komponen</span>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface rounded-sm">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-bold text-primary">Uji Efisiensi Energi Terverifikasi</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Portfolio/Projects Section -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+<h2 class="text-4xl font-headline font-extrabold text-primary">Our Installations &amp; Projects</h2>
+<p class="text-on-surface-variant leading-relaxed">
+                    Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.
+                </p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+<!-- Project Card 1 -->
+<div class="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Project Installation" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A wide angle view of a large-scale modern rice milling factory interior with several rows of white and blue machinery and stainless steel pipes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnqB87fFvYVatZ85wZJ2a_t9_A9m-r6oDk_2rW7wWf8j7d_X9a_Y5c_b4e_f3g_h2i_j1k_l0m_n9o_p8q_r7s_t6u_v5w_x4y_z3a_b2c_d1e_f0g_h9i_j8k_l7m_n6o_p5q_r4s_t3u_v2w_x1y_z0a_b9c_d8e_f7g_h6i_j5k_l4m_n3o_p2q_r1s_t0u"/>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-lg">Koperasi Tani Makmur - 2 Ton/Jam</h3>
+<span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider">Efficiency +15%</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Jawa Tengah
+                        </div>
+</div>
+</div>
+<!-- Project Card 2 -->
+<div class="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Project Installation" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Close up of high-end Satake polisher machines in a pristine food-grade industrial facility in Indonesia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaC2d_e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5b6c7d8e9f0g1h2i3j4k5l6m7n8o9p0q1r2s3t4u5v6w7x8y9z0a1b2c3d4e5f6g7h8i9j0"/>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-lg">Premium Export Facility</h3>
+<span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider">Export Grade</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Karawang, Jawa Barat
+                        </div>
+</div>
+</div>
+<!-- Project Card 3 -->
+<div class="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Project Installation" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A fleet of mobile rice milling units branded with Ateka Tehnik logos parked in a row at a logistics yard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbC_d1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3a4b5c6d7e8f9g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9"/>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-lg">Mobile RMU Fleet Deployment</h3>
+<span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider">Region Wide</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Sumatera Selatan
+                        </div>
+</div>
+</div>
+</div>
+<div class="flex justify-center">
+<button class="border-2 border-primary text-primary px-10 py-3 rounded-sm font-bold hover:bg-primary hover:text-white transition-all duration-300">
+                    View More Projects
+                </button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-[#001f5b] dark:bg-[#000c2e] w-full pt-16 pb-8">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1 space-y-6">
+<div class="text-xl font-bold text-white font-headline">ATEKA TEHNIK</div>
+<p class="text-slate-400 text-sm leading-relaxed">Pionir teknologi pengolahan hasil bumi dengan fokus pada kualitas dan keberlanjutan sektor pertanian Indonesia.</p>
+</div>
+<div class="space-y-4">
+<h5 class="text-[#ffa454] font-['Inter'] text-sm tracking-wide uppercase font-bold">Navigation</h5>
+<ul class="space-y-2">
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Home</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Products</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Projects</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">E-LKPP</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-[#ffa454] font-['Inter'] text-sm tracking-wide uppercase font-bold">Quick Links</h5>
+<ul class="space-y-2">
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Terms of Service</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Service Centers</a></li>
+<li><a class="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">Global Export</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-[#ffa454] font-['Inter'] text-sm tracking-wide uppercase font-bold">Contact Office</h5>
+<p class="text-slate-400 text-sm leading-relaxed">
+                    Jl. Raya Industri Utama No. 45<br/>
+                    Jawa Tengah, Indonesia<br/>
+                    info@atekatehnik.co.id
+                </p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-secondary-container">language</span>
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-secondary-container">mail</span>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-8 mt-16 pt-8 border-t border-slate-700/50 flex flex-col md:row justify-between items-center gap-4">
+<p class="text-slate-400 text-xs font-['Inter'] tracking-wide uppercase">© 2024 Ateka Tehnik Industrial Engineering. All Rights Reserved.</p>
+<div class="flex gap-8">
+<span class="text-white text-xs font-bold uppercase tracking-widest">Premium Quality</span>
+<span class="text-white text-xs font-bold uppercase tracking-widest">ISO 9001 Certified</span>
+</div>
+</div>
+</footer>
+<!-- Floating Chatbot Widget -->
+<div class="fixed bottom-6 right-6 z-[60]">
+<button class="bg-primary-container text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 hover:bg-primary transition-all group active:scale-95">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform">smart_toy</span>
+<span class="font-bold text-sm tracking-tight">Ateka Intelligent Assistant</span>
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full border-2 border-white"></div>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Product Catalog | Ateka Tehnik</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#2e3132",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#3b0900",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1d",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-container": "#713b00",
+                        "on-surface-variant": "#444650",
+                        "inverse-primary": "#b3c5ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbd1",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-container": "#481002",
+                        "primary": "#000c2e",
+                        "secondary": "#904d00",
+                        "on-tertiary-container": "#ca745c",
+                        "on-primary-container": "#7389ca",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed": "#00184a",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#240400",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "secondary-fixed": "#ffdcc3",
+                        "outline": "#757681",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed": "#2f1500",
+                        "secondary-container": "#ffa454",
+                        "surface-tint": "#465c99",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-fixed-variant": "#76321f"
+                    },
+                    fontFamily: {
+                        "headline": ["Montserrat"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-industrial-gradient {
+            background: linear-gradient(135deg, #000c2e 0%, #001f5b 100%);
+        }
+
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 0.8fr;
+        }
+
+        @media (max-width: 768px) {
+            .asymmetric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface">
+    <!-- Top Navigation Shell -->
+    <nav
+        class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-[0_32px_32px_-12px_rgba(25,28,29,0.04)] sticky">
+        <div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+            <div class="text-2xl font-black tracking-tighter text-[#001f5b] dark:text-blue-400 font-headline">
+                Ateka Tehnik
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#001f5b] transition-colors duration-300 font-body"
+                    href="#">Home</a>
+                <a class="text-[#001f5b] dark:text-blue-400 border-b-2 border-[#904d00] font-bold pb-1 font-headline tracking-tight"
+                    href="#">Products</a>
+                <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#001f5b] transition-colors duration-300 font-body"
+                    href="#">About</a>
+                <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#001f5b] transition-colors duration-300 font-body"
+                    href="#">Contact</a>
+                <button
+                    class="bg-[#001f5b] text-white px-6 py-2 rounded-sm font-headline font-bold tracking-tight scale-95 active:scale-90 transition-transform hover:bg-[#000c2e]">
+                    Get a Quote
+                </button>
+            </div>
+            <div class="md:hidden">
+                <span class="material-symbols-outlined text-[#001f5b]">menu</span>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <header class="pt-32 pb-24 px-8 bg-industrial-gradient relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <img alt="Industrial Blueprint" class="w-full h-full object-cover grayscale"
+                data-alt="Faded blueprint of complex industrial machinery with technical lines and geometric schematics over a dark navy background"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTY5hi6OCvlJmCnIWR_9HrebG9XrsLbuTN0scgoBJNVmNsjfdllRldQjgHLfQUuvYav22Ww1RX--7JW1LtHXWCwUPAoE1yyVQQfl2b9WRHUJg2zF1MtikSSVcl3s4uweWGC-6AXeSYdgd5EbOrceBgH2nHqYHBjRrpQh-VxMB1thF0Rg2009oJeFvXiSMqABzZsIujnsCImYKKhRwsMYhX5NIkYtKAbOQl-ZcjVKlpa_eHd4fKys9PX4ClMm43xJ_HsKnntxzoU78" />
+        </div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <span class="text-secondary-container font-label text-sm uppercase tracking-[0.2em] mb-4 block">Precision
+                Engineering</span>
+            <h1
+                class="text-white font-headline text-5xl md:text-7xl font-extrabold tracking-tighter max-w-3xl leading-[1.1]">
+                Our Engineering Solutions
+            </h1>
+            <p class="text-on-primary-container mt-6 max-w-xl text-lg leading-relaxed">
+                Experience the convergence of structural stability and agricultural innovation. Each RMU is a
+                masterpiece of precision-machined steel.
+            </p>
+        </div>
+    </header>
+    <!-- Category Selector -->
+    <section class="bg-surface-container-low py-12 px-8">
+        <div class="max-w-7xl mx-auto flex flex-wrap gap-4">
+            <button
+                class="bg-primary-container text-white px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">settings_input_component</span>
+                Rice Milling Units
+            </button>
+            <button
+                class="bg-surface-container-highest text-primary-container px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2 hover:bg-secondary-fixed transition-colors">
+                <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
+                Individual Components
+            </button>
+            <button
+                class="bg-surface-container-highest text-primary-container px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2 hover:bg-secondary-fixed transition-colors">
+                <span class="material-symbols-outlined text-sm">build</span>
+                Support &amp; Spare Parts
+            </button>
+        </div>
+    </section>
+    <!-- Product Grid: Rice Milling Units -->
+    <main class="py-24 px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- Product Card 1 -->
+            <div class="bg-surface-container-lowest group flex flex-col">
+                <div class="relative h-80 overflow-hidden">
+                    <img alt="Industri Menengah RMU"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        data-alt="Professional grade rice milling machine in a clean industrial warehouse with polished steel surfaces and orange accents"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7kGv6387DtPvE3BbF8ekC7enYusDtIBYZfd-FQNiXMXQIbXgU46D9A_TaAVGj6fFXx1S-nTL0EzdJKCt1uehtYRGSqPTUokRsrOeCgOzJEeffob5G2mSnaq7I7XNLmQXWuOCIgkL0u7urXumsVICdfYVDFqYoNLPfOrPTSNnIqXuuMfqGtbOzucGZCumV6qPNuFJMGbv4WlKyrsyhGF_sHhAhgPmFHmCczldtmmY5vCx_IK2XzW78HTcNjg7tn_gwxDfq23bqJb4" />
+                    <div class="absolute top-4 left-4">
+                        <span
+                            class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm">Premium
+                            Selection</span>
+                    </div>
+                </div>
+                <div class="p-8 flex-grow">
+                    <h3 class="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU Industri Menengah
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span>
+                            <span class="text-primary-container font-bold">1,5 - 2,0 Ton/Jam</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span>
+                            <span class="text-primary-container font-bold">Diesel 40 HP</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span>
+                            <span class="text-primary-container font-bold">4500 x 2200 x 3100</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button
+                            class="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">Inquire
+                            Now</button>
+                        <button
+                            class="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            Download Specs
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Product Card 2 -->
+            <div class="bg-surface-container-lowest group flex flex-col">
+                <div class="relative h-80 overflow-hidden">
+                    <img alt="RMU Premium"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        data-alt="High-capacity industrial rice mill with multiple polished chrome elevators and automated control panels in a bright factory"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt5wy0SC04xwE8r-CLgGN0p4sObSZymo2yWTJgSikEXaF6PrUYUP5f-U4rtGQrSLYNNHHweqGg03Hjdca1huMh4I-A5bIV0mjNgAfKWuc92fXKWqqB_Ke8qNv0O5Q5ct-TsklrFmrdk2UQf-ZGORhupvTAZFniy8ngXDyRB26J-duZL4TviotMvMsRi16wMzE3E9Yp5APPdw8Jgvf4x2Rs6511zjtlVeM1TiRDXVCXRe8IpwWPDBrxPTKJePjJyAHYXgmao5GWphc" />
+                </div>
+                <div class="p-8 flex-grow">
+                    <h3 class="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU High-End Premium
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span>
+                            <span class="text-primary-container font-bold">3,5 - 5,0 Ton/Jam</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span>
+                            <span class="text-primary-container font-bold">Electric 75 kW</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span>
+                            <span class="text-primary-container font-bold">8500 x 4000 x 5500</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button
+                            class="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">Inquire
+                            Now</button>
+                        <button
+                            class="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            Download Specs
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Product Card 3 -->
+            <div class="bg-surface-container-lowest group flex flex-col">
+                <div class="relative h-80 overflow-hidden">
+                    <img alt="Mobile RMU"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        data-alt="Compact rice milling unit mounted on a sturdy steel trailer frame designed for mobile operation in rural fields"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXNGa6-b9O7Tms5Y_ysWilJX4LwqtLYUo94yf3ahYLxG_mzB4DVi9-opya88zcVTv1GYRWdypnAaNWhS_N7Jx0i9U7Vrzm_fQaYDzwgsMJ5-TXlIf8HiRIM2TQQmaWhHw_t9rekYoiPiqt5eYsjeQbmvoAltOYc2XpMBGh-yc5ssSV-7E3pOFC_1061rcSddYQXw-Zn9Q9EL1xVdJqwiBOGVDbltaVPA_R65uzDhw_ECoElmbCLzDZpf2m5o6qnx0xgSUiP72pHSM" />
+                    <div class="absolute top-4 left-4">
+                        <span
+                            class="bg-primary text-white px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm">Mobile
+                            Solution</span>
+                    </div>
+                </div>
+                <div class="p-8 flex-grow">
+                    <h3 class="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU Mobile Traktor
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span>
+                            <span class="text-primary-container font-bold">0,8 - 1,2 Ton/Jam</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span>
+                            <span class="text-primary-container font-bold">PTO / Diesel 24 HP</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                            <span
+                                class="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span>
+                            <span class="text-primary-container font-bold">3200 x 1800 x 2400</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button
+                            class="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">Inquire
+                            Now</button>
+                        <button
+                            class="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            Download Specs
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Comparison Table -->
+    <section class="bg-surface-container-low py-24 px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-headline text-4xl font-extrabold text-primary-container mb-12 text-center">Package
+                Comparison</h2>
+            <div class="overflow-x-auto shadow-sm rounded-sm overflow-hidden">
+                <table class="w-full text-left bg-white border-collapse">
+                    <thead>
+                        <tr class="bg-primary-container text-white font-headline">
+                            <th class="p-6 font-bold uppercase tracking-wider text-xs">Technical Feature</th>
+                            <th class="p-6 font-bold uppercase tracking-wider text-xs">Standard Pack</th>
+                            <th class="p-6 font-bold uppercase tracking-wider text-xs">Business Pro</th>
+                            <th class="p-6 font-bold uppercase tracking-wider text-xs">Premium Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm font-body">
+                        <tr class="bg-surface border-b border-outline-variant/10">
+                            <td class="p-6 font-semibold text-primary-container">Pre-Cleaner Stage</td>
+                            <td class="p-6">Single Screen</td>
+                            <td class="p-6">Dual Screen Vibratory</td>
+                            <td class="p-6">Full Magnetic Destoner</td>
+                        </tr>
+                        <tr class="bg-white border-b border-outline-variant/10">
+                            <td class="p-6 font-semibold text-primary-container">Milling Recovery</td>
+                            <td class="p-6">62% - 64%</td>
+                            <td class="p-6">65% - 68%</td>
+                            <td class="p-6">69% - 71%</td>
+                        </tr>
+                        <tr class="bg-surface border-b border-outline-variant/10">
+                            <td class="p-6 font-semibold text-primary-container">Polishing Type</td>
+                            <td class="p-6">Friction Polisher</td>
+                            <td class="p-6">Single Mist Polisher</td>
+                            <td class="p-6">Dual Silky Polisher</td>
+                        </tr>
+                        <tr class="bg-white border-b border-outline-variant/10">
+                            <td class="p-6 font-semibold text-primary-container">Automation Level</td>
+                            <td class="p-6">Manual Lever</td>
+                            <td class="p-6">Semi-Auto PLC</td>
+                            <td class="p-6">Full Digital Control Center</td>
+                        </tr>
+                        <tr class="bg-surface">
+                            <td class="p-6 font-semibold text-primary-container">Warranty Period</td>
+                            <td class="p-6">12 Months</td>
+                            <td class="p-6">24 Months</td>
+                            <td class="p-6">36 Months + On-Site</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <!-- Support Section: Bento Grid -->
+    <section class="py-24 px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px]">
+            <div
+                class="md:col-span-2 md:row-span-2 bg-primary-container p-12 flex flex-col justify-end relative overflow-hidden group">
+                <img alt="Spare Parts"
+                    class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-1000"
+                    data-alt="Close-up of organized high-precision industrial gears and steel bearings on a workbench with workshop lighting"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2csb2bBc5wmPyeG-HeD-gTXq8JaQMqx_CEuBWfeRZiqj3nQItX4XE2AL4K-TFKTdTjUgCGnO_aia2qj4Xr-4tWxHQjeg_oQMGq1mj3Om3hmEcrcRoZElJgiAtJMBDt13YZsyvZFxhNmhLNnhSVfVFLZiy5P7SznBwTRfAgQS9LHVnbJ8xz7vO3GAG_KYqfJnlw2NBRiDIaQxTA9r0pP5P7YxnJ9OJu6GhYAjXoL7lbqjBkUsgL1BHo67lMjyviKrrxB4vn8-Wq94" />
+                <div class="relative z-10">
+                    <h3 class="text-white font-headline text-3xl font-extrabold mb-4">Genuine Spare Parts</h3>
+                    <p class="text-on-primary-container mb-6 max-w-sm">Every gear and belt is engineered to the same
+                        rigorous standards as our main units. Ensure longevity with Ateka Original.</p>
+                    <button
+                        class="bg-secondary-container text-on-secondary-container px-8 py-3 font-headline font-bold uppercase tracking-widest text-xs">Catalog
+                        Download</button>
+                </div>
+            </div>
+            <div class="md:col-span-2 bg-surface-container-high p-8 flex flex-col justify-center">
+                <span class="material-symbols-outlined text-secondary text-4xl mb-4">support_agent</span>
+                <h4 class="font-headline text-xl font-bold text-primary-container mb-2">24/7 Technical Support</h4>
+                <p class="text-on-surface-variant text-sm">Our engineers are ready to assist you anywhere in the
+                    archipelago, ensuring minimal downtime for your production.</p>
+            </div>
+            <div class="md:col-span-1 bg-white p-8 border border-outline-variant/20 flex flex-col justify-center">
+                <span class="material-symbols-outlined text-secondary text-4xl mb-4">verified</span>
+                <h4 class="font-headline text-lg font-bold text-primary-container mb-2">ISO Certified</h4>
+                <p class="text-on-surface-variant text-xs">Global engineering standards applied locally.</p>
+            </div>
+            <div class="md:col-span-1 bg-secondary-fixed p-8 flex flex-col justify-center">
+                <span class="material-symbols-outlined text-on-secondary-fixed text-4xl mb-4">language</span>
+                <h4 class="font-headline text-lg font-bold text-on-secondary-fixed mb-2">Global Export</h4>
+                <p class="text-on-secondary-fixed-variant text-xs">Serving SEA, Africa, and beyond.</p>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-[#001f5b] dark:bg-slate-950 w-full pt-16 pb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 py-16 w-full max-w-7xl mx-auto">
+            <div class="md:col-span-1">
+                <div class="font-headline font-bold text-white text-xl mb-6">Ateka Tehnik</div>
+                <p class="font-body text-sm leading-relaxed text-slate-300">
+                    Leading the industry in precision rice milling solutions since 1998. Engineering the future of
+                    agricultural productivity.
+                </p>
+            </div>
+            <div>
+                <h5 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Products</h5>
+                <ul class="space-y-4 font-body text-sm leading-relaxed">
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">Industrial RMU</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">Mobile Units</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">Technical Specs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Company</h5>
+                <ul class="space-y-4 font-body text-sm leading-relaxed">
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">About Us</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">Terms of Service</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] hover:translate-x-1 duration-200 block transition-all"
+                            href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Newsletter
+                </h5>
+                <div class="flex flex-col gap-4">
+                    <p class="font-body text-xs text-slate-400">Subscribe for technical updates and industry insights.
+                    </p>
+                    <div class="flex flex-col gap-2">
+                        <input
+                            class="bg-[#000c2e] border-none focus:ring-2 focus:ring-[#ffa454] p-3 text-xs text-white placeholder-slate-500"
+                            placeholder="Your email address" type="email" />
+                        <button
+                            class="bg-[#ffa454] text-[#001f5b] py-3 font-headline font-bold uppercase tracking-widest text-[10px] hover:bg-[#ffb77d] transition-colors">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-16 pt-8 border-t border-white/10 text-center font-body text-slate-400 text-xs">
+            © 2024 Ateka Tehnik. Engineering Precision.
+        </div>
+    </footer>
+    <!-- Floating AI Assistant -->
+    <div class="fixed bottom-8 right-8 z-[100] group">
+        <div class="flex items-center gap-4 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="bg-white p-4 shadow-xl rounded-lg border border-outline-variant/20 max-w-[240px]">
+                <p class="text-xs font-bold text-primary-container mb-1">Ateka Intelligent Assistant</p>
+                <p class="text-[10px] text-on-surface-variant leading-relaxed">Need technical specs for a specific
+                    capacity? Ask me anything!</p>
+            </div>
+        </div>
+        <button
+            class="bg-secondary-container w-16 h-16 flex items-center justify-center rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-transform border-4 border-white">
+            <span class="material-symbols-outlined text-on-secondary-container text-3xl"
+                style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+        </button>
+    </div>
+</body>
+
+</html>

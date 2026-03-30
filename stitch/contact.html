@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Contact Ateka Tehnik | Industrial Precision</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#2e3132",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#3b0900",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1d",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-container": "#713b00",
+                        "on-surface-variant": "#444650",
+                        "inverse-primary": "#b3c5ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbd1",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-container": "#481002",
+                        "primary": "#000c2e",
+                        "secondary": "#904d00",
+                        "on-tertiary-container": "#ca745c",
+                        "on-primary-container": "#7389ca",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed": "#00184a",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#240400",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "secondary-fixed": "#ffdcc3",
+                        "outline": "#757681",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed": "#2f1500",
+                        "secondary-container": "#ffa454",
+                        "surface-tint": "#465c99",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-fixed-variant": "#76321f"
+                    },
+                    fontFamily: {
+                        "headline": ["Montserrat"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-industrial-gradient {
+            background: linear-gradient(135deg, #000c2e 0%, #001f5b 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface antialiased">
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-[0_32px_32px_-12px_rgba(25,28,29,0.04)]">
+        <div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+            <div class="text-2xl font-black tracking-tighter text-[#001f5b] font-headline uppercase">
+                Ateka Tehnik
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a class="text-slate-600 font-medium hover:text-[#001f5b] transition-colors duration-300 font-headline"
+                    href="#">Home</a>
+                <a class="text-slate-600 font-medium hover:text-[#001f5b] transition-colors duration-300 font-headline"
+                    href="#">Products</a>
+                <a class="text-slate-600 font-medium hover:text-[#001f5b] transition-colors duration-300 font-headline"
+                    href="#">About</a>
+                <a class="text-[#001f5b] border-b-2 border-[#904d00] font-bold pb-1 font-headline" href="#">Contact</a>
+            </div>
+            <button
+                class="bg-[#001f5b] text-white px-6 py-2 rounded-sm font-headline font-bold tracking-tight scale-95 active:scale-90 transition-transform hover:bg-[#000c2e]">
+                Get a Quote
+            </button>
+        </div>
+    </nav>
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="relative py-24 px-8 overflow-hidden bg-industrial-gradient">
+            <div class="max-w-7xl mx-auto relative z-10">
+                <h1
+                    class="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tighter max-w-3xl mb-6">
+                    Start Your Industrial Consultation
+                </h1>
+                <p class="text-on-primary-container text-lg md:text-xl font-body max-w-2xl opacity-90">
+                    Engineered for precision. Built for scale. Connect with our engineering specialists to optimize your
+                    rice milling infrastructure.
+                </p>
+            </div>
+            <!-- Background Accent -->
+            <div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none">
+                <img alt="Technical blueprint lines and industrial machinery schematics"
+                    class="w-full h-full object-cover grayscale"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQpIol-t6QTH-KLt3q6qFujDYKz2LO03x3azOiHi9PvbXCrgyge4DR57Iu16wkqxqPgmA6HtVwBq7Ik9jNAoXbcK2Qvaar7XL1ee85kaM7RCJoQcmvPPsOv688x9FkZtXjUG7A8HTg2dvKvdFRyG_lrLeAONi7ny40jEKYUDeJokkS4vXSfNpIc8GM_OYrq7QMAQSESlnhwXbOa_tBYVazFHbacb3tEZodyvHqt08nZeUarhlW97QCzfR-RGpg1kRJqYhlvfDIv4g" />
+            </div>
+        </section>
+        <!-- Contact Section -->
+        <section class="py-20 px-8 bg-surface">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <!-- Left: Inquiry Form -->
+                <div class="lg:col-span-7 bg-surface-container-lowest p-8 md:p-12 shadow-sm rounded-sm">
+                    <h2 class="text-3xl font-headline font-bold text-primary-container mb-8">Technical Inquiry</h2>
+                    <form class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="relative">
+                                <label
+                                    class="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Full
+                                    Name</label>
+                                <input
+                                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none"
+                                    placeholder="John Doe" type="text" />
+                            </div>
+                            <div class="relative">
+                                <label
+                                    class="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Company
+                                    Name</label>
+                                <input
+                                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none"
+                                    placeholder="Industrial Corp" type="text" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="relative">
+                                <label
+                                    class="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Kapasitas
+                                    RMU (Ton/Hour)</label>
+                                <select
+                                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none">
+                                    <option>Select Capacity</option>
+                                    <option>1-5 Ton/Hour</option>
+                                    <option>5-15 Ton/Hour</option>
+                                    <option>15+ Ton/Hour</option>
+                                </select>
+                            </div>
+                            <div class="relative">
+                                <label
+                                    class="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Location</label>
+                                <input
+                                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none"
+                                    placeholder="City, Country" type="text" />
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label
+                                class="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Detailed
+                                Message</label>
+                            <textarea
+                                class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none resize-none"
+                                placeholder="Describe your technical requirements..." rows="4"></textarea>
+                        </div>
+                        <button
+                            class="w-full bg-secondary-container text-on-secondary-container font-headline font-extrabold text-lg py-5 rounded-sm hover:bg-secondary transition-colors duration-300 shadow-lg tracking-tight uppercase"
+                            type="submit">
+                            Send Inquiry
+                        </button>
+                    </form>
+                </div>
+                <!-- Right: Office Details -->
+                <div class="lg:col-span-5 space-y-12">
+                    <div>
+                        <h3 class="text-sm font-label font-bold text-secondary uppercase tracking-[0.2em] mb-6">
+                            Headquarters</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary-container mt-1">location_on</span>
+                                <div>
+                                    <p class="font-headline font-bold text-lg text-primary-container">Central Factory
+                                        &amp; Office</p>
+                                    <p class="text-on-surface-variant font-body mt-1">Jl. Raya Industri Utama No.
+                                        45<br />Java Tengah, Indonesia</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary-container mt-1">call</span>
+                                <div>
+                                    <p class="font-headline font-bold text-lg text-primary-container">WhatsApp Support
+                                    </p>
+                                    <p class="text-on-surface-variant font-body mt-1">+62 812-3456-7890</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary-container mt-1">mail</span>
+                                <div>
+                                    <p class="font-headline font-bold text-lg text-primary-container">Email
+                                        Correspondence</p>
+                                    <p class="text-on-surface-variant font-body mt-1">engineering@atekatehnik.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-8 rounded-sm">
+                        <h3 class="text-sm font-label font-bold text-primary-container uppercase tracking-[0.2em] mb-4">
+                            Export Capabilities</h3>
+                        <p class="text-on-surface-variant text-sm leading-relaxed mb-4">
+                            We offer global shipping and installation services for our milling systems. Our team
+                            specializes in cross-border industrial logistics.
+                        </p>
+                        <div class="flex gap-2">
+                            <span
+                                class="bg-surface-container-highest px-3 py-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Asia
+                                Pacific</span>
+                            <span
+                                class="bg-surface-container-highest px-3 py-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Africa</span>
+                            <span
+                                class="bg-surface-container-highest px-3 py-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Europe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Map Section -->
+        <section class="h-[500px] w-full bg-surface-container-high relative">
+            <div class="absolute inset-0 bg-gray-200">
+                <img alt="Map view of factory location" class="w-full h-full object-cover"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-xVQ3N8Q7gBAdhyWDbJOxe1eFA5Kyp5vZ9_zjMiiXU2ZkvNv2LZuids5p9JXf7z9eB5i8KTuP6TYQ1lDHdaTw-EnY7PbzuIF_XoYUcdYRjvGBf_cmHAyK-3ztJvofKWBmJi_h5F9uQWH3pQk4iIZD1F0VyMhJfArvD74btpZsHkwZ1cmSI_Z50wLPV5ChKfynWwk0klAUFXBPZGEJm0UnOMneu-VWEqM_uwf8DjqLdVpNLQEPbypzcLQnoSn9EuZNNpnHL9GmYr0" />
+            </div>
+            <div class="absolute inset-0 bg-primary-container/10 pointer-events-none"></div>
+            <div class="absolute bottom-8 left-8 bg-white p-6 shadow-xl max-w-sm">
+                <p class="font-headline font-extrabold text-primary-container text-xl">Factory Visit</p>
+                <p class="text-sm text-on-surface-variant mt-2 font-body">Visits are by appointment only. Please contact
+                    our support team at least 48 hours in advance.</p>
+            </div>
+        </section>
+    </main>
+    <!-- Floating AI Assistant -->
+    <div class="fixed bottom-8 right-8 z-[60] flex flex-col items-end">
+        <div
+            class="bg-white p-6 shadow-2xl rounded-sm mb-4 max-w-xs border-l-4 border-secondary animate-in slide-in-from-bottom-4 duration-500">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-secondary uppercase tracking-wider">Ateka Intelligent Assistant</p>
+                    <p class="text-sm font-headline font-bold text-primary-container">Online Now</p>
+                </div>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                "Hello, I'm here to expedite your inquiry. What scale of rice milling capacity are you looking for
+                today?"
+            </p>
+            <button
+                class="mt-4 w-full text-center py-2 bg-surface-container-low text-xs font-bold text-primary-container hover:bg-surface-container-high transition-colors">
+                Start Chatting
+            </button>
+        </div>
+        <div
+            class="w-16 h-16 bg-primary-container text-on-primary flex items-center justify-center shadow-2xl cursor-pointer hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-3xl">chat_bubble</span>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-[#001f5b] text-slate-300">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 py-16 w-full max-w-7xl mx-auto">
+            <div class="col-span-1">
+                <div class="text-xl font-bold text-white font-headline mb-6">Ateka Tehnik</div>
+                <p class="text-sm leading-relaxed font-body">
+                    Pioneering precision engineering in rice milling solutions since 1994. Global reach, local
+                    expertise.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Products</h4>
+                <ul class="space-y-4">
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Rice Mill Plants</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Automation Systems</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Technical Specs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Company</h4>
+                <ul class="space-y-4">
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Privacy Policy</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Terms of Service</a></li>
+                    <li><a class="text-slate-300 hover:text-[#ffa454] text-sm transition-all duration-200 font-body"
+                            href="#">Global Export</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline font-bold uppercase tracking-widest text-xs text-[#ffa454] mb-6">Newsletter
+                </h4>
+                <p class="text-sm mb-4 font-body">Stay updated with our latest industrial innovations.</p>
+                <form class="flex flex-col gap-2">
+                    <input
+                        class="bg-[#000c2e] border-none text-white text-sm px-4 py-3 rounded-sm focus:ring-1 focus:ring-[#ffa454]"
+                        placeholder="Your Email Address" type="email" />
+                    <button
+                        class="bg-[#ffa454] text-[#001f5b] font-headline font-bold py-3 rounded-sm hover:bg-[#ffb77d] transition-colors uppercase text-xs tracking-widest"
+                        type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div
+            class="max-w-7xl mx-auto px-8 py-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="font-body text-sm text-slate-400">
+                © 2024 Ateka Tehnik. Engineering Precision.
+            </p>
+            <div class="flex gap-4">
+                <div
+                    class="w-8 h-8 flex items-center justify-center bg-white/5 text-slate-300 rounded-sm hover:text-[#ffa454] transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined text-lg">public</span>
+                </div>
+                <div
+                    class="w-8 h-8 flex items-center justify-center bg-white/5 text-slate-300 rounded-sm hover:text-[#ffa454] transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined text-lg">share</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About Us | Ateka Tehnik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#2e3132",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#3b0900",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1d",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-container": "#713b00",
+                        "on-surface-variant": "#444650",
+                        "inverse-primary": "#b3c5ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbd1",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-container": "#481002",
+                        "primary": "#000c2e",
+                        "secondary": "#904d00",
+                        "on-tertiary-container": "#ca745c",
+                        "on-primary-container": "#7389ca",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed": "#00184a",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#240400",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "secondary-fixed": "#ffdcc3",
+                        "outline": "#757681",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed": "#2f1500",
+                        "secondary-container": "#ffa454",
+                        "surface-tint": "#465c99",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-fixed-variant": "#76321f"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#000c2e]/80 backdrop-blur-md border-b border-[#c5c6d1]/20 shadow-[0_32px_32px_rgba(25,28,29,0.04)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-full mx-auto">
+<div class="text-2xl font-black text-[#001f5b] dark:text-white tracking-tighter font-headline">
+                Ateka Tehnik
+            </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-[#191c1d] dark:text-[#e1e3e4] hover:text-[#001f5b] transition-colors duration-300 font-headline font-bold tracking-tight" href="#">Home</a>
+<a class="text-[#904d00] dark:text-[#ffa454] border-b-2 border-[#904d00] pb-1 font-headline font-bold tracking-tight" href="#">About</a>
+<a class="text-[#191c1d] dark:text-[#e1e3e4] hover:text-[#001f5b] transition-colors duration-300 font-headline font-bold tracking-tight" href="#">Products</a>
+<a class="text-[#191c1d] dark:text-[#e1e3e4] hover:text-[#001f5b] transition-colors duration-300 font-headline font-bold tracking-tight" href="#">Contact</a>
+</div>
+<button class="bg-primary-container text-on-primary px-6 py-2 rounded-sm font-headline font-bold scale-95 active:scale-90 transition-transform">
+                Get a Quote
+            </button>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[819px] flex items-center overflow-hidden bg-primary-container">
+<div class="absolute inset-0 opacity-40">
+<img alt="Industrial machinery" class="w-full h-full object-cover grayscale" data-alt="Close-up of industrial steel gears and high-precision mechanical components with a cool blue metallic sheen and dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACevkjZk7yZIAwmZmumfgz06AAVsuXDrxGuG59nLxjRQ_01VP3iFbBmnDSfzheoc0Khkjx6RcfLuiX80ad8QTDEhgZAkv7ucKvGmtHrQBIb_6zPaoFI4pfgDvlh4A3GQ1gp8yuztfn8Oos0sCdC5U9K7GT4pLqbEvL63TNgbiH7jw7BmptTiUL7KeiQczx3qYO9gB_d3CP1Z83FpXYO2aA7am5FSFuGVmIjbAMn6I7dLKzXrCI_lbKUrDOlDZ0cltTyJd5Vl9eXP0"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent"></div>
+<div class="relative z-10 max-w-7xl mx-auto px-8">
+<div class="max-w-3xl">
+<span class="inline-block px-4 py-1 mb-6 bg-secondary text-on-secondary text-xs font-bold tracking-[0.2em] uppercase rounded-sm">Est. 2004</span>
+<h1 class="text-6xl md:text-8xl font-headline font-extrabold text-white leading-tight tracking-tighter mb-8">
+                        Engineering the Future of <span class="text-secondary-container">Rice Milling</span>
+</h1>
+<p class="text-xl text-surface-variant font-body leading-relaxed max-w-xl">
+                        Two decades of technical mastery in agricultural engineering, dedicated to Indonesian food security and industrial excellence.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Story Section: Tonal Shift Boundary -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-7">
+<h2 class="text-4xl font-headline font-bold text-primary mb-8 tracking-tight">A Legacy of Industrial Precision</h2>
+<div class="space-y-6 text-on-surface-variant text-lg leading-relaxed font-body">
+<p>Founded in 2004, Ateka Tehnik began with a singular vision: to bridge the gap between traditional agricultural practices and modern industrial efficiency. Over the past <span class="font-bold text-primary">20 years</span>, we have evolved from a local workshop into a nationally recognized leader in rice milling technology.</p>
+<p>As an <span class="font-bold text-secondary">official LKPP vendor</span>, we are honored to contribute directly to national food security initiatives. Our machines are not just equipment; they are the heart of milling operations across the archipelago, engineered to withstand the rigors of Indonesian climate and throughput requirements.</p>
+</div>
+<div class="mt-12 grid grid-cols-2 md:grid-cols-3 gap-8">
+<div>
+<div class="text-4xl font-headline font-black text-secondary">20+</div>
+<div class="text-sm font-label uppercase tracking-widest text-outline">Years Experience</div>
+</div>
+<div>
+<div class="text-4xl font-headline font-black text-secondary">1.5k+</div>
+<div class="text-sm font-label uppercase tracking-widest text-outline">Installations</div>
+</div>
+<div>
+<div class="text-4xl font-headline font-black text-secondary">34</div>
+<div class="text-sm font-label uppercase tracking-widest text-outline">Provinces Served</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="aspect-square bg-surface-container-highest rounded-sm overflow-hidden shadow-2xl">
+<img alt="Technical drawing" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="Blueprint of a technical machine part with precise measurements and architectural lines on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPH2jPkT4gekvHv3YtMMw1xeeTa0MDqF-t24McHKBH8BC2vs7afCyGhI-_DSo5mG8e2qibMumqADAK9NsjfrPDx5KZ8GJhfu8yrpUD22TAv3GXsxR9vg_JF9YXHmGuGvYq-x7DOJU4dRw4-WhvB7-ljoo8lgWsquh-tmgbGoDDUjcgLQAt_-8SKh-6shUZofS9otYZr_Ew4otRy5D0kbMNrwZLxP3qctojaG0Cjx-nHwevrZ6eIsfW-N0pVG6H9Qu33tGDKsXr_3g"/>
+</div>
+<div class="absolute -bottom-8 -left-8 bg-primary-container p-8 text-white shadow-xl max-w-xs">
+<p class="font-headline font-bold text-lg mb-2 italic">"Precision is our baseline. Progress is our mission."</p>
+<p class="text-sm text-on-primary-container">— Founding Director</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Mission & Vision: Bento Grid -->
+<section class="bg-surface py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="mb-16">
+<h2 class="text-3xl font-headline font-bold text-primary tracking-tight">Our Core Directives</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Precision Card -->
+<div class="bg-surface-container-lowest p-10 border-b-4 border-secondary shadow-sm group hover:shadow-lg transition-all">
+<div class="w-12 h-12 bg-surface-container-low flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="precision_manufacturing">precision_manufacturing</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Unrivaled Precision</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">We employ aerospace-grade tolerances in our milling assemblies to ensure minimum grain breakage and maximum yield consistency.</p>
+</div>
+<!-- Innovation Card -->
+<div class="bg-surface-container-lowest p-10 border-b-4 border-primary shadow-sm group hover:shadow-lg transition-all">
+<div class="w-12 h-12 bg-surface-container-low flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="bolt">bolt</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Continuous Innovation</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">Our R&amp;D team integrates IoT monitoring and automation into every machine, bringing the Industry 4.0 revolution to the rice fields.</p>
+</div>
+<!-- Partnership Card -->
+<div class="bg-surface-container-lowest p-10 border-b-4 border-secondary-container shadow-sm group hover:shadow-lg transition-all">
+<div class="w-12 h-12 bg-surface-container-low flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-secondary-container text-3xl" data-icon="handshake">handshake</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Strategic Partnership</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">We don't just sell machines; we build lifelong alliances with millers through dedicated on-site support and maintenance training.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Leadership: Asymmetric Layout -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
+<h2 class="text-4xl font-headline font-bold text-primary tracking-tight">Engineering Leadership</h2>
+<p class="max-w-md text-on-surface-variant font-body">Guided by a team of mechanical specialists and industrial visionaries with decades of on-field expertise.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+<!-- Leader 1 -->
+<div class="relative group">
+<div class="aspect-[3/4] overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 rounded-sm">
+<img alt="Chief Technical Officer" class="w-full h-full object-cover" data-alt="Professional portrait of a mature male engineer in a light blue shirt, looking confident against a clean workshop background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGP9QM5EJA7YCFR3g7iJX5AJECLNodlT_-O3UVPtyw3fWIn64TLSlYnhgUuG1q7UWgirlNa5-C8WEeW8k7E64_-89shWsckparW4L64UACcYj3sJCWaXHjNEHvCkYWUhYN3Z0pyg9i2NLIARrWBQy8vTEimpvdOolDMxQdkguzjyETLEsxonAsPETKupkrCOSqNT0_-AoclcebPAIAKXsEdAc0FZqqhPeH4JuEQNL3gcJpkDsfwJXzEoWnqZBOedS6AAhq6IRh4_w"/>
+</div>
+<div class="absolute -bottom-4 left-4 right-4 bg-white p-6 shadow-xl">
+<p class="text-sm font-label text-secondary font-bold tracking-widest uppercase mb-1">Chief Technical Officer</p>
+<h4 class="text-xl font-headline font-extrabold text-primary tracking-tight">Ir. Hendra Wijaya</h4>
+</div>
+</div>
+<!-- Leader 2 -->
+<div class="relative group md:mt-12">
+<div class="aspect-[3/4] overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 rounded-sm">
+<img alt="Operations Director" class="w-full h-full object-cover" data-alt="Professional portrait of a middle-aged male executive in a charcoal suit, minimalist grey background, studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-wXNupEKw4HXkS4YoYnMpnPQTTWotptxoxJtlpuGWw4tHTetNcB7a0mGgr9zb4O3kfGTnU-65GHWCxrhtVokaD-9PCT6swbw6omttDWf_Ug5jVcXKzrPmyeN569trnwWznzPkLG7Qu7NnfNbZn0kzIMUALdf8m8vbg9BNwMI4MOfXanMQ85lWpSGLRW37Y6NWSwSl7uEEQBWSfSvk3pP-0ciD2kOeRiNsOymnfXgLlBPU3zVUPuDNET59-9neHElZ9GiTpnJcNQA"/>
+</div>
+<div class="absolute -bottom-4 left-4 right-4 bg-white p-6 shadow-xl">
+<p class="text-sm font-label text-secondary font-bold tracking-widest uppercase mb-1">Operations Director</p>
+<h4 class="text-xl font-headline font-extrabold text-primary tracking-tight">Budi Santoso</h4>
+</div>
+</div>
+<!-- Leader 3 -->
+<div class="relative group">
+<div class="aspect-[3/4] overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 rounded-sm">
+<img alt="Lead Design Engineer" class="w-full h-full object-cover" data-alt="Professional portrait of a female lead engineer in industrial setting, wearing a white lab coat, blurred machinery background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1WgBvVGTNJj3XdAK5inNS7r9njQFGA2_LqJqHjswHdtjg08_FlwyJj-hJQa8MO9KoBXWrWe_GAKxvv5ScZezC20DRNzsv5JtjAZKheMM27hOrB-PVJBoB58ASFGMk-oFLgX8XjG05uaOvYXVXd9nX6Ln8oD32pXwXgHMoARwH1NsST65p9xJ2JKP7Pzao4IijmI5IJzfXAbzr1l1Ex1CIczQabLX4pDI-MO2h5T5rJLQaVwarVMGV9JoV8xqKaDWXW8O5f0JiEJo"/>
+</div>
+<div class="absolute -bottom-4 left-4 right-4 bg-white p-6 shadow-xl">
+<p class="text-sm font-label text-secondary font-bold tracking-widest uppercase mb-1">Lead Design Engineer</p>
+<h4 class="text-xl font-headline font-extrabold text-primary tracking-tight">Siti Aminah, M.T.</h4>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Certifications: Minimalist Showcase -->
+<section class="bg-surface py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-16">
+<h2 class="text-sm font-label text-outline tracking-[0.3em] uppercase mb-4">Standards &amp; Compliance</h2>
+<h3 class="text-3xl font-headline font-bold text-primary tracking-tight">Certified Excellence</h3>
+</div>
+<div class="flex flex-wrap justify-center items-center gap-16 md:gap-32 opacity-70 grayscale hover:grayscale-0 transition-all">
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="verified">verified</span>
+</div>
+<span class="font-headline font-bold text-primary">SNI ISO 9001</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="account_balance">account_balance</span>
+</div>
+<span class="font-headline font-bold text-primary">LKPP Certified</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="security">security</span>
+</div>
+<span class="font-headline font-bold text-primary">TKDN Compliant</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="workspace_premium">workspace_premium</span>
+</div>
+<span class="font-headline font-bold text-primary">ASAE Standard</span>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="relative bg-primary overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary via-primary-container to-secondary opacity-30"></div>
+<div class="relative z-10 max-w-7xl mx-auto px-8 py-24 text-center">
+<h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-8 tracking-tighter">Ready to optimize your milling capacity?</h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center">
+<button class="bg-secondary text-on-secondary px-10 py-4 rounded-sm font-headline font-bold text-lg hover:bg-secondary-container transition-colors duration-300">
+                        Discuss Your Project
+                    </button>
+<button class="bg-white/10 text-white backdrop-blur-md px-10 py-4 rounded-sm font-headline font-bold text-lg hover:bg-white/20 transition-colors duration-300">
+                        Download Catalog
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f3f4f5] dark:bg-[#000c2e] w-full pt-16 pb-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 max-w-7xl mx-auto font-['Inter'] text-sm leading-6">
+<div class="space-y-4">
+<div class="font-['Manrope'] font-extrabold text-[#001f5b] dark:text-white text-xl">Ateka Tehnik</div>
+<p class="text-[#44474e] dark:text-[#c5c6d1]">Leading manufacturer of precision rice milling machinery in Indonesia since 2004.</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-[#001f5b] dark:text-[#ffa454]">Contact Us</h4>
+<p class="text-[#44474e] dark:text-[#c5c6d1]">Jl. Industri No. 45<br/>Sidoarjo, Jawa Timur<br/>Indonesia</p>
+<p class="text-[#44474e] dark:text-[#c5c6d1]">+62 (31) 555-0123</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-[#001f5b] dark:text-[#ffa454]">Quick Links</h4>
+<ul class="space-y-2">
+<li><a class="text-[#44474e] dark:text-[#c5c6d1] hover:underline decoration-[#904d00] underline-offset-4 transition-all duration-200" href="#">Machine Specs</a></li>
+<li><a class="text-[#44474e] dark:text-[#c5c6d1] hover:underline decoration-[#904d00] underline-offset-4 transition-all duration-200" href="#">Global Export</a></li>
+<li><a class="text-[#44474e] dark:text-[#c5c6d1] hover:underline decoration-[#904d00] underline-offset-4 transition-all duration-200" href="#">Privacy Policy</a></li>
+<li><a class="text-[#44474e] dark:text-[#c5c6d1] hover:underline decoration-[#904d00] underline-offset-4 transition-all duration-200" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-[#001f5b] dark:text-[#ffa454]">Newsletter</h4>
+<p class="text-[#44474e] dark:text-[#c5c6d1]">Stay updated with our latest industrial innovations.</p>
+<div class="flex">
+<input class="w-full bg-white border-none rounded-l-sm focus:ring-secondary" placeholder="Email address" type="email"/>
+<button class="bg-primary text-white px-4 rounded-r-sm hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-16 pt-8 border-t border-[#c5c6d1]/20 max-w-7xl mx-auto px-12 text-center text-[#44474e] dark:text-[#c5c6d1]">
+            © 2024 Ateka Tehnik. Engineering Precision in Rice Milling.
+        </div>
+</footer>
+</body></html>
