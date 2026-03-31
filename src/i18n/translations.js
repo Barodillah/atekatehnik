@@ -6,6 +6,7 @@ const translations = {
     "nav.about": "Tentang",
     "nav.elkkp": "INAPROC",
     "nav.contact": "Kontak",
+    "nav.portfolio": "Portofolio",
 
     // Hero Section
     "hero.badge": "Pemimpin Industri Sejak 2004",
@@ -47,6 +48,27 @@ const translations = {
     "contact.phone": "Telepon / WhatsApp",
     "contact.whatsapp": "WhatsApp",
     "contact.call": "Telepon",
+    "contact.badge": "Ateka Tehnik Hub",
+    "contact.subtitle": "Kunjungi bengkel dan kantor operasional kami atau hubungi tim representatif kami untuk konsultasi produk yang Anda butuhkan.",
+    "contact.addressLabel": "Alamat Bengkel Utama",
+    "contact.addressValue": "Jl. Grompol - Jambangan, Gondang, Kedungjeruk, Kec. Mojogedang, Kabupaten Karanganyar, Jawa Tengah",
+    "contact.mapsLabel": "Lokasi Karanganyar",
+
+    // OfficialChannelNotice
+    "notice.title": "Peringatan Keamanan",
+    "notice.descPre": "Website dengan domain ",
+    "notice.fakeDomain": "atekateknik.com",
+    "notice.descMid": " (menggunakan huruf 'k') adalah ",
+    "notice.notOfficial": "BUKAN saluran resmi kami",
+    "notice.descPost": ". Segala penawaran maupun transaksi di luar kontak resmi bukan tanggung jawab kami.",
+    "notice.locationLabel": "Satu-satunya Lokasi Resmi",
+    "notice.locationDesc": "Kantor & Bengkel operasional kami HANYA berlokasi di ",
+    "notice.locationCity": "Karanganyar, Jawa Tengah",
+    "notice.fakeLabel": "Contoh Channel Tidak Resmi",
+    "notice.fakeDesc": "Website dan alamat di peta dengan bentuk menyerupai latar di belakang ini adalah ",
+    "notice.fakeDescPost": " milik Ateka Tehnik. Jangan mudah percaya jika dihubungi atas nama kami dari selain nomor dan alamat resmi.",
+    "notice.hoverLabel": "Tangkapan Layar Tidak Resmi",
+    "notice.ctaBtn": "Lihat Daftar Channel Resmi Kami",
 
     // ChatbotWidget
     "chatbot.name": "Ateka AI Assistant",
@@ -186,6 +208,26 @@ const translations = {
     "portfolioPage.ctaDesc": "Baik Anda ingin meningkatkan fasilitas yang sudah ada atau memulai usaha penggilingan baru, tim teknisi kami siap merancang jalur presisi Anda.",
     "portfolioPage.ctaBtn1": "Mulai Konsultasi Proyek",
     "portfolioPage.ctaBtn2": "Lihat Profil Perusahaan",
+
+    // Official Channels Page
+    "channels.badge": "Verifikasi Channel",
+    "channels.title": "Daftar Channel Resmi ",
+    "channels.titleHighlight": "Ateka Tehnik",
+    "channels.subtitle": "Pastikan Anda hanya bertransaksi dan menghubungi kami melalui jalur komunikasi dan lokasi yang tertera di bawah ini.",
+    "channels.officialTitle": "Channel RESMI Kami",
+    "channels.officialSub": "Valid & Terverifikasi (Aman)",
+    "channels.officialMapLabel": "Lokasi Pabrik Induk (Karanganyar)",
+    "channels.openMaps": "Buka di Google Maps",
+    "channels.socialLabel": "Media Sosial Resmi",
+    "channels.fakeTitle": "Channel PALSU / BUKAN Resmi",
+    "channels.fakeSub": "Harap Hindari Bertransaksi Disini!",
+    "channels.fakeMapLabel": "Lokasi Modus (Tangerang) - BUKAN KAMI",
+    "channels.ignoreLocation": "Abaikan lokasi ini",
+    "channels.viewRef": "Lihat referensi modus",
+    "channels.fakeWebLabel": "Website Tiruan Merek Kami",
+    "channels.fakeWebNote": "Menggunakan huruf 'k' - BUKAN KAMI",
+    "channels.fakeWebVisit": "Kunjungi",
+    "channels.backHome": "Kembali ke Beranda",
   },
 
   en: {
@@ -195,6 +237,7 @@ const translations = {
     "nav.about": "About",
     "nav.elkkp": "INAPROC",
     "nav.contact": "Contact",
+    "nav.portfolio": "Portfolio",
 
     // Hero Section
     "hero.badge": "Industrial Leader Since 2004",
@@ -236,6 +279,27 @@ const translations = {
     "contact.phone": "Phone / WhatsApp",
     "contact.whatsapp": "WhatsApp",
     "contact.call": "Call",
+    "contact.badge": "Ateka Tehnik Hub",
+    "contact.subtitle": "Visit our workshop and operational office or contact our representative team for a product consultation.",
+    "contact.addressLabel": "Main Workshop Address",
+    "contact.addressValue": "Jl. Grompol - Jambangan, Gondang, Kedungjeruk, Kec. Mojogedang, Kabupaten Karanganyar, Central Java",
+    "contact.mapsLabel": "Karanganyar Location",
+
+    // OfficialChannelNotice
+    "notice.title": "Security Warning",
+    "notice.descPre": "The website with the domain ",
+    "notice.fakeDomain": "atekateknik.com",
+    "notice.descMid": " (using the letter 'k') is ",
+    "notice.notOfficial": "NOT our official channel",
+    "notice.descPost": ". Any offers or transactions outside our official contacts are not our responsibility.",
+    "notice.locationLabel": "The Only Official Location",
+    "notice.locationDesc": "Our office & workshop are ONLY located in ",
+    "notice.locationCity": "Karanganyar, Central Java",
+    "notice.fakeLabel": "Example of Unofficial Channels",
+    "notice.fakeDesc": "The website and map address resembling the background behind this are ",
+    "notice.fakeDescPost": " owned by Ateka Tehnik. Do not trust if contacted on our behalf from other than our official numbers and addresses.",
+    "notice.hoverLabel": "Unofficial Channel Screenshots",
+    "notice.ctaBtn": "See Our Official Channels",
 
     // ChatbotWidget
     "chatbot.name": "Ateka AI Assistant",
@@ -375,6 +439,26 @@ const translations = {
     "portfolioPage.ctaDesc": "Whether you're looking to upgrade an existing facility or start a new milling enterprise, our engineers are ready to design your path to precision.",
     "portfolioPage.ctaBtn1": "Start Your Project Consultation",
     "portfolioPage.ctaBtn2": "View Company Profile",
+
+    // Official Channels Page
+    "channels.badge": "Channel Verification",
+    "channels.title": "Official Channels of ",
+    "channels.titleHighlight": "Ateka Tehnik",
+    "channels.subtitle": "Make sure you only transact and contact us through the communication channels and locations listed below.",
+    "channels.officialTitle": "Our OFFICIAL Channels",
+    "channels.officialSub": "Valid & Verified (Safe)",
+    "channels.officialMapLabel": "Main Factory Location (Karanganyar)",
+    "channels.openMaps": "Open in Google Maps",
+    "channels.socialLabel": "Official Social Media",
+    "channels.fakeTitle": "FAKE / Unofficial Channels",
+    "channels.fakeSub": "Please Avoid Transacting Here!",
+    "channels.fakeMapLabel": "Scam Location (Tangerang) - NOT US",
+    "channels.ignoreLocation": "Ignore this location",
+    "channels.viewRef": "View scam reference",
+    "channels.fakeWebLabel": "Counterfeit Brand Website",
+    "channels.fakeWebNote": "Uses the letter 'k' - NOT US",
+    "channels.fakeWebVisit": "Visit",
+    "channels.backHome": "Back to Home",
   }
 };
 

@@ -13,6 +13,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Portfolio from './pages/Portfolio';
 import Post from './pages/Post';
+import OfficialChannels from './pages/OfficialChannels';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/post" element={<Post />} />
+            <Route path="/official-channels" element={<OfficialChannels />} />
           </Routes>
         </div>
 

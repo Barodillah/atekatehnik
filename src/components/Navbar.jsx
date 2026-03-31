@@ -7,14 +7,24 @@ const Navbar = () => {
   const { lang, toggleLang, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const isPathActive = (path) => {
+    if (path === '/portfolio') {
+      return location.pathname.startsWith('/portfolio') || location.pathname.startsWith('/post');
+    }
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
   const getLinkClass = (path) => {
-    return location.pathname === path
+    return isPathActive(path)
       ? "font-headline font-bold tracking-tight text-[#904d00] border-b-2 border-[#904d00] pb-1"
       : "font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300";
   };
 
   const getMobileLinkClass = (path) => {
-    return location.pathname === path
+    return isPathActive(path)
       ? "block w-full py-3 px-4 font-headline font-bold tracking-tight text-[#904d00] bg-[#904d00]/5 border-l-4 border-[#904d00]"
       : "block w-full py-3 px-4 font-headline font-bold tracking-tight text-[#001f5b] hover:text-[#904d00] hover:bg-surface-container-low transition-colors duration-200";
   };
@@ -22,6 +32,7 @@ const Navbar = () => {
   const navItems = [
     { path: '/', label: t('nav.home') },
     { path: '/products', label: t('nav.products') },
+    { path: '/portfolio', label: t('nav.portfolio') },
     { path: '/about', label: t('nav.about') },
     { path: '/contact', label: t('nav.contact') },
   ];
@@ -100,7 +111,7 @@ const Navbar = () => {
               ))}
               <a
                 className="block w-full py-3 px-4 font-headline font-bold tracking-tight text-[#001f5b] hover:text-[#904d00] hover:bg-surface-container-low transition-colors duration-200"
-                href="#"
+                href="https://katalog.inaproc.id/ateka-tehnik"
               >
                 {t('nav.elkkp')}
               </a>
