@@ -63,6 +63,28 @@ if (!filter_var($contactData['email'], FILTER_VALIDATE_EMAIL)) {
      exit;
 }
 
+require_once __DIR__ . '/helpers.php';
+
+try {
+    $db = getDB();
+    $stmt = $db->prepare("
+        INSERT INTO leads (name, company, capacity_ref, location, email, phone, service_request, status)
+        VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New')
+    ");
+    $stmt->execute([
+        ':name'    => $contactData['name'],
+        ':company' => $contactData['company'],
+        ':cap'     => $contactData['capacity'],
+        ':loc'     => $contactData['location'],
+        ':email'   => $contactData['email'],
+        ':phone'   => $contactData['phone'],
+        ':svc'     => $contactData['message'],
+    ]);
+} catch (Exception $e) {
+    // Log db error but don't fail the request completely if we still want to send email
+    error_log("Failed to insert lead from contact form: " . $e->getMessage());
+}
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;

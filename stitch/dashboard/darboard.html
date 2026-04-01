@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Ateka Tehnik | Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-tertiary-container": "#ca745c",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "surface-tint": "#465c99",
+                        "secondary": "#904d00",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#7389ca",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "primary-fixed": "#dbe1ff",
+                        "on-surface": "#191c1d",
+                        "on-tertiary-fixed": "#3b0900",
+                        "surface-container-low": "#f3f4f5",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-surface-variant": "#444650",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#00184a",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface-variant": "#e1e3e4",
+                        "outline": "#757681",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#b3c5ff",
+                        "tertiary": "#240400",
+                        "primary": "#000c2e",
+                        "on-secondary-fixed": "#2f1500",
+                        "tertiary-container": "#481002",
+                        "secondary-container": "#ffa454",
+                        "tertiary-fixed": "#ffdbd1",
+                        "on-secondary-container": "#713b00",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#76321f",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface">
+    <!-- SideNavBar (Authority Source: JSON) -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 border-r border-blue-900/50 shadow-2xl flex flex-col h-full py-6 font-inter text-sm font-medium tracking-wide">
+        <div class="px-6 mb-8">
+            <h1 class="text-lg font-extrabold text-white tracking-tighter uppercase">Industrial Admin</h1>
+            <p class="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1">Engineering Precision</p>
+        </div>
+        <div class="flex-1 px-4 space-y-1">
+            <!-- Active Navigation (Semantic Mapping: Dashboard) -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-blue-900 text-orange-400 rounded-sm border-l-4 border-orange-400 scale-95 duration-150 cursor-pointer"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                <span>Customer Leads</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer"
+                href="#">
+                <span class="material-symbols-outlined"
+                    data-icon="precision_manufacturing">precision_manufacturing</span>
+                <span>Product Management</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                <span>Blog Posts</span>
+            </a>
+        </div>
+        <div class="mt-auto px-4 pt-6 border-t border-blue-900/30">
+            <button
+                class="w-full bg-orange-400 text-blue-950 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-colors mb-4">
+                New Entry
+            </button>
+            <a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-sm" data-icon="help">help</span>
+                <span>Support</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content Wrapper -->
+    <main class="ml-64 min-h-screen">
+        <!-- TopAppBar (Authority Source: JSON) -->
+        <header
+            class="w-full h-16 sticky top-0 z-40 bg-slate-50 shadow-sm flex justify-between items-center px-6 font-manrope tracking-tight">
+            <div class="flex items-center gap-4">
+                <span class="text-xl font-bold text-blue-900 uppercase">Ateka Tehnik</span>
+                <div class="h-8 w-px bg-slate-200 mx-2"></div>
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                    <input
+                        class="bg-slate-100 border-none rounded-full py-1.5 pl-10 pr-4 text-sm w-64 focus:ring-2 focus:ring-blue-900/20"
+                        placeholder="Search data..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="text-slate-500 hover:bg-slate-200 p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+                    <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                </button>
+                <button
+                    class="text-slate-500 hover:bg-slate-200 p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                </button>
+                <div class="flex items-center gap-3 ml-2">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-blue-900 leading-none">Admin User</p>
+                        <p class="text-[10px] text-slate-500">System Overseer</p>
+                    </div>
+                    <img alt="Administrator Profile"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                        data-alt="professional headshot of an executive administrator in a clean office setting, sharp focus, neutral tones"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtitxrg_DWIAHWD2MT6OXwQOqrWTXUbt0AdpGgzbJ0FwvUYUokb6-3Z4EyE0ZCrk3hSXF3YuBTSsffRfiirNcGWrCJC8x6rdgWj8UdY9IT96YPg87Yv0GW44E_uo0nHiPg4OtbLsOIsSJ1Us8T_SbSpisamYFRPADnugcbhEwij5rgNRWX170sVdN5B4ycJzhIxuI8_CQbNwmOiM0C6ZMfXFQ5kXboaSIm-vaawqzm1PJ8_lx7WWEwhsCFOOX6eD47uUAf2poddhk" />
+                </div>
+            </div>
+        </header>
+        <!-- Dashboard Canvas -->
+        <div class="p-8 space-y-8">
+            <!-- Page Header -->
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-primary tracking-tight">Dashboard Overview</h2>
+                    <p class="text-on-surface-variant font-body">Operational performance and lead distribution metrics.
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">
+                        Generate Report
+                    </button>
+                    <button
+                        class="px-4 py-2 bg-primary-container text-on-primary text-xs font-bold uppercase tracking-widest rounded-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">calendar_today</span>
+                        Last 30 Days
+                    </button>
+                </div>
+            </div>
+            <!-- KPI Grid (Bento Style) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Total Leads -->
+                <div
+                    class="bg-surface-container-lowest p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Total
+                            Leads</span>
+                        <div class="p-2 bg-secondary-fixed text-on-secondary-fixed rounded-sm">
+                            <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-headline font-extrabold text-primary tracking-tighter">1,284</h3>
+                        <p class="text-xs text-secondary font-medium mt-1 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">trending_up</span> +12.5% from last month
+                        </p>
+                    </div>
+                </div>
+                <!-- Active Projects -->
+                <div
+                    class="bg-surface-container-lowest p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Active
+                            Projects</span>
+                        <div class="p-2 bg-primary-fixed text-on-primary-fixed rounded-sm">
+                            <span class="material-symbols-outlined"
+                                data-icon="precision_manufacturing">precision_manufacturing</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-headline font-extrabold text-primary tracking-tighter">42</h3>
+                        <p class="text-xs text-primary-container/60 font-medium mt-1">8 completion due this week</p>
+                    </div>
+                </div>
+                <!-- Product Sales -->
+                <div
+                    class="bg-primary-container p-6 flex flex-col justify-between h-40 text-on-primary group transition-all hover:shadow-xl hover:shadow-primary/20">
+                    <div class="flex justify-between items-start">
+                        <span
+                            class="text-[10px] font-label font-bold text-on-primary/60 uppercase tracking-widest">Units
+                            Sold</span>
+                        <div class="p-2 bg-secondary-container text-on-secondary-container rounded-sm">
+                            <span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-headline font-extrabold tracking-tighter">312</h3>
+                        <p class="text-xs text-secondary-container font-medium mt-1">Ateka Milling Machine Gen 4</p>
+                    </div>
+                </div>
+                <!-- Conversion Rate -->
+                <div
+                    class="bg-surface-container-lowest p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5">
+                    <div class="flex justify-between items-start">
+                        <span
+                            class="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Efficiency</span>
+                        <div class="p-2 bg-surface-container-highest text-primary rounded-sm">
+                            <span class="material-symbols-outlined" data-icon="insights">insights</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-headline font-extrabold text-primary tracking-tighter">88%</h3>
+                        <p class="text-xs text-error font-medium mt-1 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">trending_down</span> -2% system latency
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Analytics Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Lead Acquisition Chart -->
+                <div class="lg:col-span-2 bg-surface-container-low rounded-lg p-8">
+                    <div class="flex justify-between items-center mb-10">
+                        <h4 class="text-lg font-bold text-primary flex items-center gap-2">
+                            <span class="w-1 h-6 bg-secondary-container"></span>
+                            Monthly Lead Acquisition
+                        </h4>
+                        <div class="flex gap-4 text-[10px] font-label font-bold text-outline">
+                            <span class="flex items-center gap-2"><span
+                                    class="w-2 h-2 bg-primary-container rounded-full"></span> QUALIFIED</span>
+                            <span class="flex items-center gap-2"><span
+                                    class="w-2 h-2 bg-secondary-container rounded-full"></span> RAW</span>
+                        </div>
+                    </div>
+                    <!-- Simplified Bar Chart CSS Layout -->
+                    <div class="h-64 flex items-end justify-between gap-4 px-4">
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 45%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 65%;"></div>
+                            </div>
+                            <span class="text-[10px] font-label text-outline uppercase">Jan</span>
+                        </div>
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 55%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 75%;"></div>
+                            </div>
+                            <span class="text-[10px] font-label text-outline uppercase">Feb</span>
+                        </div>
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 85%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 95%;"></div>
+                            </div>
+                            <span
+                                class="text-[10px] font-label text-outline uppercase text-primary font-bold">Mar</span>
+                        </div>
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 40%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 60%;"></div>
+                            </div>
+                            <span class="text-[10px] font-label text-outline uppercase">Apr</span>
+                        </div>
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 65%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 80%;"></div>
+                            </div>
+                            <span class="text-[10px] font-label text-outline uppercase">May</span>
+                        </div>
+                        <div class="w-full flex flex-col items-center gap-2">
+                            <div class="w-full bg-surface-container-highest relative flex items-end">
+                                <div class="w-full bg-primary-container rounded-t-sm" style="height: 75%;"></div>
+                                <div class="absolute bottom-0 w-full bg-secondary-container/40 rounded-t-sm"
+                                    style="height: 90%;"></div>
+                            </div>
+                            <span class="text-[10px] font-label text-outline uppercase">Jun</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Activity -->
+                <div class="bg-surface-container-low rounded-lg p-6 flex flex-col">
+                    <h4 class="text-lg font-bold text-primary mb-6">Recent Activity</h4>
+                    <div class="space-y-6 flex-1 overflow-y-auto pr-2">
+                        <!-- Activity Item -->
+                        <div class="flex gap-4 group">
+                            <div class="relative">
+                                <div
+                                    class="w-10 h-10 bg-secondary-fixed rounded-full flex items-center justify-center text-on-secondary-fixed shrink-0">
+                                    <span class="material-symbols-outlined text-xl">contact_page</span>
+                                </div>
+                                <div
+                                    class="absolute top-10 left-1/2 -translate-x-1/2 w-px h-full bg-outline-variant/30 group-last:hidden">
+                                </div>
+                            </div>
+                            <div class="pb-6">
+                                <p class="text-sm font-semibold text-primary">New Lead: PT. Sawah Makmur</p>
+                                <p class="text-xs text-on-surface-variant mt-1">Rice Mill inquiry - Gen 4 machinery spec
+                                    requested.</p>
+                                <span class="text-[10px] text-outline font-label uppercase mt-2 block">2 Minutes
+                                    Ago</span>
+                            </div>
+                        </div>
+                        <!-- Activity Item -->
+                        <div class="flex gap-4 group">
+                            <div class="relative">
+                                <div
+                                    class="w-10 h-10 bg-primary-fixed rounded-full flex items-center justify-center text-on-primary-fixed shrink-0">
+                                    <span class="material-symbols-outlined text-xl">verified</span>
+                                </div>
+                                <div
+                                    class="absolute top-10 left-1/2 -translate-x-1/2 w-px h-full bg-outline-variant/30 group-last:hidden">
+                                </div>
+                            </div>
+                            <div class="pb-6">
+                                <p class="text-sm font-semibold text-primary">Project Completed</p>
+                                <p class="text-xs text-on-surface-variant mt-1">Installation at Medan Facility
+                                    finalized.</p>
+                                <span class="text-[10px] text-outline font-label uppercase mt-2 block">1 Hour Ago</span>
+                            </div>
+                        </div>
+                        <!-- Activity Item -->
+                        <div class="flex gap-4 group">
+                            <div class="relative">
+                                <div
+                                    class="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center text-primary shrink-0">
+                                    <span class="material-symbols-outlined text-xl">edit_square</span>
+                                </div>
+                                <div
+                                    class="absolute top-10 left-1/2 -translate-x-1/2 w-px h-full bg-outline-variant/30 group-last:hidden">
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-primary">Blog Published</p>
+                                <p class="text-xs text-on-surface-variant mt-1">"Efficiency in Modern Rice Processing"
+                                </p>
+                                <span class="text-[10px] text-outline font-label uppercase mt-2 block">Yesterday</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        class="w-full mt-6 text-xs font-bold text-primary-container hover:text-secondary transition-colors uppercase tracking-widest text-center border-t border-outline-variant/20 pt-4">
+                        View All Activity
+                    </button>
+                </div>
+            </div>
+            <!-- Featured Product Slot (Specification Blueprint Concept) -->
+            <div class="bg-primary-container relative overflow-hidden rounded-lg min-h-[400px] flex items-center">
+                <!-- Background visual -->
+                <div class="absolute right-0 top-0 w-2/3 h-full opacity-20 pointer-events-none">
+                    <img alt="Technical Drawing Background" class="w-full h-full object-cover mix-blend-overlay"
+                        data-alt="high-tech technical blueprint overlaying industrial machinery components, sharp technical lines, desaturated navy blue palette"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtdNy3OfX3zStgDUwt4bpJcTpGNWnZwmB9phP5I66C8r9h4VBljrltVc15z4xcn1sqhGwGI6B093nqVfMSR58xe-XXUorwf5Y65VCgzoddmoCYA08AMX1F9-jdXzPDaSjmcgrswzpxld2CAjhIWUc-n4cDALMaFP-2uSosy95mIQ6gxzydYHAwTPAnmRoIVVOJ7FJgw_wji1siBrDxtdiwe7JvwFVk3Oc13tWGBVR0RkShqHIFrV5vdwhvfofdkdjoRh1EINIdD94" />
+                </div>
+                <div class="relative z-10 p-12 max-w-xl space-y-6">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">
+                        Product Spotlight
+                    </div>
+                    <h2 class="text-5xl font-headline font-extrabold text-white tracking-tighter leading-tight">
+                        Ateka Milling <br /> <span class="text-secondary-container">Generation 4</span>
+                    </h2>
+                    <p class="text-on-primary-container/80 text-lg leading-relaxed">
+                        Setting a new benchmark in efficiency with 99.8% precision husking and integrated IoT
+                        monitoring.
+                    </p>
+                    <div class="flex gap-8 pt-4">
+                        <div class="space-y-1">
+                            <span
+                                class="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Efficiency</span>
+                            <p class="text-xl font-bold text-white">+15.2%</p>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Leads
+                                Generated</span>
+                            <p class="text-xl font-bold text-white">412</p>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="space-y-1">
+                            <span
+                                class="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Status</span>
+                            <p class="text-xl font-bold text-secondary-container">High Demand</p>
+                        </div>
+                    </div>
+                    <button
+                        class="bg-white text-primary px-8 py-3 rounded-sm font-bold text-sm uppercase tracking-widest hover:bg-secondary-container hover:text-white transition-all transform hover:-translate-y-1">
+                        View Product Analytics
+                    </button>
+                </div>
+                <!-- Floating Hotspot chips (Asymmetric Design) -->
+                <div class="absolute top-20 right-40 z-20 space-y-20 hidden xl:block">
+                    <div
+                        class="bg-surface-container-lowest/10 backdrop-blur-md border border-white/20 p-3 rounded-sm flex items-center gap-3 animate-pulse">
+                        <div class="w-2 h-2 bg-secondary-container rounded-full"></div>
+                        <span class="text-[10px] font-label text-white uppercase tracking-tighter">Optical Sensors
+                            Ready</span>
+                    </div>
+                    <div
+                        class="bg-surface-container-lowest/10 backdrop-blur-md border border-white/20 p-3 rounded-sm flex items-center gap-3 translate-x-12">
+                        <div class="w-2 h-2 bg-secondary-container rounded-full"></div>
+                        <span class="text-[10px] font-label text-white uppercase tracking-tighter">Steel Alloy
+                            Integrity: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

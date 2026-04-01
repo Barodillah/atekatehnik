@@ -1,46 +1,28 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useState, useEffect } from 'react';
 
 const Portfolio = () => {
-  const { t } = useLanguage();
-  const projects = [
-    {
-      title: "PEMBUATAN RICEMILL BERAS GLOSOR SRAGEN",
-      img: "https://atekateknik.com/wp-content/uploads/2019/10/ateka-teknik-ricemill-2.jpg",
-      tag: "Sragen",
-      location: "Jawa Tengah"
-    },
-    {
-      title: "PEMBUATAN RICE MILL POLES SURAKARTA",
-      img: "https://atekateknik.com/wp-content/uploads/2019/10/ateka-teknik-ricemill-3.jpg",
-      tag: "Surakarta",
-      location: "Jawa Tengah"
-    },
-    {
-      title: "PEMBUATAN RICE MILL PREMIUM JAWA BARAT",
-      img: "https://atekateknik.com/wp-content/uploads/2020/12/Slide1-6.jpg",
-      tag: "Premium",
-      location: "Jawa Barat"
-    },
-    {
-      title: "PEMBUATAN RICE MILLING UNIT RMU PAKET PENGADAAN 1",
-      img: "https://atekateknik.com/wp-content/uploads/2020/12/Slide1-1.jpg",
-      tag: "Paket 1",
-      location: "Indonesia"
-    },
-    {
-      title: "PEMBUATAN RICE MILLING UNIT RMU PAKET PENGADAAN 2",
-      img: "https://atekateknik.com/wp-content/uploads/2020/07/Slide1.jpg",
-      tag: "Paket 2",
-      location: "Indonesia"
-    },
-    {
-      title: "PEMBUATAN RICE MILLING UNIT RMU PAKET PENGADAAN 3",
-      img: "https://atekateknik.com/wp-content/uploads/2020/07/Slide1-1.jpg",
-      tag: "Paket 3",
-      location: "Indonesia"
-    }
-  ];
+  const { t, lang } = useLanguage();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch(`/api/posts.php?lang=${lang}&limit=3`);
+        const data = await res.json();
+        if (data.success) {
+          setProjects(data.posts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects frontend", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, [lang]);
 
   return (
     <section className="py-24 bg-surface-container-low">
@@ -53,32 +35,44 @@ const Portfolio = () => {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {projects.slice(0, 3).map((project, idx) => (
-            <Link to="/post" key={idx} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
-              <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  alt={project.title} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                  src={project.img}
-                />
+          {loading ? (
+            <div className="col-span-full py-10 flex justify-center">
+              <span className="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
+            </div>
+          ) : projects.map((project) => (
+            <Link to={`/post/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
+              <div className="aspect-[4/3] overflow-hidden bg-surface-container">
+                {project.cover_image ? (
+                  <img 
+                    alt={project.title} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    src={project.cover_image}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-outline">
+                    <span className="material-symbols-outlined text-4xl">image</span>
+                  </div>
+                )}
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-4">
                   <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
-                    {project.tag}
+                    {project.category}
                   </span>
                   <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">
-                    {project.date || "2024"}
+                    {new Date(project.publish_date || project.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
                 <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">{project.title}</h3>
                 <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">
-                  {project.desc || "Modern agricultural processing facility installation with integrated technology."}
+                  {project.subtitle}
                 </p>
-                <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
-                  <span className="material-symbols-outlined text-sm">location_on</span>
-                  <span className="truncate">{project.location}</span>
-                </div>
+                {project.location && (
+                  <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                    <span className="material-symbols-outlined text-sm">location_on</span>
+                    <span className="truncate">{project.location}</span>
+                  </div>
+                )}
               </div>
             </Link>
           ))}

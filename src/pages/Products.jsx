@@ -1,8 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
 const Products = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
+
+    const [products, setProducts] = useState([]);
+    const [activeCategory, setActiveCategory] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    const categories = [
+        { value: '', label: t('products.catAll') || 'Semua Produk', icon: 'apps' },
+        { value: 'Paket', label: t('products.catPaketLengkap') || 'Paket Lengkap', icon: 'settings_input_component' },
+        { value: 'Suku Cadang', label: t('products.catSukuCadang') || 'Suku Cadang', icon: 'build' },
+    ];
+
+    const fetchProducts = async (kategori = '') => {
+        setIsLoading(true);
+        try {
+            const params = new URLSearchParams({ limit: '50' });
+            if (kategori) params.set('kategori', kategori);
+            const res = await fetch(`/api/products.php?${params}`);
+            const data = await res.json();
+            if (data.success) {
+                setProducts(data.products);
+            }
+        } catch {
+            // silent fail on public page
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts(activeCategory);
+    }, [activeCategory]);
+
+    const handleCategoryChange = (value) => {
+        setActiveCategory(value);
+    };
+
     return (
         <>
             {/* Hero Section */}
@@ -25,84 +62,109 @@ const Products = () => {
             {/* Category Selector */}
             <section className="bg-surface-container-low py-12 px-8">
                 <div className="max-w-7xl mx-auto flex flex-wrap gap-4">
-                    <button className="bg-primary-container text-white px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm">settings_input_component</span>
-                        {t('products.catRMU')}
-                    </button>
-                    <button className="bg-surface-container-highest text-primary-container px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2 hover:bg-secondary-fixed transition-colors">
-                        <span className="material-symbols-outlined text-sm">precision_manufacturing</span>
-                        {t('products.catComponents')}
-                    </button>
-                    <button className="bg-surface-container-highest text-primary-container px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2 hover:bg-secondary-fixed transition-colors">
-                        <span className="material-symbols-outlined text-sm">build</span>
-                        {t('products.catSupport')}
-                    </button>
+                    {categories.map((cat) => (
+                        <button
+                            key={cat.value}
+                            onClick={() => handleCategoryChange(cat.value)}
+                            className={`px-8 py-3 rounded-sm font-headline font-bold flex items-center gap-2 transition-colors cursor-pointer ${
+                                activeCategory === cat.value
+                                    ? 'bg-primary-container text-white'
+                                    : 'bg-surface-container-highest text-primary-container hover:bg-secondary-fixed'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-sm">{cat.icon}</span>
+                            {cat.label}
+                        </button>
+                    ))}
                 </div>
             </section>
 
             {/* Product Grid */}
             <main className="py-24 px-8 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    {/* Card 1 */}
-                    <div className="bg-surface-container-lowest group flex flex-col">
-                        <div className="relative h-80 overflow-hidden">
-                            <img alt="RMU Industri Menengah" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7kGv6387DtPvE3BbF8ekC7enYusDtIBYZfd-FQNiXMXQIbXgU46D9A_TaAVGj6fFXx1S-nTL0EzdJKCt1uehtYRGSqPTUokRsrOeCgOzJEeffob5G2mSnaq7I7XNLmQXWuOCIgkL0u7urXumsVICdfYVDFqYoNLPfOrPTSNnIqXuuMfqGtbOzucGZCumV6qPNuFJMGbv4WlKyrsyhGF_sHhAhgPmFHmCczldtmmY5vCx_IK2XzW78HTcNjg7tn_gwxDfq23bqJb4" />
-                            <div className="absolute top-4 left-4"><span className="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm">Premium Selection</span></div>
-                        </div>
-                        <div className="p-8 flex-grow flex flex-col">
-                            <h3 className="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU Industri Menengah</h3>
-                            <div className="space-y-4 mb-8 flex-1">
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span><span className="text-primary-container font-bold">1,5 - 2,0 Ton/Jam</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span><span className="text-primary-container font-bold">Diesel 40 HP</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span><span className="text-primary-container font-bold">4500 x 2200 x 3100</span></div>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <button className="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">{t('products.inquire')}</button>
-                                <button className="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline"><span className="material-symbols-outlined text-sm">download</span>{t('products.downloadSpec')}</button>
-                            </div>
-                        </div>
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <span className="material-symbols-outlined text-primary animate-spin text-4xl">progress_activity</span>
+                        <p className="text-sm text-on-surface-variant mt-3">{t('products.loading') || 'Memuat produk...'}</p>
                     </div>
-                    {/* Card 2 */}
-                    <div className="bg-surface-container-lowest group flex flex-col">
-                        <div className="relative h-80 overflow-hidden">
-                            <img alt="RMU Premium" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt5wy0SC04xwE8r-CLgGN0p4sObSZymo2yWTJgSikEXaF6PrUYUP5f-U4rtGQrSLYNNHHweqGg03Hjdca1huMh4I-A5bIV0mjNgAfKWuc92fXKWqqB_Ke8qNv0O5Q5ct-TsklrFmrdk2UQf-ZGORhupvTAZFniy8ngXDyRB26J-duZL4TviotMvMsRi16wMzE3E9Yp5APPdw8Jgvf4x2Rs6511zjtlVeM1TiRDXVCXRe8IpwWPDBrxPTKJePjJyAHYXgmao5GWphc" />
-                        </div>
-                        <div className="p-8 flex-grow flex flex-col">
-                            <h3 className="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU High-End Premium</h3>
-                            <div className="space-y-4 mb-8 flex-1">
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span><span className="text-primary-container font-bold">3,5 - 5,0 Ton/Jam</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span><span className="text-primary-container font-bold">Electric 75 kW</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span><span className="text-primary-container font-bold">8500 x 4000 x 5500</span></div>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <button className="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">{t('products.inquire')}</button>
-                                <button className="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline"><span className="material-symbols-outlined text-sm">download</span>{t('products.downloadSpec')}</button>
-                            </div>
-                        </div>
+                ) : products.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                        <span className="material-symbols-outlined text-5xl mb-3">inventory_2</span>
+                        <p className="text-lg font-bold">{t('products.noProducts') || 'Belum ada produk.'}</p>
                     </div>
-                    {/* Card 3 */}
-                    <div className="bg-surface-container-lowest group flex flex-col">
-                        <div className="relative h-80 overflow-hidden">
-                            <img alt="Mobile RMU" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXNGa6-b9O7Tms5Y_ysWilJX4LwqtLYUo94yf3ahYLxG_mzB4DVi9-opya88zcVTv1GYRWdypnAaNWhS_N7Jx0i9U7Vrzm_fQaYDzwgsMJ5-TXlIf8HiRIM2TQQmaWhHw_t9rekYoiPiqt5eYsjeQbmvoAltOYc2XpMBGh-yc5ssSV-7E3pOFC_1061rcSddYQXw-Zn9Q9EL1xVdJqwiBOGVDbltaVPA_R65uzDhw_ECoElmbCLzDZpf2m5o6qnx0xgSUiP72pHSM" />
-                            <div className="absolute top-4 left-4"><span className="bg-primary text-white px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm">Mobile Solution</span></div>
-                        </div>
-                        <div className="p-8 flex-grow flex flex-col">
-                            <h3 className="font-headline text-2xl font-extrabold text-primary-container mb-6">RMU Mobile Traktor</h3>
-                            <div className="space-y-4 mb-8 flex-1">
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Kapasitas</span><span className="text-primary-container font-bold">0,8 - 1,2 Ton/Jam</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Power</span><span className="text-primary-container font-bold">PTO / Diesel 24 HP</span></div>
-                                <div className="flex justify-between items-center py-2 border-b border-outline-variant/20"><span className="text-on-surface-variant font-label text-xs uppercase tracking-tighter">Dimensi</span><span className="text-primary-container font-bold">3200 x 1800 x 2400</span></div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        {products.map((product) => (
+                            <div key={product.id} className="bg-surface-container-lowest group flex flex-col">
+                                <div className="relative h-80 overflow-hidden">
+                                    {product.gambar ? (
+                                        <img
+                                            alt={product.nama}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            src={product.gambar}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-surface-container-highest flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-6xl text-outline">image</span>
+                                        </div>
+                                    )}
+                                    <div className="absolute top-4 left-4">
+                                        <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm ${
+                                            product.kategori === 'Paket'
+                                                ? 'bg-secondary-fixed text-on-secondary-fixed'
+                                                : 'bg-primary text-white'
+                                        }`}>
+                                            {product.kategori === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap') : product.kategori}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-8 flex-grow flex flex-col">
+                                    <Link to={`/product/${product.slug || product.id}`} className="hover:opacity-80 transition-opacity">
+                                        <h3 className="font-headline text-2xl font-extrabold text-primary-container mb-6">{product.nama}</h3>
+                                    </Link>
+                                    {product.spesifikasi && product.spesifikasi.length > 0 && (
+                                        <div className="space-y-4 mb-8 flex-1">
+                                            {product.spesifikasi.map((spec, i) => (
+                                                <div key={i} className="flex items-center gap-2 py-2 border-b border-outline-variant/20">
+                                                    <span className="material-symbols-outlined text-secondary text-sm">check_circle</span>
+                                                    <span className="text-primary-container font-medium text-sm">{spec}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <div className="flex flex-col gap-3 mt-auto">
+                                        <Link
+                                            to={`/product/${product.slug || product.id}`}
+                                            className="bg-surface-container-high text-primary-container py-3 font-headline font-bold text-sm tracking-tight hover:bg-surface-container-highest transition-colors text-center border border-outline-variant/20"
+                                        >
+                                            {lang === 'id' ? 'Lihat Detail' : 'View Detail'}
+                                        </Link>
+                                        {product.shopee_link ? (
+                                            <a
+                                                href={product.shopee_link}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors text-center flex items-center justify-center gap-2"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">shopping_bag</span>
+                                                {t('products.buyOnShopee') || 'Beli di Shopee'}
+                                            </a>
+                                        ) : (
+                                            <a
+                                                href={`https://wa.me/6288108063461?text=${encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.nama}. Bisa info lebih lanjut?`)}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors text-center flex items-center justify-center gap-2"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">chat</span>
+                                                {t('products.inquire')}
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-3">
-                                <button className="bg-primary-container text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-primary transition-colors">{t('products.inquire')}</button>
-                                <button className="text-secondary font-headline font-bold text-sm flex items-center justify-center gap-2 hover:underline"><span className="material-symbols-outlined text-sm">download</span>{t('products.downloadSpec')}</button>
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                </div>
+                )}
             </main>
 
             {/* Comparison Table */}
@@ -140,7 +202,7 @@ const Products = () => {
                         <div className="relative z-10">
                             <h3 className="text-white font-headline text-3xl font-extrabold mb-4">{t('products.spareParts')}</h3>
                             <p className="text-on-primary-container mb-6 max-w-sm">{t('products.spareDesc')}</p>
-                            <button className="bg-secondary-container text-on-secondary-container px-8 py-3 font-headline font-bold uppercase tracking-widest text-xs">{t('products.catalogDownload')}</button>
+                            <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noreferrer" className="bg-secondary-container text-on-secondary-container px-8 py-3 font-headline font-bold uppercase tracking-widest text-xs inline-block">{t('products.visitOfficialStore')}</a>
                         </div>
                     </div>
                     <div className="md:col-span-2 bg-surface-container-high p-8 flex flex-col justify-center">

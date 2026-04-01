@@ -33,7 +33,7 @@ const HeroSection = () => {
               <img
                 alt="Industrial Machinery"
                 className="w-full h-full object-cover mix-blend-multiply opacity-90"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWkg7S98AvUe_mO9EkZmakk1mEyKxQIvTgcVFrJhyauTjmSz-cO6RXJXLEin9V8ap-4XpR5Exx7yHVS4yiG6pPwsMS75o4pscHyCcm3oM8XGk7daOSJ1jttrh59RZjoZNKOmDIQSDTCNybiKYb3PzUMvQpHDycKARpwti5SdXJwpQjVInGEr-OWTUXX6XSO_C2wo6uY9VeMcbf8kJyyTWUdqxRnIKb01otat--toe8otwwFobOOSfU5ITTem54BzSUWkP-TYmgV0s"
+                src="https://atekatehnik.com/wp-content/uploads/gambar_hero_ai.jpeg"
               />
             </div>
             <div className="absolute -bottom-6 -left-6 bg-primary-container text-white p-6 rounded-sm shadow-xl hidden md:block">

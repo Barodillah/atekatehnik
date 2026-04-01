@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Product Management | Ateka Tehnik</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-tertiary-container": "#ca745c",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "surface-tint": "#465c99",
+                        "secondary": "#904d00",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#7389ca",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "primary-fixed": "#dbe1ff",
+                        "on-surface": "#191c1d",
+                        "on-tertiary-fixed": "#3b0900",
+                        "surface-container-low": "#f3f4f5",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-surface-variant": "#444650",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#00184a",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface-variant": "#e1e3e4",
+                        "outline": "#757681",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#b3c5ff",
+                        "tertiary": "#240400",
+                        "primary": "#000c2e",
+                        "on-secondary-fixed": "#2f1500",
+                        "tertiary-container": "#481002",
+                        "secondary-container": "#ffa454",
+                        "tertiary-fixed": "#ffdbd1",
+                        "on-secondary-container": "#713b00",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#76321f",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body antialiased">
+    <!-- SideNavBar -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 dark:bg-slate-950 border-r border-blue-900/50 shadow-2xl flex flex-col h-full py-6">
+        <div class="px-6 mb-8">
+            <h1 class="text-lg font-extrabold text-white tracking-tighter uppercase">Ateka Industrial Logo</h1>
+            <p class="font-inter text-sm font-medium tracking-wide text-orange-400">Engineering Precision</p>
+        </div>
+        <nav class="flex-1 px-2 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Customer Leads</span>
+            </a>
+            <!-- Active Tab: Product Management -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-blue-900 text-orange-400 rounded-sm border-l-4 border-orange-400 font-inter text-sm font-medium tracking-wide cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined"
+                    data-icon="precision_manufacturing">precision_manufacturing</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Product Management</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Blog Posts</span>
+            </a>
+        </nav>
+        <div class="mt-auto px-2 border-t border-blue-900/30 pt-4">
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="help">help</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Support</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Sign Out</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content Area -->
+    <main class="ml-64 min-h-screen">
+        <!-- TopAppBar -->
+        <header
+            class="w-full h-16 sticky top-0 z-40 bg-slate-50 dark:bg-slate-900 shadow-sm dark:shadow-none flex justify-between items-center px-6">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                        <span class="material-symbols-outlined text-sm">search</span>
+                    </span>
+                    <input
+                        class="pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-sm text-sm focus:ring-2 focus:ring-secondary/50 w-64 transition-all"
+                        placeholder="Search inventory..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <button
+                        class="p-2 text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer active:opacity-80 rounded-sm">
+                        <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                    </button>
+                    <button
+                        class="p-2 text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer active:opacity-80 rounded-sm">
+                        <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    </button>
+                </div>
+                <div class="h-8 w-8 bg-primary-container rounded-sm overflow-hidden border border-outline-variant/20">
+                    <img alt="Administrator Profile" class="w-full h-full object-cover"
+                        data-alt="Close-up portrait of a professional industrial administrator in a clean office environment with neutral lighting"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5X2yU1dd2I-u7VpGdSXfKyBZzo6aH7Z1DZKkugXxaVsTpkMUD9f_v6vVMftlTETT2R7QZH3Arf0s2wgWWu6uPR_f5CSQgDOUHZxKor5_YL_-kuro0CsDfhXSLZqjwfZmwMsKB-xhzT-qc0AZ-xRM77zHepWBrNfGXtUvaKcMZeL3QVh2NzjaXZGb6TpDLNARf55SGNuwr0_6yxVs8Nduw2HCfOmKKzDUKm2hgSvcgcGZFEXcy4JkQfiGIfxwKKw4epIRZjuwP6Dw" />
+                </div>
+            </div>
+        </header>
+        <!-- Canvas Content -->
+        <section class="p-8">
+            <!-- Page Header Asymmetric Layout -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <span
+                        class="font-label text-xs tracking-widest text-secondary uppercase font-bold mb-2 block">Inventory
+                        Control</span>
+                    <h2 class="font-headline text-4xl font-extrabold text-primary tracking-tight leading-none mb-4">
+                        Product Management</h2>
+                    <p class="text-on-surface-variant max-w-lg leading-relaxed">Configure and monitor the Ateka Tehnik
+                        industrial rice milling units. Manage technical specifications, inventory status, and regional
+                        pricing tiers from a central control hub.</p>
+                </div>
+                <div>
+                    <button
+                        class="bg-primary-container text-on-primary px-6 py-3 rounded-sm font-label font-bold flex items-center gap-2 shadow-sm hover:brightness-110 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                        New Entry
+                    </button>
+                </div>
+            </div>
+            <!-- Dashboard Stats Tonal Layers (No Borders) -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
+                <div class="bg-surface-container-low p-6 rounded-sm">
+                    <p class="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Units
+                    </p>
+                    <p class="text-3xl font-headline font-bold text-primary">1,284</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm">
+                    <p class="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Active
+                        Listings</p>
+                    <p class="text-3xl font-headline font-bold text-primary">86</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm">
+                    <p class="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Pending Sync
+                    </p>
+                    <p class="text-3xl font-headline font-bold text-secondary">12</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm border-l-4 border-secondary">
+                    <p class="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Avg Lead
+                        Time</p>
+                    <p class="text-3xl font-headline font-bold text-primary">14 Days</p>
+                </div>
+            </div>
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                <!-- Product Card 1 -->
+                <div class="group bg-surface-container-lowest transition-all">
+                    <div class="aspect-[16/10] bg-surface-container-highest overflow-hidden relative">
+                        <img alt="RMU Industrial Machine"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="High-precision industrial rice milling machine with polished stainless steel surfaces in a clean factory setting"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA55gz3w2kLxZ8HenFBDgZV7HavrAcBiL2IqkJhW2sRF4qcEkw9g8OakQBqhFAaO_UQdZH1RIh0q9NkKkDYG3ABRddYbMja4O8r97P5_ERXltzBcwq-yirxCgJIj8n8xbhKKoTB8gdW_l21P3yUmg560Hmm6TQ1gy1ohPxBijCEDB5CnxWDGf84nIOBB8P-ICucKEJwHVjpxOmzzzlBOFu6CfnyJX42KH4fPtHscUJrluYrhUJxCFsmXhQBKMexEnkWma_Gqlvq8EA" />
+                        <div
+                            class="absolute top-4 left-4 bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter">
+                            New Model</div>
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-label text-[10px] text-secondary font-bold uppercase tracking-widest">RMU
+                                    Series</p>
+                                <h3 class="font-headline text-xl font-bold text-primary">Titan-V Rice Mill 2000</h3>
+                            </div>
+                            <span class="font-headline font-bold text-primary-container">$12,450.00</span>
+                        </div>
+                        <div class="flex gap-6 py-4">
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Capacity</p>
+                                <p class="text-sm font-semibold">2.5 Tons/Hr</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Power</p>
+                                <p class="text-sm font-semibold">45kW / 3-Phase</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Status</p>
+                                <p class="text-sm font-semibold text-green-700">In Stock</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                            <button
+                                class="flex-1 py-2 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">Edit</button>
+                            <button
+                                class="px-4 py-2 text-error hover:bg-error-container/30 transition-colors rounded-sm">
+                                <span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 2 -->
+                <div class="group bg-surface-container-lowest transition-all">
+                    <div class="aspect-[16/10] bg-surface-container-highest overflow-hidden relative">
+                        <img alt="Industrial Sifter"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="Modern high-tech industrial grain separator and sifter with chrome finishes and digital control panel"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7P034cbLjlq-E1DOUa4fFG9MfUgCsxy0g_z1-xgx5uk_LdTLaR7qHYt3NVqS8c8I_mU4Q0BoG55tWqkL_Ng7ZpZ-k1g48GaamWJskvZiCfl7ygVjjINHvAfJMQLeE02N7D5oF_r0t953nWE1p2DT5M0PfjMGGdTbk46CFG2O48zmpEBwwdvTDg7sUIsF8Si0iSEFJLaUMs-HCSRhxgzQ3JFCKHMyJyPEsW784I4QWwmQBYfNzk8dHsNI1R5bYUsEu1IlXnfjhWBk" />
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-label text-[10px] text-secondary font-bold uppercase tracking-widest">
+                                    Processing</p>
+                                <h3 class="font-headline text-xl font-bold text-primary">Ultra-Sift Precision G7</h3>
+                            </div>
+                            <span class="font-headline font-bold text-primary-container">$8,900.00</span>
+                        </div>
+                        <div class="flex gap-6 py-4">
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Efficiency</p>
+                                <p class="text-sm font-semibold">99.8% Grade</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Footprint</p>
+                                <p class="text-sm font-semibold">2.4m x 1.8m</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Status</p>
+                                <p class="text-sm font-semibold text-secondary">Backorder</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                            <button
+                                class="flex-1 py-2 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">Edit</button>
+                            <button
+                                class="px-4 py-2 text-error hover:bg-error-container/30 transition-colors rounded-sm">
+                                <span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 3 -->
+                <div class="group bg-surface-container-lowest transition-all">
+                    <div class="aspect-[16/10] bg-surface-container-highest overflow-hidden relative">
+                        <img alt="Mobile Milling Unit"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="Heavy-duty mobile rice milling unit mounted on a reinforced steel chassis for remote agricultural operations"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiYwz9t0ML4zCii0apHFCwZba70NC_LKTdlEMl_JqX_ubsrKdsojnj4E9EQ6Qa1RNmRM3qE_MNURgIGM3KEKY0ox5ZET4F8NtdL71fYP0bZmXWSct7Pb0_tt5wpG_rRvKpZmuL7SA2pC_l_IsOqMTFznSRn7rPZCCGqYIZ3Jz9VJGfNxI4-Rd_zGnTQcLRg17lngy1MlnYytLPhyp4gxzBK1HwFft78Qwz_SiPDUs3q30WQ1f0MrMio6IJUb_SGkCVSxYu0bGCLkk" />
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-label text-[10px] text-secondary font-bold uppercase tracking-widest">
+                                    Mobile Units</p>
+                                <h3 class="font-headline text-xl font-bold text-primary">Flex-Mill Mobile Pro</h3>
+                            </div>
+                            <span class="font-headline font-bold text-primary-container">$15,200.00</span>
+                        </div>
+                        <div class="flex gap-6 py-4">
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Mobility</p>
+                                <p class="text-sm font-semibold">Tractor Hitch</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Diesel</p>
+                                <p class="text-sm font-semibold">Turbo-Direct</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Status</p>
+                                <p class="text-sm font-semibold text-green-700">In Stock</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                            <button
+                                class="flex-1 py-2 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">Edit</button>
+                            <button
+                                class="px-4 py-2 text-error hover:bg-error-container/30 transition-colors rounded-sm">
+                                <span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 4 -->
+                <div class="group bg-surface-container-lowest transition-all">
+                    <div class="aspect-[16/10] bg-surface-container-highest overflow-hidden relative">
+                        <img alt="Dryer Unit"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="Massive industrial grain drying silo with heat exchangers and intricate piping systems"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXDgsW84vQIEkPkISnMKctLpTSOzb4jb8btaNm82rme0RKK9vSNpFyuwrbH3yQfWUQae8xGIFw2S-hyPZjKG4R7btTRrLt0X5jqpDkVkpVmLXe88C_wTH1roM_3ZaDTGEydKHhZqT2-79fF_nHYeZcXTESUUg8QI_ybTaqzc0USwYKwFrURs19Jmim8Ktrx4pnuF0IGFsdD6IOkK64Q2WKTT0QjAmDghryrSRwM7zEpqInGoDkZjWzgkuvG4V2tu0GO1KPGxUXU8I" />
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-label text-[10px] text-secondary font-bold uppercase tracking-widest">
+                                    Drying</p>
+                                <h3 class="font-headline text-xl font-bold text-primary">Heat-Flow Silo DX5</h3>
+                            </div>
+                            <span class="font-headline font-bold text-primary-container">$22,000.00</span>
+                        </div>
+                        <div class="flex gap-6 py-4">
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Volume</p>
+                                <p class="text-sm font-semibold">5000 Liters</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Temp</p>
+                                <p class="text-sm font-semibold">Up to 85°C</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Status</p>
+                                <p class="text-sm font-semibold text-green-700">In Stock</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                            <button
+                                class="flex-1 py-2 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">Edit</button>
+                            <button
+                                class="px-4 py-2 text-error hover:bg-error-container/30 transition-colors rounded-sm">
+                                <span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Empty State / Add New Placeholder Card -->
+                <div
+                    class="border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-12 hover:bg-surface-container transition-colors cursor-pointer group">
+                    <div
+                        class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-container group-hover:text-on-primary transition-all">
+                        <span class="material-symbols-outlined text-3xl" data-icon="add_circle">add_circle</span>
+                    </div>
+                    <p class="font-headline font-bold text-primary">Register New Machine</p>
+                    <p class="text-xs text-on-surface-variant mt-2">Upload specs and high-res imagery</p>
+                </div>
+            </div>
+            <!-- Pagination / Footer Controls -->
+            <div class="mt-16 pt-8 border-t border-outline-variant/10 flex justify-between items-center">
+                <p class="text-xs font-label uppercase tracking-widest text-outline">Displaying 5 of 86 products</p>
+                <div class="flex gap-2">
+                    <button
+                        class="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all">
+                        <span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center bg-primary-container text-on-primary rounded-sm shadow-md">1</button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all">2</button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all">3</button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all">
+                        <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

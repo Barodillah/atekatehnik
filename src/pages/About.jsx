@@ -98,7 +98,7 @@ const About = () => {
             </section>
 
             {/* Leadership */}
-            <section className="bg-surface-container-low py-24">
+            {/* <section className="bg-surface-container-low py-24">
                 <div className="max-w-7xl mx-auto px-8">
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
                         <h2 className="text-4xl font-headline font-bold text-primary tracking-tight">{t('about.leadershipTitle')}</h2>
@@ -137,7 +137,7 @@ const About = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Certifications */}
             <section className="bg-surface py-24">

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Blog Management | Ateka Tehnik</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-tertiary-container": "#ca745c",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "surface-tint": "#465c99",
+                        "secondary": "#904d00",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#7389ca",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "primary-fixed": "#dbe1ff",
+                        "on-surface": "#191c1d",
+                        "on-tertiary-fixed": "#3b0900",
+                        "surface-container-low": "#f3f4f5",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#001f5b",
+                        "outline-variant": "#c5c6d1",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-surface-variant": "#444650",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#00184a",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface-variant": "#e1e3e4",
+                        "outline": "#757681",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#b3c5ff",
+                        "tertiary": "#240400",
+                        "primary": "#000c2e",
+                        "on-secondary-fixed": "#2f1500",
+                        "tertiary-container": "#481002",
+                        "secondary-container": "#ffa454",
+                        "tertiary-fixed": "#ffdbd1",
+                        "on-secondary-container": "#713b00",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#76321f",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface">
+    <!-- SideNavBar Component -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 dark:bg-slate-950 border-r border-blue-900/50 flex flex-col h-full py-6 shadow-2xl">
+        <div class="px-6 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-secondary flex items-center justify-center rounded-sm">
+                    <span class="material-symbols-outlined text-white"
+                        style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-extrabold text-white tracking-tighter uppercase">Industrial Admin</h2>
+                    <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Engineering Precision
+                    </p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Customer Leads</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined"
+                    data-icon="precision_manufacturing">precision_manufacturing</span>
+                <span class="font-inter text-sm font-medium tracking-wide">Product Management</span>
+            </a>
+            <!-- Active Tab: Blog Posts -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-blue-900 text-orange-400 rounded-sm border-l-4 border-orange-400 font-inter text-sm font-medium tracking-wide cursor-pointer active:opacity-80 scale-95 duration-150"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                <span>Blog Posts</span>
+            </a>
+        </nav>
+        <div class="px-6 mt-auto">
+            <button
+                class="w-full py-3 bg-secondary text-white font-bold rounded-sm text-sm tracking-wide hover:bg-secondary-container transition-colors shadow-lg shadow-black/20">
+                New Entry
+            </button>
+            <div class="mt-8 pt-6 border-t border-blue-900/50 space-y-1">
+                <a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs font-medium"
+                    href="#">
+                    <span class="material-symbols-outlined text-sm" data-icon="help">help</span>
+                    <span>Support</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs font-medium"
+                    href="#">
+                    <span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Content Canvas -->
+    <main class="ml-64 min-h-screen">
+        <!-- TopAppBar Component -->
+        <header
+            class="w-full h-16 sticky top-0 z-40 bg-slate-50 dark:bg-slate-900 shadow-sm dark:shadow-none flex justify-between items-center px-6">
+            <div class="flex items-center gap-4">
+                <div class="relative group">
+                    <input
+                        class="bg-surface-container-low border-none rounded-sm py-2 pl-10 pr-4 text-sm w-64 focus:ring-2 focus:ring-secondary/50 transition-all"
+                        placeholder="Search blog posts..." type="text" />
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <button class="p-2 text-slate-500 hover:bg-slate-200 transition-colors rounded-full">
+                        <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                    </button>
+                    <button class="p-2 text-slate-500 hover:bg-slate-200 transition-colors rounded-full">
+                        <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    </button>
+                </div>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-blue-900">Administrator</p>
+                        <p class="text-[10px] text-slate-500">Super User</p>
+                    </div>
+                    <img alt="Administrator Profile" class="w-10 h-10 rounded-full object-cover border border-slate-200"
+                        data-alt="professional portrait of a middle-aged male administrator in a clean office setting, soft corporate lighting"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYpqqlhIrmUiYcMTvBHE1ZpGszsD0JQ62_ysAxe0bPcVVmQe5Qelluub7akqf3cqw4AbD4BdFxrhzcLXYK718z4Tr-tu0Sbd7N8G-wRPYuvIAxhYac0OMIPadLCSkv_YovglGbg69iHFgG5EWs-lEQMndnt-5fvhm4nYMLLDX6TBd84knU06E1O8bhKL8tRXKjSGwbcTnW3Ah99xtrGIitFqbX9VWMesOuQhthRuXRzpmVp8SEwClFNbE-iamtdUlMrucaKN6n9No" />
+                </div>
+            </div>
+        </header>
+        <!-- CMS Content -->
+        <div class="p-8 max-w-7xl mx-auto">
+            <!-- Hero Header Section -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div class="space-y-2">
+                    <span class="text-secondary font-bold text-xs tracking-widest uppercase">Content Management</span>
+                    <h1 class="text-4xl font-extrabold text-primary tracking-tight">Article Repository</h1>
+                    <p class="text-on-surface-variant max-w-lg">Manage your industrial insights, project installations,
+                        and technical maintenance guides for the Ateka Tehnik audience.</p>
+                </div>
+                <button
+                    class="flex items-center gap-2 bg-primary-container text-white px-6 py-3 rounded-sm font-bold shadow-md hover:translate-y-[-1px] transition-all">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+                    <span>Create New Post</span>
+                </button>
+            </div>
+            <!-- Dashboard Stats Tonal Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                <div class="bg-surface-container-lowest p-6 rounded-sm border-b-2 border-primary-container shadow-sm">
+                    <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Total Posts</p>
+                    <p class="text-3xl font-extrabold text-primary">124</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm shadow-sm">
+                    <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Published</p>
+                    <p class="text-3xl font-extrabold text-primary">98</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm shadow-sm">
+                    <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Drafts</p>
+                    <p class="text-3xl font-extrabold text-secondary">26</p>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-sm shadow-sm">
+                    <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Total Views</p>
+                    <p class="text-3xl font-extrabold text-primary">12.8k</p>
+                </div>
+            </div>
+            <!-- Blog List: Industrial Zebra Style -->
+            <div class="bg-surface-container-lowest rounded-sm shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-surface-container-high text-on-surface-variant">
+                                <th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Title &amp; Category
+                                </th>
+                                <th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Author</th>
+                                <th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Date</th>
+                                <th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Status</th>
+                                <th class="px-6 py-4 font-bold text-xs uppercase tracking-widest text-right">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-container-low">
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-12 h-12 bg-surface-container rounded-sm overflow-hidden flex-shrink-0">
+                                            <img alt="Project Installation" class="w-full h-full object-cover"
+                                                data-alt="industrial rice milling machinery installation in a clean factory setting with steel pipes and blue structural beams"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIAP3gpU1oE1zK5hVEfcdyGbEiJVntLCbvflBR5avavH2Lt42CwF0S3jiSBWdbEQ8z7NaDLwKyWJNDYVNLhPWAItf9CZlAHuzD4avz6VOMnCuBuJpHG4Y9SSJuoqkT67WctGKCeKbU60nlnuAmbqlzKzkVY5uHmqyadSNjs8LtTdTsmbNCVDNHX8OAULLCHR0Pp7wwJR3DT-G5745bQMNJFD4uSHPMZWh7jXhYD0ktVyt6OJkcTCd8K94MzPelJSwKNL5NItdSb2s" />
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="font-bold text-primary group-hover:text-secondary transition-colors">
+                                                Modernizing Rice Milling: The RM-500 Installation</p>
+                                            <span
+                                                class="text-[10px] bg-primary-container/10 text-primary px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Project
+                                                Installation</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm text-on-surface-variant font-medium">Budi Santoso</td>
+                                <td class="px-6 py-5 text-sm text-outline">Oct 24, 2023</td>
+                                <td class="px-6 py-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-[11px] font-bold uppercase tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                        Published
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl"
+                                                data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr
+                                class="bg-surface-container-low/30 hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-12 h-12 bg-surface-container rounded-sm overflow-hidden flex-shrink-0 text-center flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-outline">image</span>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="font-bold text-primary group-hover:text-secondary transition-colors">
+                                                5 Essential Maintenance Tips for Diesel Engines</p>
+                                            <span
+                                                class="text-[10px] bg-secondary-container/20 text-secondary px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Maintenance
+                                                Tips</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm text-on-surface-variant font-medium">Siti Aminah</td>
+                                <td class="px-6 py-5 text-sm text-outline">Nov 02, 2023</td>
+                                <td class="px-6 py-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-[11px] font-bold uppercase tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                        Draft
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl"
+                                                data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-12 h-12 bg-surface-container rounded-sm overflow-hidden flex-shrink-0">
+                                            <img alt="Technical Specs" class="w-full h-full object-cover"
+                                                data-alt="close up of heavy duty gears and mechanical parts with oil sheen and high detail lighting"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRcSEuO-f6Q9z7E-2Lbuu6WyvaQOy883L6koDbNyKEPBTWULjWV4BhXBqHapZthtlfgK4Yq7hiFw1UM0jgvuUPfFZHYbxy56G_p8qM6p5TwS67PuG0mV0WKq1vQmkcMFIZRZecpsw5tJCbWWl6cAHeJ1WKyupaQEvfEpJskjsE4tCpGfxS6rWvsZFIbJk0UVfDnpm8q1PeKfvGdqTgN8lVSCBjhwqHZ2FrDJ-4_2JDydAlVUCknq-z67mns_EgBVPFMba1KM8VztY" />
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="font-bold text-primary group-hover:text-secondary transition-colors">
+                                                Efficiency Benchmarks for Late 2023 Hullers</p>
+                                            <span
+                                                class="text-[10px] bg-primary-container/10 text-primary px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Product
+                                                News</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm text-on-surface-variant font-medium">Admin</td>
+                                <td class="px-6 py-5 text-sm text-outline">Oct 15, 2023</td>
+                                <td class="px-6 py-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-[11px] font-bold uppercase tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                        Published
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl"
+                                                data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button
+                                            class="p-2 hover:bg-surface-container-highest rounded-sm transition-colors text-outline hover:text-primary">
+                                            <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Industrial Pagination -->
+                <div class="p-4 bg-surface-container-low flex items-center justify-between">
+                    <p class="text-xs text-outline font-medium tracking-tight">Showing 1 to 3 of 124 articles</p>
+                    <div class="flex items-center gap-1">
+                        <button
+                            class="p-2 bg-surface-container-highest text-primary-container rounded-sm hover:bg-white transition-all disabled:opacity-50"
+                            disabled="">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-sm">1</button>
+                        <button
+                            class="px-3 py-1 bg-surface-container-highest text-primary text-xs font-bold rounded-sm hover:bg-white transition-all">2</button>
+                        <button
+                            class="px-3 py-1 bg-surface-container-highest text-primary text-xs font-bold rounded-sm hover:bg-white transition-all">3</button>
+                        <button
+                            class="p-2 bg-surface-container-highest text-primary-container rounded-sm hover:bg-white transition-all">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Contextual CTA / Footer Info -->
+            <div
+                class="mt-16 bg-primary-container p-8 rounded-sm text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-extrabold mb-2">Need to announce a new project?</h3>
+                    <p class="text-blue-200 text-sm max-w-md">Our documentation standards ensure every installation is
+                        featured with technical precision. Use the pre-built templates for consistency.</p>
+                </div>
+                <div class="flex gap-4 relative z-10">
+                    <button
+                        class="px-6 py-3 border-2 border-white/20 hover:bg-white/10 transition-colors rounded-sm text-sm font-bold uppercase tracking-widest">Download
+                        Templates</button>
+                    <button
+                        class="px-6 py-3 bg-secondary text-white rounded-sm text-sm font-bold uppercase tracking-widest hover:bg-secondary-container shadow-lg">New
+                        Post</button>
+                </div>
+                <!-- Decorative BG Texture -->
+                <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+                    <span class="material-symbols-outlined text-[200px]" data-icon="edit_note"
+                        style="font-variation-settings: 'wght' 200;">edit_note</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

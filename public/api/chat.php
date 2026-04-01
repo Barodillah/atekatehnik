@@ -27,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // ── Configuration ────────────────────────────────────────────────────
 // PENTING: Ganti dengan API key Anda
-$OPENROUTER_API_KEY = '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';
-$OPENROUTER_MODEL   = 'google/gemini-2.5-flash-lite';
-$MAX_TOKENS         = 1024;
-$TEMPERATURE        = 0.7;
+$OPENROUTER_API_KEY = 'sk';
+$OPENROUTER_MODEL = 'google/gemini-2.5-flash-lite';
+$MAX_TOKENS = 1024;
+$TEMPERATURE = 0.7;
 
 // ── Rate Limiting (simple session-based) ─────────────────────────────
 session_start();
@@ -68,31 +68,31 @@ if (!$input || !isset($input['messages']) || !is_array($input['messages'])) {
 // Sanitize messages (only allow role + content)
 $messages = array_map(function ($msg) {
     return [
-        'role'    => in_array($msg['role'], ['system', 'user', 'assistant']) ? $msg['role'] : 'user',
+        'role' => in_array($msg['role'], ['system', 'user', 'assistant']) ? $msg['role'] : 'user',
         'content' => substr(trim($msg['content'] ?? ''), 0, 10000), // limit content length
     ];
 }, $input['messages']);
 
 // ── Call OpenRouter API ──────────────────────────────────────────────
 $payload = json_encode([
-    'model'       => $OPENROUTER_MODEL,
-    'messages'    => $messages,
-    'max_tokens'  => $MAX_TOKENS,
+    'model' => $OPENROUTER_MODEL,
+    'messages' => $messages,
+    'max_tokens' => $MAX_TOKENS,
     'temperature' => $TEMPERATURE,
 ]);
 
 $ch = curl_init('https://openrouter.ai/api/v1/chat/completions');
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => $payload,
-    CURLOPT_HTTPHEADER     => [
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => $payload,
+    CURLOPT_HTTPHEADER => [
         'Authorization: Bearer ' . $OPENROUTER_API_KEY,
         'Content-Type: application/json',
         'HTTP-Referer: ' . ($_SERVER['HTTP_ORIGIN'] ?? $_SERVER['HTTP_HOST'] ?? 'https://atekateknik.com'),
         'X-Title: Ateka Tehnik AI Assistant',
     ],
-    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_TIMEOUT => 30,
     CURLOPT_SSL_VERIFYPEER => true,
 ]);
 
