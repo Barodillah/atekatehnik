@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { formatAdminDateTime } from '../../utils/dateUtils';
 
 const Analytics = () => {
   const { authFetch } = useAuth();
@@ -151,7 +152,7 @@ const Analytics = () => {
                       <span className="text-sm font-bold text-on-surface">{p.unique_ips}</span>
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-on-surface-variant whitespace-nowrap">
-                      {p.last_view ? new Date(p.last_view).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                      {p.last_view ? formatAdminDateTime(p.last_view) : '—'}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <span className="material-symbols-outlined text-on-surface-variant text-lg">{selectedSlug === p.slug ? 'expand_less' : 'expand_more'}</span>
@@ -242,7 +243,7 @@ const Analytics = () => {
                       <td className="px-4 py-2.5">{v.country || '—'}</td>
                       <td className="px-4 py-2.5">{v.city || '—'}</td>
                       <td className="px-4 py-2.5 max-w-[150px] truncate text-xs text-on-surface-variant" title={v.referrer}>{v.referrer || '—'}</td>
-                      <td className="px-4 py-2.5 whitespace-nowrap">{new Date(v.viewed_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                      <td className="px-4 py-2.5 whitespace-nowrap">{formatAdminDateTime(v.viewed_at)}</td>
                     </tr>
                   ))}
                 </tbody>

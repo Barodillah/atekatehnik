@@ -265,6 +265,40 @@ const translations = {
     "channels.fakeWebNote": "Menggunakan huruf 'k' - BUKAN KAMI",
     "channels.fakeWebVisit": "Kunjungi",
     "channels.backHome": "Kembali ke Beranda",
+
+    // Privacy Policy
+    "privacy.title": "Kebijakan Privasi",
+    "privacy.lastUpdated": "Terakhir diperbarui: 2 April 2026",
+    "privacy.intro": "CV Ateka Tehnik (\"kami\", \"kita\", atau \"milik kami\") mengoperasikan situs web atekatehnik.com dan layanan terkait (\"Layanan\"). Halaman ini memberi tahu Anda tentang kebijakan kami terkait pengumpulan, penggunaan, dan pengungkapan data pribadi saat Anda menggunakan Layanan kami serta pilihan yang telah Anda kaitkan dengan data tersebut.",
+    "privacy.infoCollectionLabel": "1. Pengumpulan dan Penggunaan Informasi",
+    "privacy.infoCollectionDesc": "Kami mengumpulkan beberapa jenis informasi untuk berbagai tujuan dalam menyediakan dan meningkatkan Layanan kami kepada Anda. Informasi ini dapat mencakup Nama, Alamat Email, Nomor Telepon (termasuk WhatsApp), Alamat Pengiriman (seperti untuk pemesanan), dan Data Penggunaan Situs.",
+    "privacy.useDataLabel": "2. Penggunaan Data",
+    "privacy.useDataDesc": "CV Ateka Tehnik menggunakan data yang dikumpulkan untuk berbagai tujuan: menyediakan dan memelihara Layanan, memberi tahu Anda tentang perubahan Layanan, memberikan dukungan dan konsultasi teknis pelanggan (seperti pertanyaan seputar RMU), memfasilitasi transaksi melalui LKPP atau e-katalog, dan memantau penggunaan Layanan.",
+    "privacy.transferDataLabel": "3. Transfer Data",
+    "privacy.transferDataDesc": "Sistem informasi kami berpusat di Indonesia. Dengan menggunakan layanan kami, Anda menyetujui pemrosesan data di Indonesia sesuai dengan regulasi setempat. Kami akan mengambil langkah wajar untuk memastikan bahwa data Anda diperlakukan secara aman.",
+    "privacy.disclosureLabel": "4. Pengungkapan Data",
+    "privacy.disclosureDesc": "Kami dapat mengungkapkan Data Pribadi Anda dengan itikad baik bahwa tindakan tersebut diperlukan untuk: mematuhi kewajiban hukum, melindungi dan membela hak atau properti CV Ateka Tehnik, atau mencegah/menyelidiki kesalahan terkait Layanan.",
+    "privacy.securityLabel": "5. Keamanan Data",
+    "privacy.securityDesc": "Keamanan data Anda penting bagi kami. Meskipun tidak ada metode transmisi di Internet yang 100% aman, kami berupaya menggunakan cara-cara yang diterima secara komersial untuk melindungi Data Pribadi Anda.",
+    "privacy.contactLabel": "6. Hubungi Kami",
+    "privacy.contactDesc": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami via WhatsApp atau di kantor pusat kami di Dusun Gondang, RT 02 RW 01, Desa Kedungjeruk, Kec. Mojogedang, Kabupaten Karanganyar, Jawa Tengah.",
+
+    // Terms of Service
+    "terms.title": "Syarat Layanan",
+    "terms.lastUpdated": "Terakhir diperbarui: 2 April 2026",
+    "terms.intro": "Harap baca Syarat Layanan (\"Syarat\", \"Syarat Layanan\") ini dengan cermat sebelum menggunakan situs web atekatehnik.com (\"Layanan\") yang dioperasikan oleh CV Ateka Tehnik.",
+    "terms.acceptanceLabel": "1. Penerimaan Syarat",
+    "terms.acceptanceDesc": "Akses Anda ke dan penggunaan Layanan kami dikondisikan pada penerimaan dan kepatuhan Anda terhadap Syarat ini. Syarat ini berlaku untuk semua pengunjung, pengguna, dan orang lain yang mengakses Layanan.",
+    "terms.servicesLabel": "2. Layanan Konsultasi & Penjualan",
+    "terms.servicesDesc": "CV Ateka Tehnik menyediakan jasa manufaktur, instalasi, dan konsultasi mesin Rice Milling Unit (RMU). Informasi di situs ini merangkum spesifikasi standar; spesifikasi akhir setiap proyek dapat disesuaikan (custom) dan disepakati melalui kontrak atau proses E-Katalog LKPP secara terpisah.",
+    "terms.intellectualLabel": "3. Hak Kekayaan Intelektual",
+    "terms.intellectualDesc": "Layanan dan konten asli, fitur, serta fungsionalitasnya (seperti desain antarmuka, gambar mesin Ateka, dokumen spesifikasi teknis) adalah milik eksklusif dari CV Ateka Tehnik. Konten tersebut tidak boleh direproduksi tanpa izin tertulis.",
+    "terms.linksLabel": "4. Tautan ke Situs Web Lain",
+    "terms.linksDesc": "Layanan kami mungkin berisi tautan ke situs web pihak ketiga yang tidak dimiliki atau dikontrol oleh CV Ateka Tehnik (misalnya, platform Indotrading atau LKPP). Kami tidak bertanggung jawab atas konten atau praktik privasi situs pihak ketiga mana pun.",
+    "terms.liabilityLabel": "5. Batasan Kewajiban",
+    "terms.liabilityDesc": "Dalam keadaan apa pun CV Ateka Tehnik tidak bertanggung jawab atas segala kerugian tidak langsung, insidental, atau konsekuensial yang timbul dari akses atau penggunaan materi pada Layanan web ini. Untuk jaminan produk fisik seperti RMU, hal tersebut dicakup dalam Syarat Garansi terpisah.",
+    "terms.governingLabel": "6. Hukum yang Berlaku",
+    "terms.governingDesc": "Syarat ini akan diatur dan ditafsirkan sesuai dengan hukum Republik Indonesia. Segala perselisihan yang mungkin timbul akan diselesaikan di bawah yurisdiksi pengadilan di Indonesia yang sesuai."
   },
 
   en: {
@@ -533,6 +567,40 @@ const translations = {
     "channels.fakeWebNote": "Uses the letter 'k' - NOT US",
     "channels.fakeWebVisit": "Visit",
     "channels.backHome": "Back to Home",
+
+    // Privacy Policy
+    "privacy.title": "Privacy Policy",
+    "privacy.lastUpdated": "Last updated: April 2, 2026",
+    "privacy.intro": "CV Ateka Tehnik (\"us\", \"we\", or \"our\") operates the atekatehnik.com website and associated services (the \"Service\"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.",
+    "privacy.infoCollectionLabel": "1. Information Collection and Use",
+    "privacy.infoCollectionDesc": "We collect several different types of information for various purposes to provide and improve our Service to you. This may include your Name, Email Address, Phone Number (including WhatsApp), Delivery Address (for orders), and Site Usage Data.",
+    "privacy.useDataLabel": "2. Use of Data",
+    "privacy.useDataDesc": "CV Ateka Tehnik uses the collected data for various purposes: to provide and maintain the Service, notify you about changes, provide customer support and technical consultation (e.g., regarding RMU inquiries), facilitate transactions via LKPP or e-catalog, and monitor the usage of the Service.",
+    "privacy.transferDataLabel": "3. Transfer of Data",
+    "privacy.transferDataDesc": "Our information systems are based in Indonesia. By using our services, you consent to the processing of data in Indonesia in accordance with local regulations. We will take reasonable steps to ensure that your data is treated securely.",
+    "privacy.disclosureLabel": "4. Disclosure of Data",
+    "privacy.disclosureDesc": "We may disclose your Personal Data in the good faith belief that such action is necessary to: comply with a legal obligation, protect and defend the rights or property of CV Ateka Tehnik, or prevent/investigate wrongdoing in connection with the Service.",
+    "privacy.securityLabel": "5. Security of Data",
+    "privacy.securityDesc": "The security of your data is important to us. While no method of transmission over the Internet is 100% secure, we strive to use commercially acceptable means to protect your Personal Data.",
+    "privacy.contactLabel": "6. Contact Us",
+    "privacy.contactDesc": "If you have any questions about this Privacy Policy, please contact us via WhatsApp or at our headquarters in Dusun Gondang, RT 02 RW 01, Desa Kedungjeruk, Kec. Mojogedang, Karanganyar Regency, Central Java.",
+
+    // Terms of Service
+    "terms.title": "Terms of Service",
+    "terms.lastUpdated": "Last updated: April 2, 2026",
+    "terms.intro": "Please read these Terms of Service (\"Terms\", \"Terms of Service\") carefully before using the atekatehnik.com website (the \"Service\") operated by CV Ateka Tehnik.",
+    "terms.acceptanceLabel": "1. Acceptance of Terms",
+    "terms.acceptanceDesc": "Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access the Service.",
+    "terms.servicesLabel": "2. Consultation & Sales Services",
+    "terms.servicesDesc": "CV Ateka Tehnik provides manufacturing, installation, and consultation services for Rice Milling Units (RMU). Information on this site summarizes standard specifications; final specifications of each project may be customized and agreed upon via separate contracts or the LKPP E-Catalog process.",
+    "terms.intellectualLabel": "3. Intellectual Property",
+    "terms.intellectualDesc": "The Service and its original content, features, and functionality (such as UI design, Ateka machine images, technical docs) are and will remain the exclusive property of CV Ateka Tehnik. Such content may not be reproduced without written permission.",
+    "terms.linksLabel": "4. Links to Other Web Sites",
+    "terms.linksDesc": "Our Service may contain links to third-party web sites that are not owned or controlled by CV Ateka Tehnik (e.g., Indotrading or LKPP platforms). We assume no responsibility for the content or privacy practices of any third-party web sites.",
+    "terms.liabilityLabel": "5. Limitation of Liability",
+    "terms.liabilityDesc": "In no event shall CV Ateka Tehnik be liable for any indirect, incidental, or consequential damages arising out of accessing or using the materials on this web Service. For physical product warranties such as for RMUs, those are covered under separate Warranty Terms.",
+    "terms.governingLabel": "6. Governing Law",
+    "terms.governingDesc": "These Terms shall be governed and construed in accordance with the laws of the Republic of Indonesia. Any disputes arising will be resolved under the jurisdiction of the appropriate Indonesian courts."
   }
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { formatAdminDate } from '../../utils/dateUtils';
 
 const Leads = () => {
   const { authFetch } = useAuth();
@@ -219,7 +220,7 @@ const Leads = () => {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="text-sm font-medium text-on-surface-variant">
-                        {new Date(lead.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatAdminDate(lead.created_at)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">

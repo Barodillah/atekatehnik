@@ -150,6 +150,26 @@ Kamu juga memiliki pengetahuan umum tentang:
 7. SELALU akhiri jawaban panjang dengan singkat bahwa untuk penawaran lebih lanjut bisa langsung berkonsultasi
 8. Jangan pernah menjawab topik yang tidak berhubungan dengan perusahaan atau penggilingan padi — arahkan kembali dengan sopan`;
 
+// ── Session Key Helpers ─────────────────────────────────────────────
+const SESSION_STORAGE_KEY = 'ateka_chat_session';
+
+const generateSessionKey = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+const getOrCreateSessionKey = () => {
+  let key = localStorage.getItem(SESSION_STORAGE_KEY);
+  if (!key) {
+    key = generateSessionKey();
+    localStorage.setItem(SESSION_STORAGE_KEY, key);
+  }
+  return key;
+};
+
 // ── ChatbotWidget Component ─────────────────────────────────────────
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -157,8 +177,11 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const sessionKeyRef = useRef(getOrCreateSessionKey());
+  const historyLoadedRef = useRef(false);
   const { t } = useLanguage();
 
   const WA_LINK = 'https://wa.me/62881080634612?text=Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
@@ -185,6 +208,59 @@ const ChatbotWidget = () => {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
+
+  // Load previous chat history from DB when opening for the first time
+  useEffect(() => {
+    if (isOpen && !historyLoadedRef.current) {
+      historyLoadedRef.current = true;
+      loadChatHistory();
+    }
+  }, [isOpen]);
+
+  // ── Load Chat History ──────────────────────────────────────────────
+  const loadChatHistory = async () => {
+    try {
+      setIsLoadingHistory(true);
+      const res = await fetch(`/api/chat_history.php?action=load&session_key=${encodeURIComponent(sessionKeyRef.current)}`);
+      const data = await res.json();
+      if (data.success && data.messages && data.messages.length > 0) {
+        const restored = data.messages.map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: new Date(msg.sent_at),
+          isError: msg.is_error === 1 || msg.is_error === '1',
+        }));
+        setMessages(restored);
+      }
+    } catch (err) {
+      console.error('Failed to load chat history:', err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  // ── Clear Chat (new session) ───────────────────────────────────────
+  const handleClearChat = async () => {
+    // Close old session in DB
+    try {
+      await fetch('/api/chat_history.php?action=clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_key: sessionKeyRef.current }),
+      });
+    } catch (err) {
+      console.error('Failed to clear session:', err);
+    }
+
+    // Generate new session key
+    const newKey = generateSessionKey();
+    localStorage.setItem(SESSION_STORAGE_KEY, newKey);
+    sessionKeyRef.current = newKey;
+
+    // Clear messages in UI
+    setMessages([]);
+    historyLoadedRef.current = true; // prevent re-loading
+  };
 
   // ── Call OpenRouter API ────────────────────────────────────────────
   const sendToOpenRouter = async (userMessage) => {
@@ -224,11 +300,15 @@ const ChatbotWidget = () => {
         }),
       });
     } else {
-      // Production: call PHP proxy
+      // Production: call PHP proxy (which also saves to DB)
       response = await fetch('/api/chat.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: requestMessages }),
+        body: JSON.stringify({
+          messages: requestMessages,
+          session_key: sessionKeyRef.current,
+          page_url: window.location.href,
+        }),
       });
     }
 
@@ -318,20 +398,28 @@ const ChatbotWidget = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2 text-white/70">
+            <div className="flex gap-1 text-white/70">
+              {/* Clear Chat Button */}
+              <button
+                onClick={handleClearChat}
+                className="hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10"
+                title={t('chatbot.clearChat') || 'Bersihkan Chat'}
+              >
+                <span className="material-symbols-outlined text-[20px]">delete_sweep</span>
+              </button>
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10"
                 title={isFullscreen ? t('chatbot.fullscreenExit') : t('chatbot.fullscreenEnter')}
               >
-                <span className="material-symbols-outlined">{isFullscreen ? 'close_fullscreen' : 'fullscreen'}</span>
+                <span className="material-symbols-outlined text-[20px]">{isFullscreen ? 'close_fullscreen' : 'fullscreen'}</span>
               </button>
               <button
                 onClick={() => { setIsOpen(false); setIsFullscreen(false); }}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10"
                 title={t('chatbot.closeChat')}
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
           </div>
@@ -351,8 +439,18 @@ const ChatbotWidget = () => {
               </div>
             </div>
 
-            {/* Quick Questions (only show when no messages) */}
-            {messages.length === 0 && (
+            {/* Loading History Indicator */}
+            {isLoadingHistory && (
+              <div className="flex justify-center py-3">
+                <div className="flex items-center gap-2 text-xs text-on-surface-variant/60">
+                  <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                  Memuat riwayat chat...
+                </div>
+              </div>
+            )}
+
+            {/* Quick Questions (only show when no messages and not loading history) */}
+            {messages.length === 0 && !isLoadingHistory && (
               <div className="flex flex-col gap-2 pl-11">
                 <p className="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-widest">{t('chatbot.popularLabel')}</p>
                 {quickQuestions.map((q, i) => (

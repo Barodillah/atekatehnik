@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const Post = () => {
     const { slug } = useParams();
@@ -26,6 +27,8 @@ const Post = () => {
     const [commentSubmitting, setCommentSubmitting] = useState(false);
     const [commentSuccess, setCommentSuccess] = useState('');
     const [relatedInstallations, setRelatedInstallations] = useState([]);
+
+    usePageTitle(post?.title || null);
 
     // ── Fetch Related Installations ──────────────────────────────────
     useEffect(() => {

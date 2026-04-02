@@ -65,6 +65,9 @@ if (!$input || !isset($input['messages']) || !is_array($input['messages'])) {
     exit;
 }
 
+// Session key from frontend (for chat history persistence)
+$sessionKey = isset($input['session_key']) ? substr(trim($input['session_key']), 0, 64) : null;
+
 // Sanitize messages (only allow role + content)
 $messages = array_map(function ($msg) {
     return [
@@ -117,3 +120,73 @@ if ($httpCode !== 200) {
 // Forward the OpenRouter response directly
 http_response_code(200);
 echo $response;
+
+// ── Persist Chat to Database (async-style, after output) ────────────
+// Save the latest user message and assistant reply to the database
+if ($sessionKey && $httpCode === 200) {
+    try {
+        require_once __DIR__ . '/db.php';
+        $db = getDB();
+
+        // Find or create chat_session
+        $stmt = $db->prepare("SELECT id FROM chat_sessions WHERE session_key = :sk LIMIT 1");
+        $stmt->execute([':sk' => $sessionKey]);
+        $session = $stmt->fetch();
+
+        if (!$session) {
+            // Create new session
+            $stmt = $db->prepare("
+                INSERT INTO chat_sessions (session_key, visitor_ip, visitor_ua, page_url, status, message_count, started_at, last_message_at)
+                VALUES (:sk, :ip, :ua, :url, 'active', 0, NOW(), NOW())
+            ");
+            $stmt->execute([
+                ':sk'  => $sessionKey,
+                ':ip'  => $_SERVER['REMOTE_ADDR'] ?? null,
+                ':ua'  => isset($_SERVER['HTTP_USER_AGENT']) ? substr($_SERVER['HTTP_USER_AGENT'], 0, 500) : null,
+                ':url' => isset($input['page_url']) ? substr($input['page_url'], 0, 500) : null,
+            ]);
+            $sessionId = (int) $db->lastInsertId();
+        } else {
+            $sessionId = (int) $session['id'];
+        }
+
+        // Extract the last user message (skip system prompt)
+        $lastUserContent = null;
+        $allMessages = $input['messages'];
+        for ($i = count($allMessages) - 1; $i >= 0; $i--) {
+            if ($allMessages[$i]['role'] === 'user') {
+                $lastUserContent = substr(trim($allMessages[$i]['content'] ?? ''), 0, 10000);
+                break;
+            }
+        }
+
+        // Extract assistant reply from response
+        $responseData = json_decode($response, true);
+        $assistantContent = $responseData['choices'][0]['message']['content'] ?? null;
+
+        $insertedCount = 0;
+
+        // Insert user message
+        if ($lastUserContent) {
+            $stmt = $db->prepare("INSERT INTO chat_messages (session_id, role, content, is_error, sent_at) VALUES (:sid, 'user', :content, 0, NOW())");
+            $stmt->execute([':sid' => $sessionId, ':content' => $lastUserContent]);
+            $insertedCount++;
+        }
+
+        // Insert assistant message
+        if ($assistantContent) {
+            $stmt = $db->prepare("INSERT INTO chat_messages (session_id, role, content, is_error, sent_at) VALUES (:sid, 'assistant', :content, 0, NOW())");
+            $stmt->execute([':sid' => $sessionId, ':content' => $assistantContent]);
+            $insertedCount++;
+        }
+
+        // Update session counters
+        if ($insertedCount > 0) {
+            $stmt = $db->prepare("UPDATE chat_sessions SET message_count = message_count + :cnt, last_message_at = NOW() WHERE id = :sid");
+            $stmt->execute([':cnt' => $insertedCount, ':sid' => $sessionId]);
+        }
+    } catch (Exception $e) {
+        // Chat history saving should never break the main response
+        error_log("Chat history save error: " . $e->getMessage());
+    }
+}

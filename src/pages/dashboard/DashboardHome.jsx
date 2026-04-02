@@ -43,7 +43,8 @@ const DashboardHome = () => {
 
   // Formatter for relative time
   const timeAgo = (dateStr) => {
-    const date = new Date(dateStr);
+    const safeDate = dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z';
+    const date = new Date(safeDate);
     const seconds = Math.floor((new Date() - date) / 1000);
     let interval = Math.floor(seconds / 31536000);
     if (interval >= 1) return interval + " year" + (interval > 1 ? "s" : "") + " ago";

@@ -17,6 +17,9 @@ import Portfolio from './pages/Portfolio';
 import Post from './pages/Post';
 import OfficialChannels from './pages/OfficialChannels';
 import SearchResults from './pages/SearchResults';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import { NotFound } from './pages/ErrorPage';
 
 // Admin Dashboard Components & Pages
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -29,6 +32,7 @@ import AdminPostForm from './pages/dashboard/PostForm';
 import AdminComments from './pages/dashboard/Comments';
 import AdminAnalytics from './pages/dashboard/Analytics';
 import ActivityLogs from './pages/dashboard/ActivityLogs';
+import ChatHistory from './pages/dashboard/ChatHistory';
 import AdminLogin from './pages/dashboard/Login';
 
 const PublicLayout = () => {
@@ -60,6 +64,9 @@ function App() {
           <Route path="/post/:slug" element={<Post />} />
           <Route path="/official-channels" element={<OfficialChannels />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
 
         {/* Admin Routes — Wrapped with AuthProvider */}
@@ -75,10 +82,15 @@ function App() {
             <Route path="posts/new" element={<AdminPostForm />} />
             <Route path="posts/edit/:id" element={<AdminPostForm />} />
             <Route path="comments" element={<AdminComments />} />
+            <Route path="chat-history" element={<ChatHistory />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="logs" element={<ActivityLogs />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
+
+        {/* Global catch-all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </LanguageProvider>
   );

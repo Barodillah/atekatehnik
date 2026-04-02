@@ -1,4 +1,5 @@
 import { useLanguage } from '../context/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -12,19 +13,19 @@ const Footer = () => {
         <div className="space-y-4">
           <h5 className="text-[#ffa454] font-['Inter'] text-sm tracking-wide uppercase font-bold">{t('footer.navigation')}</h5>
           <ul className="space-y-2">
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="/">{t('footer.home')}</a></li>
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="/products">{t('footer.products')}</a></li>
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="/portfolio">{t('footer.projects')}</a></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/">{t('footer.home')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/products">{t('footer.products')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/portfolio">{t('footer.projects')}</Link></li>
             <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="https://katalog.inaproc.id/ateka-tehnik">E-Katalog INAPROC</a></li>
           </ul>
         </div>
         <div className="space-y-4">
           <h5 className="text-[#ffa454] font-['Inter'] text-sm tracking-wide uppercase font-bold">{t('footer.quickLinks')}</h5>
           <ul className="space-y-2">
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">{t('footer.privacy')}</a></li>
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">{t('footer.terms')}</a></li>
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="#">{t('footer.serviceCenters')}</a></li>
-            <li><a className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" href="/contact">{t('footer.globalExport')}</a></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/privacy-policy">{t('footer.privacy')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/terms-of-service">{t('footer.terms')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/contact">{t('footer.serviceCenters')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/contact">{t('footer.globalExport')}</Link></li>
           </ul>
         </div>
         <div className="space-y-4">
@@ -52,8 +53,8 @@ const Footer = () => {
             </a>
             <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#ffa454] transition-colors" aria-label="Shopee">
               <svg className="w-6 h-6" viewBox="0 0 192 192" fill="none" aria-hidden="true">
-                <path fill="currentColor" d="m29.004 157.064 5.987-.399-5.987.399ZM22 52v-6a6 6 0 0 0-5.987 6.4L22 52Zm140.996 105.064-5.987-.399 5.987.399ZM170 52l5.987.4A6 6 0 0 0 170 46v6ZM34.991 156.665 27.987 51.601l-11.974.798 7.005 105.064 11.973-.798Zm133.991.798 7.005-105.064-11.974-.798-7.004 105.064 11.973.798Zm-11.973-.798a10 10 0 0 1-9.978 9.335v12c11.582 0 21.181-8.98 21.951-20.537l-11.973-.798Zm-133.991.798C23.788 169.02 33.387 178 44.968 178v-12a10 10 0 0 1-9.977-9.335l-11.973.798ZM74 48c0-12.15 9.85-22 22-22V14c-18.778 0-34 15.222-34 34h12Zm22-22c12.15 0 22 9.85 22 22h12c0-18.778-15.222-34-34-34v12ZM22 58h148V46H22v12Zm22.969 120H147.03v-12H44.969v12Z"/>
-                <path stroke="currentColor" strokeLinecap="round" strokeWidth="12" d="M114 84H88c-7.732 0-14 6.268-14 14v0c0 7.732 6.268 14 14 14h4m-2 0h14c7.732 0 14 6.268 14 14v0c0 7.732-6.268 14-14 14H78"/>
+                <path fill="currentColor" d="m29.004 157.064 5.987-.399-5.987.399ZM22 52v-6a6 6 0 0 0-5.987 6.4L22 52Zm140.996 105.064-5.987-.399 5.987.399ZM170 52l5.987.4A6 6 0 0 0 170 46v6ZM34.991 156.665 27.987 51.601l-11.974.798 7.005 105.064 11.973-.798Zm133.991.798 7.005-105.064-11.974-.798-7.004 105.064 11.973.798Zm-11.973-.798a10 10 0 0 1-9.978 9.335v12c11.582 0 21.181-8.98 21.951-20.537l-11.973-.798Zm-133.991.798C23.788 169.02 33.387 178 44.968 178v-12a10 10 0 0 1-9.977-9.335l-11.973.798ZM74 48c0-12.15 9.85-22 22-22V14c-18.778 0-34 15.222-34 34h12Zm22-22c12.15 0 22 9.85 22 22h12c0-18.778-15.222-34-34-34v12ZM22 58h148V46H22v12Zm22.969 120H147.03v-12H44.969v12Z" />
+                <path stroke="currentColor" strokeLinecap="round" strokeWidth="12" d="M114 84H88c-7.732 0-14 6.268-14 14v0c0 7.732 6.268 14 14 14h4m-2 0h14c7.732 0 14 6.268 14 14v0c0 7.732-6.268 14-14 14H78" />
               </svg>
             </a>
           </div>

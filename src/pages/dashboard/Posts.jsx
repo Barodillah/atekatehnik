@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { formatAdminDate } from '../../utils/dateUtils';
 
 const Posts = () => {
   const navigate = useNavigate();
@@ -136,7 +137,7 @@ const Posts = () => {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-sm text-outline">
-                      {post.publish_date ? new Date(post.publish_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                      {post.publish_date ? formatAdminDate(post.publish_date) : '—'}
                     </td>
                     <td className="px-6 py-5">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${categoryStyles[post.category] || 'bg-surface-container-high text-on-surface-variant'}`}>

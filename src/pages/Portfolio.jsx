@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const Portfolio = () => {
     const { t, lang } = useLanguage();
+    usePageTitle(lang === 'id' ? 'Portofolio & Proyek' : 'Portfolio & Projects');
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
 

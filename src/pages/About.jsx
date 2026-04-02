@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const About = () => {
     const { t } = useLanguage();
+    usePageTitle(t('nav.about') === 'Tentang' ? 'Tentang Kami' : 'About Us');
     return (
         <main className="pt-20">
             {/* Hero Section */}

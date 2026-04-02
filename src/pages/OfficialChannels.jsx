@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
+import usePageTitle from '../hooks/usePageTitle';
 
 const OfficialChannels = () => {
   const { t } = useLanguage();
+  usePageTitle(t('channels.badge') === 'Verifikasi Channel' ? 'Channel Resmi Ateka Tehnik' : 'Official Channels');
 
   useEffect(() => {
     window.scrollTo(0, 0);

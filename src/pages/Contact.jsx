@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const Contact = () => {
     const { t, lang } = useLanguage();
+    usePageTitle(lang === 'id' ? 'Hubungi Kami' : 'Contact Us');
 
     const [formData, setFormData] = useState({
         name: '',

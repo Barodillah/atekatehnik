@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { formatAdminDateTime } from '../../utils/dateUtils';
 
 const ActivityLogs = () => {
   const { authFetch } = useAuth();
@@ -55,11 +56,10 @@ const ActivityLogs = () => {
   };
 
   const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return new Intl.DateTimeFormat('en-GB', {
+    return formatAdminDateTime(dateStr, {
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit', second: '2-digit'
-    }).format(d);
+    });
   };
 
   return (

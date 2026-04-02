@@ -50,7 +50,7 @@ if ($isPost || $isProduct) {
                 $item = $stmt->fetch();
 
                 if ($item) {
-                    $title = $item['nama'] . " | ATEKA TEHNIK";
+                    $title = "Jual " . $item['nama'] . " | ATEKA TEHNIK";
                     $descriptionRaw = $item['description'];
                     $imageRaw = $item['gambar'];
                 }

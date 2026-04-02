@@ -69,6 +69,10 @@ const DashboardLayout = () => {
             <span className="material-symbols-outlined">forum</span>
             <span>Comments</span>
           </Link>
+          <Link className={getLinkClasses('/admin/chat-history')} to="/admin/chat-history">
+            <span className="material-symbols-outlined">smart_toy</span>
+            <span>Chat History</span>
+          </Link>
           <Link className={getLinkClasses('/admin/analytics')} to="/admin/analytics">
             <span className="material-symbols-outlined">monitoring</span>
             <span>Analytics</span>
@@ -112,6 +116,7 @@ const DashboardLayout = () => {
                   location.pathname.startsWith('/admin/products') ? "Search inventory..." :
                   location.pathname.startsWith('/admin/posts') ? "Search blog posts..." :
                   location.pathname.startsWith('/admin/comments') ? "Search comments..." :
+                  location.pathname.startsWith('/admin/chat-history') ? "Search chat sessions..." :
                   location.pathname.startsWith('/admin/analytics') ? "Search pages..." :
                   location.pathname.startsWith('/admin/logs') ? "Search logs..." :
                   "Search data..."

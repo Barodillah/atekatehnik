@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const SearchResults = () => {
   const { lang } = useLanguage();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const query = queryParams.get('q') || '';
+
+  usePageTitle(query ? `${lang === 'id' ? 'Pencarian' : 'Search'}: ${query}` : (lang === 'id' ? 'Hasil Pencarian' : 'Search Results'));
 
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

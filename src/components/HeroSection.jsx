@@ -1,8 +1,26 @@
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
 const HeroSection = () => {
   const { t } = useLanguage();
+  
+  const [currentImage, setCurrentImage] = useState(0);
+  
+  const images = [
+    "https://atekatehnik.com/wp-content/uploads/gambar_hero_ai.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/gambar_hero_3.png",
+    "https://atekatehnik.com/wp-content/uploads/gambar_hero_2.png",
+    "https://atekatehnik.com/wp-content/uploads/gambar_hero_1.jpg"
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
   return (
     <header className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-surface">
       <div className="max-w-7xl mx-auto px-8 relative z-10">
@@ -29,12 +47,17 @@ const HeroSection = () => {
             </div>
           </div>
           <div className="relative">
-            <div className="aspect-square bg-surface-container-highest rounded-sm overflow-hidden shadow-2xl">
-              <img
-                alt="Industrial Machinery"
-                className="w-full h-full object-cover mix-blend-multiply opacity-90"
-                src="https://atekatehnik.com/wp-content/uploads/gambar_hero_ai.jpeg"
-              />
+            <div className="aspect-square bg-surface-container-highest rounded-sm overflow-hidden shadow-2xl relative">
+              {images.map((src, index) => (
+                <img
+                  key={index}
+                  alt={`Industrial Machinery ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover mix-blend-multiply transition-opacity duration-1000 ease-in-out ${
+                    index === currentImage ? 'opacity-90' : 'opacity-0'
+                  }`}
+                  src={src}
+                />
+              ))}
             </div>
             <div className="absolute -bottom-6 -left-6 bg-primary-container text-white p-6 rounded-sm shadow-xl hidden md:block">
               <div className="text-4xl font-black font-headline">20+</div>

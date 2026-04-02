@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import usePageTitle from '../hooks/usePageTitle';
 
 const ProductDetail = () => {
     const { slug } = useParams();
@@ -13,6 +14,8 @@ const ProductDetail = () => {
     const [isCopied, setIsCopied] = useState(false);
     const [imageRatio, setImageRatio] = useState('vertical');
     const [relatedProducts, setRelatedProducts] = useState([]);
+
+    usePageTitle(product?.nama || null);
 
     useEffect(() => {
         const fetchProduct = async () => {

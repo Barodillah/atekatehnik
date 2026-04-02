@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { formatAdminDate } from '../../utils/dateUtils';
 
 const Comments = () => {
   const { authFetch } = useAuth();
@@ -164,7 +165,7 @@ const Comments = () => {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="text-sm font-medium text-on-surface-variant whitespace-nowrap">
-                        {new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatAdminDate(c.created_at)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
