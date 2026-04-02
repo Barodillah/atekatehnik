@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate } from '../../utils/dateUtils';
 
 const Leads = () => {
   const { authFetch } = useAuth();
+  const location = useLocation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [leads, setLeads] = useState([]);
@@ -56,6 +58,14 @@ const Leads = () => {
     fetchLeads();
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.openNewLeadModal) {
+      setIsModalOpen(true);
+      // Automatically clear out the state so it doesn't re-open when refreshed
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   // Handle status change
   const handleStatusChange = async (leadId, newStatus) => {

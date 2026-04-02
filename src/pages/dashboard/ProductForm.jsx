@@ -20,6 +20,65 @@ const ProductForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(isEdit);
   const [submitError, setSubmitError] = useState('');
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+
+  const handleGenerateAi = async (length) => {
+    if (!formData.nama) {
+      alert("Silakan isi Nama Produk terlebih dahulu.");
+      return;
+    }
+
+    setIsAiGenerating(true);
+    setSubmitError('');
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      const model = import.meta.env.VITE_OPENROUTER_MODEL;
+
+      if (!apiKey) {
+        throw new Error("API Key OpenRouter tidak ditemukan. Harap pastikan variable di setting .env frontend.");
+      }
+
+      const specsText = spesifikasi.filter(s => s.trim() !== '').join(', ');
+      
+      let lengthInstruction = "";
+      if (length === 'singkat') lengthInstruction = "sekitar 2-3 kalimat singkat";
+      if (length === 'sedang') lengthInstruction = "sekitar 4-6 kalimat menengah";
+      if (length === 'panjang') lengthInstruction = "agak panjang dan sangat detail, maksimal 1 paragraf penuh";
+
+      const prompt = `Anda adalah asisten copywriter Ateka Tehnik (perusahaan bengkel pemesinan industri besar dan pembuatan pabrik penggilingan padi/RMU).
+Buatlah paragraf penjelasan deskripsi produk yang menarik, sales-oriented dan profesional berdasarkan spesifikasi berikut ini:
+Nama Mesin/Produk: ${formData.nama}
+Spesifikasi Teknis: ${specsText ? specsText : 'Belum ada data'}
+
+Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perlu menggunakan bullet points atau list, buatlah mengalir seperti penawaran produk industrial. Kembalikan HANYA teks paragrafnya.`;
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: model || "google/gemini-2.5-flash-lite",
+          messages: [
+            { role: "user", content: prompt }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      if (data.choices && data.choices.length > 0) {
+        setFormData(prev => ({ ...prev, description: data.choices[0].message.content.trim() }));
+      } else {
+        throw new Error(data.error?.message || "Gagal mengambil response dari AI.");
+      }
+    } catch (err) {
+      setSubmitError("AI Error: " + err.message);
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
 
   useEffect(() => {
     if (isEdit) {
@@ -200,15 +259,61 @@ const ProductForm = () => {
               </div>
 
               <div className="relative">
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Deskripsi Produk (Opsional)</label>
-                <textarea 
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm leading-relaxed" 
-                  placeholder="Tuliskan deskripsi lengkap atau keterangan tambahan mengenai produk ini..."
-                />
+                <div className="flex justify-between items-end mb-2">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline">Deskripsi Produk (Opsional)</label>
+                  
+                  {/* AI Generation Tools */}
+                  <div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-bold text-secondary flex items-center gap-1 mr-1">
+                      <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                      Generate AI:
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => handleGenerateAi('singkat')}
+                      disabled={isAiGenerating}
+                      className="text-[9px] uppercase tracking-widest font-bold bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm hover:bg-secondary hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      Singkat
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleGenerateAi('sedang')}
+                      disabled={isAiGenerating}
+                      className="text-[9px] uppercase tracking-widest font-bold bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm hover:bg-secondary hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      Sedang
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleGenerateAi('panjang')}
+                      disabled={isAiGenerating}
+                      className="text-[9px] uppercase tracking-widest font-bold bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm hover:bg-secondary hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      Panjang
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <textarea 
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={4}
+                    disabled={isAiGenerating}
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm leading-relaxed disabled:opacity-60" 
+                    placeholder="Tuliskan deskripsi lengkap atau gunakan tombol Generate AI di atas..."
+                  />
+                  {isAiGenerating && (
+                    <div className="absolute inset-0 bg-surface-container-lowest/50 backdrop-blur-[1px] flex items-center justify-center">
+                      <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+                        <span className="material-symbols-outlined animate-spin text-primary text-[18px]">progress_activity</span>
+                        <span className="text-xs font-bold text-primary">AI sedang menulis deskripsi...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

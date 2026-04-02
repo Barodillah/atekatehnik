@@ -1,10 +1,13 @@
-import React from 'react';
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, loading, logout } = useAuth();
+  
+  const [isEntryModalOpen, setEntryModalOpen] = useState(false);
 
   // Show loading screen while verifying token
   if (loading) {
@@ -83,7 +86,10 @@ const DashboardLayout = () => {
           </Link>
         </div>
         <div className="mt-auto px-4 pt-6 border-t border-blue-900/30">
-          <button className="w-full bg-orange-400 text-blue-950 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-colors mb-4 cursor-pointer">
+          <button 
+            onClick={() => setEntryModalOpen(true)}
+            className="w-full bg-orange-400 text-blue-950 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-colors mb-4 cursor-pointer"
+          >
             New Entry
           </button>
           <button className="w-full flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs transition-colors cursor-pointer">
@@ -152,6 +158,64 @@ const DashboardLayout = () => {
           <p className="text-[10px] font-bold font-label uppercase tracking-[0.4em] text-on-surface-variant">Ateka Tehnik Engineering Dashboard © 2026</p>
         </footer>
       </main>
+
+      {/* New Entry Modal */}
+      {isEntryModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-blue-950/40 backdrop-blur-sm px-4">
+          <div className="bg-surface-container-lowest w-full max-w-sm rounded-sm shadow-2xl overflow-hidden relative">
+            <button 
+              onClick={() => setEntryModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <div className="p-8 space-y-6">
+              <h3 className="text-xl font-headline font-bold text-primary-container text-center mb-2">Create New Entry</h3>
+              
+              <div className="grid grid-cols-1 gap-3">
+                <button 
+                  onClick={() => { setEntryModalOpen(false); navigate('/admin/posts/new'); }}
+                  className="flex items-center gap-3 p-4 bg-surface-container hover:bg-blue-50 text-left transition-colors rounded-sm group cursor-pointer"
+                >
+                  <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">edit_square</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-primary text-sm uppercase tracking-widest leading-tight">Blog Post</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">Add an article / project update</div>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => { setEntryModalOpen(false); navigate('/admin/products/new'); }}
+                  className="flex items-center gap-3 p-4 bg-surface-container hover:bg-indigo-50 text-left transition-colors rounded-sm group cursor-pointer"
+                >
+                  <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">precision_manufacturing</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-primary text-sm uppercase tracking-widest leading-tight">Product</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">List new machinery</div>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => { setEntryModalOpen(false); navigate('/admin/leads', { state: { openNewLeadModal: true } }); }}
+                  className="flex items-center gap-3 p-4 bg-surface-container hover:bg-orange-50 text-left transition-colors rounded-sm group cursor-pointer"
+                >
+                  <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center shrink-0 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">contact_page</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-primary text-sm uppercase tracking-widest leading-tight">Lead / Query</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">Manually insert a prospect</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
