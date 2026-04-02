@@ -10,8 +10,8 @@
   # Route /api/* requests to the PHP files
   RewriteRule ^api/(.*)$ api/$1 [L]
 
-  # For all other routes, serve index.html (SPA routing)
-  RewriteRule ^ index.html [L]
+  # For all other routes, serve serve.php (SPA routing)
+  RewriteRule ^ serve.php [L]
 </IfModule>
 
 # ── Security Headers ──────────────────────────────────────────────────

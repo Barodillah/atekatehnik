@@ -12,6 +12,7 @@ const Post = () => {
     // Feature States
     const [previewImage, setPreviewImage] = useState(null);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [isCopied, setIsCopied] = useState(false);
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [views, setViews] = useState(0);
     const [likes, setLikes] = useState(0);
@@ -171,8 +172,8 @@ const Post = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shareUrl);
-        alert('Link copied to clipboard!');
-        setShowShareModal(false);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
     };
 
     if (loading) {
@@ -281,50 +282,50 @@ const Post = () => {
                 )}
             </section>
             {post.techSpecs && post.techSpecs.length > 0 && (
-                <section className="bg-primary px-8 md:px-20 py-24 text-white overflow-hidden relative">
-                    <div className="absolute right-0 top-0 w-1/2 h-full opacity-10 pointer-events-none">
+                <section className="bg-primary px-6 md:px-20 py-16 md:py-24 text-white overflow-hidden relative">
+                    <div className="absolute right-0 top-0 w-full md:w-1/2 h-full opacity-5 md:opacity-10 pointer-events-none">
                         <img alt="Blueprints" className="w-full h-full object-cover"
                             data-alt="Technical blueprint and engineering schematic of an industrial machine assembly with precise lines and measurements"
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx1hhalQM1JiLOzLrYXzby7sFwK7RDpApeAg3Px_wtKsuVXQHfhAP-_S89BUIDnK8vg1V9TqdWxbKCgn6PjWYGQaT2U7jwbMOvbkpr8gN_4FGjb5GoCJn6OSKot5WtyEycYZswnpTnFU2IszlAZYjVa4PcoQB3MUVE2Gwu6FwkX0zgRETmm7WJIIFl0LJgqiWZedn-0a_r0Ha0LeaAsSikHd6TDAfpPi5hxIZcc2MjGS7xTTl7azWRg2ifJ30JrpBb596tOB93JxU" />
                     </div>
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-center mb-16">
-                            <h2 className="text-3xl font-bold tracking-tight flex items-center space-x-4 font-headline m-0">
-                                <span className="w-12 h-0.5 bg-secondary-container inline-block"></span>
+                    <div className="relative z-10 w-full">
+                        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-6 md:gap-0 mb-10 md:mb-16">
+                            <h2 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3 md:space-x-4 font-headline m-0 shrink-0">
+                                <span className="w-8 md:w-12 h-0.5 bg-secondary-container inline-block"></span>
                                 <span>Technical Specifications</span>
                             </h2>
                             {post?.related_products && post.related_products.length > 0 ? (
-                                <div className="flex flex-wrap gap-4 justify-end items-center">
+                                <div className="flex flex-wrap gap-2 md:gap-4 justify-start md:justify-end items-center w-full md:w-auto">
                                     {post.related_products.map((prod) => (
                                         <Link
                                             key={prod.product_slug}
                                             to={`/product/${prod.product_slug}`}
-                                            className="text-secondary font-bold text-xs md:text-sm tracking-widest uppercase flex items-center space-x-2 group hover:text-white transition-colors border border-secondary/30 px-3 py-1.5 md:px-4 md:py-2 rounded-sm hover:bg-secondary/10 bg-primary/20 backdrop-blur-sm"
+                                            className="text-secondary font-bold text-[10px] md:text-sm tracking-widest uppercase flex items-center gap-1.5 md:space-x-2 group hover:text-white transition-colors border border-secondary/30 px-3 py-2 md:px-4 md:py-2 rounded-sm hover:bg-secondary/10 bg-primary/20 backdrop-blur-sm"
                                             title={`View ${prod.nama}`}
                                         >
-                                            <span className="material-symbols-outlined text-[16px] md:text-[18px]">precision_manufacturing</span>
-                                            <span className="max-w-[150px] md:max-w-[250px] truncate">{prod.nama || 'View Equipment'}</span>
-                                            <span className="material-symbols-outlined text-[16px] md:text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                            <span className="material-symbols-outlined text-[14px] md:text-[18px]">precision_manufacturing</span>
+                                            <span className="max-w-[140px] md:max-w-[250px] truncate">{prod.nama || 'View Equipment'}</span>
+                                            <span className="material-symbols-outlined text-[14px] md:text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                         </Link>
                                     ))}
                                 </div>
                             ) : (
-                                <Link to="/products" className="text-secondary font-bold text-sm tracking-widest uppercase flex items-center space-x-2 group hover:text-white transition-colors">
+                                <Link to="/products" className="text-secondary font-bold text-xs md:text-sm tracking-widest uppercase flex items-center space-x-2 group hover:text-white transition-colors">
                                     <span>View Equipment</span>
                                     <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                                 </Link>
                             )}
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-px md:bg-white/10">
                             {post.techSpecs.map((spec, index) => (
-                                <div key={index} className={`bg-primary py-10 ${index % 3 === 0 ? 'pr-8' : index % 3 === 1 ? 'px-8' : 'pl-8'}`}>
+                                <div key={index} className={`bg-primary py-6 md:py-10 ${index % 3 === 0 ? 'md:pr-8' : index % 3 === 1 ? 'md:px-8' : 'md:pl-8'}`}>
                                     <span
                                         className="text-secondary-container text-xs font-bold uppercase tracking-widest mb-2 block">
                                         {spec.header || `Spec ${index + 1}`}
                                     </span>
-                                    <div className="text-5xl font-black mb-2 whitespace-pre-wrap">{spec.spec_value} <span
-                                        className="text-xl font-medium opacity-50">{spec.unit}</span></div>
-                                    <p className="text-sm text-white/60">{spec.description}</p>
+                                    <div className="text-4xl md:text-5xl font-black mb-2 whitespace-pre-wrap leading-tight">{spec.spec_value} <span
+                                        className="text-lg md:text-xl font-medium opacity-50">{spec.unit}</span></div>
+                                    <p className="text-sm text-white/60 leading-relaxed">{spec.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -581,16 +582,18 @@ const Post = () => {
                                 </div>
                                 <span className="text-[10px] font-medium text-center">X / Twitter</span>
                             </a>
-                            <button onClick={copyToClipboard} className="flex flex-col items-center space-y-2 text-on-surface hover:text-primary transition-colors">
-                                <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-primary/10">
-                                    <span className="material-symbols-outlined">link</span>
+                            <button onClick={copyToClipboard} className={`flex flex-col items-center space-y-2 transition-colors ${isCopied ? 'text-[#25D366]' : 'text-on-surface hover:text-primary'}`}>
+                                <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${isCopied ? 'bg-[#25D366]/10' : 'bg-surface-container hover:bg-primary/10'}`}>
+                                    <span className="material-symbols-outlined">{isCopied ? 'check' : 'link'}</span>
                                 </div>
-                                <span className="text-[10px] font-medium text-center">Copy Link</span>
+                                <span className="text-[10px] font-medium text-center">{isCopied ? 'Copied!' : 'Copy Link'}</span>
                             </button>
                         </div>
                         <div className="flex items-center bg-surface-container-low p-2 rounded-sm w-full border border-outline-variant/50">
                             <input type="text" value={shareUrl} readOnly className="bg-transparent border-none w-full text-sm text-on-surface-variant outline-none px-2 overflow-hidden text-ellipsis" />
-                            <button onClick={copyToClipboard} className="text-primary font-bold text-sm px-4 py-1 hover:bg-primary/10 rounded-sm transition-colors whitespace-nowrap">COPY</button>
+                            <button onClick={copyToClipboard} className={`font-bold text-sm px-4 py-1 rounded-sm transition-colors whitespace-nowrap ${isCopied ? 'text-[#25D366] bg-[#25D366]/10' : 'text-primary hover:bg-primary/10'}`}>
+                                {isCopied ? <span className="material-symbols-outlined text-sm align-middle block">check</span> : 'COPY'}
+                            </button>
                         </div>
                     </div>
                 </div>
