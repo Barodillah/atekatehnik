@@ -27,17 +27,20 @@ const Portfolio = () => {
     return (
         <main className="pt-20">
             {/* Hero Section */}
-            <section className="bg-[linear-gradient(135deg,#000c2e_0%,#001f5b_100%)] relative overflow-hidden py-24 md:py-32">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <img alt="Industrial texture" className="w-full h-full object-cover grayscale"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Jc0BreR6iTLpK8sJZ2QPvQHc_cv7QvzquANMCpWGUho8mD_TDetmVj85EDc0PU5RYRh5j9kNsFoS25xH3AYYPu6Cz0CpSDi58EUGLrtil0XJTExM8q7zWC5yfGHEsWzO6quRCw044nE4h-cUArDcSLNJxMMglVU9_H4uM8JsiIJ8P1WlHCfPfkt9hpKFCg9OMKdHgZu1rD7fQcj3NAwdjdDYNmxMqPB-lacd2fKW4_ACUJx_wRe3ztzC_uqNLKniAvjW4j11MEY" />
+            <section className="relative overflow-hidden py-24 md:py-32 bg-[#001f5b]">
+                <div className="absolute inset-0 pointer-events-none">
+                    <img alt="Industrial texture" className="w-full h-full object-cover"
+                        src="https://atekatehnik.com/wp-content/uploads/instalasi.jpg" />
                 </div>
-                <div className="relative max-w-7xl mx-auto px-8 w-full">
+                {/* Gradient overlay to ensure text readability */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#000c2e]/80 via-[#001f5b]/70 to-transparent md:bg-gradient-to-r md:from-[#000c2e]/80 md:via-[#001f5b]/60 md:to-transparent"></div>
+
+                <div className="relative max-w-7xl mx-auto px-8 w-full z-10">
                     <div className="max-w-3xl">
-                        <h1 className="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tight leading-[1.1] mb-6 whitespace-pre-line">
+                        <h1 className="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tight leading-[1.1] mb-6 whitespace-pre-line drop-shadow-md">
                             {t('portfolioPage.heroTitle')}
                         </h1>
-                        <p className="text-lg md:text-xl text-primary-fixed-dim font-body leading-relaxed max-w-2xl">
+                        <p className="text-lg md:text-xl text-white/90 font-body leading-relaxed max-w-2xl drop-shadow">
                             {t('portfolioPage.heroSub')}
                         </p>
                     </div>
@@ -96,9 +99,9 @@ const Portfolio = () => {
                             <Link to={`/post/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
                                 <div className="aspect-[4/3] overflow-hidden bg-surface-container">
                                     {project.cover_image ? (
-                                        <img 
-                                            alt={project.title} 
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                        <img
+                                            alt={project.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             src={project.cover_image}
                                         />
                                     ) : (

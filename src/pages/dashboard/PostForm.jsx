@@ -38,6 +38,15 @@ const PostForm = () => {
     { value: '', label: '' }
   ]);
 
+  // Related Products
+  const [allProducts, setAllProducts] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]); // array of { product_slug, product_name }
+  const [productSearch, setProductSearch] = useState('');
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [postSlug, setPostSlug] = useState(''); // slug of the current post being edited
+  const [relationSaving, setRelationSaving] = useState(false);
+  const [relationSuccess, setRelationSuccess] = useState('');
+
   // Submission states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -52,6 +61,8 @@ const PostForm = () => {
           const data = await res.json();
           if (data.success && data.post) {
             const p = data.post;
+            console.log('Post loaded, slug:', p.slug, 'id:', id);
+            setPostSlug(p.slug || '');
             setFormData({
               title: p.title || '',
               subtitle: p.subtitle || '',
@@ -101,6 +112,79 @@ const PostForm = () => {
       fetchPost();
     }
   }, [id, authFetch]);
+
+  // Fetch all products for dropdown (when editing)
+  useEffect(() => {
+    if (!id) return;
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('/api/products.php?limit=50');
+        const data = await res.json();
+        if (data.success) setAllProducts(data.products || []);
+      } catch {}
+    };
+    fetchProducts();
+  }, [id]);
+
+  // Fetch existing relations (when we have the post slug)
+  useEffect(() => {
+    if (!postSlug) return;
+    const fetchRelations = async () => {
+      try {
+        const res = await fetch(`/api/post_relations.php?post_slug=${postSlug}`);
+        const data = await res.json();
+        if (data.success) setRelatedProducts(data.relations || []);
+      } catch {}
+    };
+    fetchRelations();
+  }, [postSlug]);
+
+  // Save relations
+  const handleSaveRelations = async () => {
+    if (!postSlug) return;
+    setRelationSaving(true);
+    setRelationSuccess('');
+    try {
+      const payload = {
+        post_slug: postSlug,
+        product_slugs: relatedProducts.map(r => r.product_slug),
+      };
+      console.log('Saving relations:', payload);
+      const res = await authFetch('/api/post_relations.php', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      console.log('Relations API response:', data);
+      if (data.success) {
+        setRelationSuccess('Product relations saved!');
+        setTimeout(() => setRelationSuccess(''), 3000);
+      } else {
+        setSubmitError(data.error || 'Failed to save relations.');
+      }
+    } catch (err) {
+      console.error('Relations save error:', err);
+      setSubmitError('Failed to save product relations: ' + err.message);
+    } finally {
+      setRelationSaving(false);
+    }
+  };
+
+  const addRelatedProduct = (product) => {
+    if (relatedProducts.some(r => r.product_slug === product.slug)) return;
+    setRelatedProducts([...relatedProducts, { product_slug: product.slug, product_name: product.nama }]);
+    setProductSearch('');
+    setShowProductDropdown(false);
+  };
+
+  const removeRelatedProduct = (slug) => {
+    setRelatedProducts(relatedProducts.filter(r => r.product_slug !== slug));
+  };
+
+  const filteredProducts = allProducts.filter(p =>
+    p.nama.toLowerCase().includes(productSearch.toLowerCase()) &&
+    !relatedProducts.some(r => r.product_slug === p.slug)
+  );
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -573,6 +657,108 @@ const PostForm = () => {
               </div>
             </div>
           </div>
+
+          {/* Related Products — Only when editing */}
+          {id && postSlug && (
+            <div>
+              <div className="flex items-center justify-between border-b border-surface-container-low pb-2 mb-6">
+                <h3 className="text-sm font-label font-bold text-primary-container uppercase tracking-[0.2em]">Related Products</h3>
+                <div className="flex items-center gap-3">
+                  {relationSuccess && (
+                    <span className="text-green-600 text-xs font-bold flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                      {relationSuccess}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSaveRelations}
+                    disabled={relationSaving}
+                    className="text-xs font-bold text-white bg-secondary px-4 py-1.5 rounded-sm hover:bg-secondary-container transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">{relationSaving ? 'progress_activity' : 'save'}</span>
+                    {relationSaving ? 'Saving...' : 'Save Relations'}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-xs text-on-surface-variant mb-4">Link this post to related products. The first product will be used for the "View Equipment" button.</p>
+
+              {/* Search & Add */}
+              <div className="relative mb-4">
+                <div className="flex items-center bg-surface-container-low border-b-2 border-outline-variant focus-within:border-secondary transition-colors">
+                  <span className="material-symbols-outlined text-outline px-3">search</span>
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => { setProductSearch(e.target.value); setShowProductDropdown(true); }}
+                    onFocus={() => setShowProductDropdown(true)}
+                    className="w-full py-3 px-2 outline-none text-sm bg-transparent"
+                    placeholder="Search products to link..."
+                  />
+                </div>
+                {/* Dropdown */}
+                {showProductDropdown && productSearch && filteredProducts.length > 0 && (
+                  <div className="absolute z-20 w-full bg-white border border-outline-variant/30 shadow-lg rounded-sm mt-1 max-h-48 overflow-y-auto">
+                    {filteredProducts.map((p) => (
+                      <button
+                        type="button"
+                        key={p.id}
+                        onClick={() => addRelatedProduct(p)}
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-outline-variant/10 last:border-none cursor-pointer"
+                      >
+                        {p.gambar && (
+                          <img src={p.gambar} alt={p.nama} className="w-8 h-8 object-cover rounded-sm bg-surface-container-low" />
+                        )}
+                        <div>
+                          <span className="text-sm font-bold text-primary block">{p.nama}</span>
+                          <span className="text-[10px] text-on-surface-variant">{p.kategori} • {p.slug}</span>
+                        </div>
+                        <span className="material-symbols-outlined text-secondary ml-auto text-lg">add_circle</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {showProductDropdown && productSearch && filteredProducts.length === 0 && (
+                  <div className="absolute z-20 w-full bg-white border border-outline-variant/30 shadow-lg rounded-sm mt-1 p-4 text-center text-sm text-on-surface-variant">
+                    No products found.
+                  </div>
+                )}
+              </div>
+
+              {/* Linked Products List */}
+              {relatedProducts.length === 0 ? (
+                <div className="text-center py-8 bg-surface-container-low rounded-sm text-on-surface-variant">
+                  <span className="material-symbols-outlined text-3xl mb-2 block opacity-40">link_off</span>
+                  <p className="text-sm">No products linked yet. Search above to add one.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {relatedProducts.map((rel, index) => (
+                    <div key={rel.product_slug} className="flex items-center gap-3 bg-surface-container-lowest border border-outline-variant/20 p-3 rounded-sm group">
+                      <div className="w-8 h-8 bg-primary-container text-white flex items-center justify-center rounded-sm text-xs font-black shrink-0">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-bold text-sm text-primary">{rel.product_name || rel.product_slug}</span>
+                        <span className="text-[10px] text-on-surface-variant ml-2">/{rel.product_slug}</span>
+                      </div>
+                      {index === 0 && (
+                        <span className="text-[10px] bg-secondary/10 text-secondary font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Primary Link</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeRelatedProduct(rel.product_slug)}
+                        className="p-1.5 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-sm transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">close</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Footer Actions */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-12 pb-24 border-t border-outline-variant/20">

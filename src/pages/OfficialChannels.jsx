@@ -75,6 +75,10 @@ const OfficialChannels = () => {
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="IG" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">@toko.ateka.tehnik</span>
                   </a>
+                  <a href="https://www.facebook.com/atktehnik.gondang/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" className="w-8 h-8 object-contain" />
+                    <span className="font-bold text-gray-700 group-hover:text-emerald-700">Ateka Tehnik Gondang</span>
+                  </a>
                   <a href="https://www.tiktok.com/@toko.ateka.tehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">@toko.ateka.tehnik</span>

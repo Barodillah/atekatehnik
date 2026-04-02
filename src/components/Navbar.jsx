@@ -91,6 +91,9 @@ const Navbar = () => {
     if (path === '/portfolio') {
       return location.pathname.startsWith('/portfolio') || location.pathname.startsWith('/post');
     }
+    if (path === '/products') {
+      return location.pathname.startsWith('/products') || location.pathname.startsWith('/product');
+    }
     if (path === '/') {
       return location.pathname === '/';
     }

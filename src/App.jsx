@@ -26,6 +26,9 @@ import AdminProducts from './pages/dashboard/Products';
 import AdminProductForm from './pages/dashboard/ProductForm';
 import AdminPosts from './pages/dashboard/Posts';
 import AdminPostForm from './pages/dashboard/PostForm';
+import AdminComments from './pages/dashboard/Comments';
+import AdminAnalytics from './pages/dashboard/Analytics';
+import ActivityLogs from './pages/dashboard/ActivityLogs';
 import AdminLogin from './pages/dashboard/Login';
 
 const PublicLayout = () => {
@@ -71,6 +74,9 @@ function App() {
             <Route path="posts" element={<AdminPosts />} />
             <Route path="posts/new" element={<AdminPostForm />} />
             <Route path="posts/edit/:id" element={<AdminPostForm />} />
+            <Route path="comments" element={<AdminComments />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="logs" element={<ActivityLogs />} />
           </Route>
         </Route>
       </Routes>

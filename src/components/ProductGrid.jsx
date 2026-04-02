@@ -66,6 +66,11 @@ const ProductGrid = () => {
               </div>
               <div className="p-6 space-y-4 flex-1 flex flex-col">
                 <h3 className="text-lg font-headline font-bold text-primary line-clamp-2">{item.nama}</h3>
+                {item.description && (
+                  <p className="text-sm text-on-surface-variant font-body line-clamp-3">
+                    {item.description}
+                  </p>
+                )}
                 <div className="pt-4 border-t border-outline-variant/10 mt-auto">
                   <Link 
                     to={`/product/${item.slug || item.id}`}

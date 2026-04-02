@@ -160,6 +160,13 @@ switch ($method) {
             }
             $post['impact'] = $impact ?: null;
 
+            // Related Products
+            $rp = $db->prepare("SELECT r.product_slug, p.nama FROM post_product_relations r LEFT JOIN products p ON r.product_slug = p.slug WHERE r.post_slug = :slug");
+            $rp->execute([':slug' => $post['slug']]);
+            $relatedProductsData = $rp->fetchAll();
+            $post['related_product_slug'] = !empty($relatedProductsData) ? $relatedProductsData[0]['product_slug'] : null;
+            $post['related_products'] = $relatedProductsData; // array of {product_slug, nama}
+
             jsonSuccess(['post' => $post]);
         } else {
             $search = trim($_GET['search'] ?? '');
@@ -193,7 +200,13 @@ switch ($method) {
             $countStmt->execute($params);
             $total = (int) $countStmt->fetchColumn();
 
-            $sql = "SELECT id, title, subtitle, category, publish_date, cover_image, language, location, slug, created_at FROM posts $where ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+            $sort = $_GET['sort'] ?? '';
+            $orderBy = "created_at DESC";
+            if ($sort === 'views_asc') {
+                $orderBy = "(SELECT COUNT(*) FROM page_views WHERE page_slug = posts.slug AND page_type = 'post') ASC";
+            }
+            
+            $sql = "SELECT id, title, subtitle, category, publish_date, cover_image, language, location, slug, created_at FROM posts $where ORDER BY $orderBy LIMIT :limit OFFSET :offset";
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v)
                 $stmt->bindValue($k, $v);

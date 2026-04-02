@@ -65,6 +65,18 @@ const DashboardLayout = () => {
             <span className="material-symbols-outlined">edit_note</span>
             <span>Blog Posts</span>
           </Link>
+          <Link className={getLinkClasses('/admin/comments')} to="/admin/comments">
+            <span className="material-symbols-outlined">forum</span>
+            <span>Comments</span>
+          </Link>
+          <Link className={getLinkClasses('/admin/analytics')} to="/admin/analytics">
+            <span className="material-symbols-outlined">monitoring</span>
+            <span>Analytics</span>
+          </Link>
+          <Link className={getLinkClasses('/admin/logs')} to="/admin/logs">
+            <span className="material-symbols-outlined">history</span>
+            <span>Activity Logs</span>
+          </Link>
         </div>
         <div className="mt-auto px-4 pt-6 border-t border-blue-900/30">
           <button className="w-full bg-orange-400 text-blue-950 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-colors mb-4 cursor-pointer">
@@ -99,6 +111,9 @@ const DashboardLayout = () => {
                   location.pathname.startsWith('/admin/leads') ? "Search leads..." :
                   location.pathname.startsWith('/admin/products') ? "Search inventory..." :
                   location.pathname.startsWith('/admin/posts') ? "Search blog posts..." :
+                  location.pathname.startsWith('/admin/comments') ? "Search comments..." :
+                  location.pathname.startsWith('/admin/analytics') ? "Search pages..." :
+                  location.pathname.startsWith('/admin/logs') ? "Search logs..." :
                   "Search data..."
                 }
                 type="text"
