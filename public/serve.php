@@ -17,7 +17,7 @@ if ($html === false) {
 }
 
 // Default meta values
-$title = "ATEKA TEHNIK | Modernisasi Penggilingan Padi Terbaik di Indonesia";
+$title = "ATEKA TEHNIK | Supplier Penggilingan Padi Terbaik di Indonesia";
 $description = "ATEKA TEHNIK menyediakan solusi modernisasi penggilingan padi dengan teknologi terbaru untuk meningkatkan efisiensi, kualitas beras, dan hasil produksi.";
 $image = "https://atekatehnik.com/preview.jpg";
 
@@ -26,19 +26,19 @@ $isProduct = preg_match('/^\/product\/([^\/?]+)/', $requestUri, $productMatches)
 
 if ($isPost || $isProduct) {
     $slug = $isPost ? $postMatches[1] : $productMatches[1];
-    
+
     // Direct DB query for fast execution
     $dbFile = __DIR__ . '/api/db.php';
     if (file_exists($dbFile)) {
         require_once $dbFile;
         $db = getDB();
-        
+
         try {
             if ($isPost) {
                 $stmt = $db->prepare("SELECT title, subtitle, cover_image FROM posts WHERE slug = :slug");
                 $stmt->execute([':slug' => $slug]);
                 $item = $stmt->fetch();
-                
+
                 if ($item) {
                     $title = $item['title'] . " | ATEKA TEHNIK";
                     $descriptionRaw = $item['subtitle'];
@@ -48,20 +48,20 @@ if ($isPost || $isProduct) {
                 $stmt = $db->prepare("SELECT nama, description, gambar FROM products WHERE slug = :slug");
                 $stmt->execute([':slug' => $slug]);
                 $item = $stmt->fetch();
-                
+
                 if ($item) {
                     $title = $item['nama'] . " | ATEKA TEHNIK";
                     $descriptionRaw = $item['description'];
                     $imageRaw = $item['gambar'];
                 }
             }
-            
+
             if (!empty($item)) {
                 $description = trim(strip_tags($descriptionRaw));
                 if (strlen($description) > 160) {
                     $description = substr($description, 0, 157) . "...";
                 }
-                
+
                 if (!empty($imageRaw)) {
                     // If it's a relative path, make it absolute using hostname
                     // Otherwise keep it as is
@@ -73,7 +73,7 @@ if ($isPost || $isProduct) {
                     }
                 }
             }
-            
+
         } catch (\Exception $e) {
             // Ignore DB errors and fallback to default tags silently
         }

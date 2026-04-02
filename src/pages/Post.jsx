@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 const Post = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const { t, lang } = useLanguage();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -29,7 +31,7 @@ const Post = () => {
     useEffect(() => {
         const fetchRelated = async () => {
             try {
-                const res = await fetch(`/api/posts.php?category=Industrial%20Installations&sort=views_asc&limit=4`);
+                const res = await fetch(`/api/posts.php?lang=${lang}&category=Industrial%20Installations&sort=views_asc&limit=4`);
                 const data = await res.json();
                 if (data.success && data.posts) {
                     const filtered = data.posts.filter(p => p.slug !== slug).slice(0, 3);
@@ -40,14 +42,14 @@ const Post = () => {
             }
         };
         fetchRelated();
-    }, [slug]);
+    }, [slug, lang]);
 
     // ── Fetch Post ───────────────────────────────────────────────────
     useEffect(() => {
         const fetchPost = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`/api/posts.php?slug=${slug}`);
+                const res = await fetch(`/api/posts.php?slug=${slug}&lang=${lang}`);
                 const data = await res.json();
                 if (data.success && data.post) {
                     setPost(data.post);
@@ -187,10 +189,10 @@ const Post = () => {
     if (error || !post) {
         return (
             <main className="max-w-[1440px] mx-auto pt-40 pb-40 text-center">
-                <h1 className="text-4xl font-bold text-primary mb-4">Post Not Found</h1>
-                <p className="text-on-surface-variant mb-8">{error || 'The requested article could not be found.'}</p>
+                <h1 className="text-4xl font-bold text-primary mb-4">{t('postPage.notFound')}</h1>
+                <p className="text-on-surface-variant mb-8">{error || t('postPage.notFoundDesc')}</p>
                 <Link to="/portfolio" className="bg-primary text-white px-8 py-3 rounded-sm font-bold">
-                    Back to Portfolio
+                    {t('postPage.backToPortfolio')}
                 </Link>
             </main>
         );
@@ -207,7 +209,7 @@ const Post = () => {
                     ) : (
                         <div className="w-full h-full flex items-center justify-center flex-col text-outline">
                             <span className="material-symbols-outlined text-6xl mb-2">image</span>
-                            <span>No Cover Image</span>
+                            <span>{t('postPage.noCoverImage')}</span>
                         </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent"></div>
@@ -219,7 +221,7 @@ const Post = () => {
                             {post.category}
                         </span>
                         <span className="text-white/70 text-sm font-medium tracking-wide">
-                            {new Date(post.publish_date || post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            {new Date(post.publish_date || post.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                         </span>
                     </div>
                     <h1
@@ -236,7 +238,7 @@ const Post = () => {
             <section className="grid grid-cols-1 md:grid-cols-12 gap-12 px-8 md:px-20 py-24 bg-surface">
                 <div className="md:col-span-8">
                     <div className="space-y-8">
-                        <h2 className="text-3xl font-bold text-primary tracking-tight font-headline">Project Overview</h2>
+                        <h2 className="text-3xl font-bold text-primary tracking-tight font-headline">{t('postPage.projectOverview')}</h2>
 
                         {/* Actions Bar */}
                         <div className="flex items-center space-x-6 py-4 border-y border-outline-variant/30 my-8">
@@ -254,7 +256,7 @@ const Post = () => {
                             </button>
                             <button onClick={() => setShowShareModal(true)} className="flex items-center space-x-2 text-on-surface-variant hover:text-primary transition-colors">
                                 <span className="material-symbols-outlined">share</span>
-                                <span className="font-bold">Share</span>
+                                <span className="font-bold">{t('postPage.share')}</span>
                             </button>
                         </div>
 
@@ -268,7 +270,7 @@ const Post = () => {
                 {post.deliverables && post.deliverables.length > 0 && (
                     <div className="md:col-span-4">
                         <div className="bg-surface-container-low p-8 rounded-sm space-y-6">
-                            <h3 className="text-xs font-black tracking-[0.2em] text-secondary uppercase font-headline">Key Deliverables</h3>
+                            <h3 className="text-xs font-black tracking-[0.2em] text-secondary uppercase font-headline">{t('postPage.keyDeliverables')}</h3>
                             <ul className="space-y-4">
                                 {post.deliverables.map((item, i) => (
                                     <li key={i} className="flex items-start space-x-3">
@@ -286,13 +288,13 @@ const Post = () => {
                     <div className="absolute right-0 top-0 w-full md:w-1/2 h-full opacity-5 md:opacity-10 pointer-events-none">
                         <img alt="Blueprints" className="w-full h-full object-cover"
                             data-alt="Technical blueprint and engineering schematic of an industrial machine assembly with precise lines and measurements"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx1hhalQM1JiLOzLrYXzby7sFwK7RDpApeAg3Px_wtKsuVXQHfhAP-_S89BUIDnK8vg1V9TqdWxbKCgn6PjWYGQaT2U7jwbMOvbkpr8gN_4FGjb5GoCJn6OSKot5WtyEycYZswnpTnFU2IszlAZYjVa4PcoQB3MUVE2Gwu6FwkX0zgRETmm7WJIIFl0LJgqiWZedn-0a_r0Ha0LeaAsSikHd6TDAfpPi5hxIZcc2MjGS7xTTl7azWRg2ifJ30JrpBb596tOB93JxU" />
+                            src="https://atekatehnik.com/wp-content/uploads/gambar_hero_ai.jpeg" />
                     </div>
                     <div className="relative z-10 w-full">
                         <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-6 md:gap-0 mb-10 md:mb-16">
                             <h2 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3 md:space-x-4 font-headline m-0 shrink-0">
                                 <span className="w-8 md:w-12 h-0.5 bg-secondary-container inline-block"></span>
-                                <span>Technical Specifications</span>
+                                <span>{t('postPage.techSpecs')}</span>
                             </h2>
                             {post?.related_products && post.related_products.length > 0 ? (
                                 <div className="flex flex-wrap gap-2 md:gap-4 justify-start md:justify-end items-center w-full md:w-auto">
@@ -304,14 +306,14 @@ const Post = () => {
                                             title={`View ${prod.nama}`}
                                         >
                                             <span className="material-symbols-outlined text-[14px] md:text-[18px]">precision_manufacturing</span>
-                                            <span className="max-w-[140px] md:max-w-[250px] truncate">{prod.nama || 'View Equipment'}</span>
+                                            <span className="max-w-[140px] md:max-w-[250px] truncate">{prod.nama || t('postPage.viewEquipment')}</span>
                                             <span className="material-symbols-outlined text-[14px] md:text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                         </Link>
                                     ))}
                                 </div>
                             ) : (
                                 <Link to="/products" className="text-secondary font-bold text-xs md:text-sm tracking-widest uppercase flex items-center space-x-2 group hover:text-white transition-colors">
-                                    <span>View Equipment</span>
+                                    <span>{t('postPage.viewEquipment')}</span>
                                     <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                                 </Link>
                             )}
@@ -335,7 +337,7 @@ const Post = () => {
             {/* Process Gallery: Bento Grid */}
             {post.phases && post.phases.length > 0 && (
                 <section className="px-8 md:px-20 py-24 bg-surface-container-low">
-                    <h2 className="text-3xl font-bold text-primary mb-12 tracking-tight font-headline">Installation Phases</h2>
+                    <h2 className="text-3xl font-bold text-primary mb-12 tracking-tight font-headline">{t('postPage.installationPhases')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-[800px]">
                         {post.phases.map((phase, index) => (
                             <div key={index}
@@ -351,7 +353,7 @@ const Post = () => {
                                     </div>
                                 </div>
                                 <div className="absolute bottom-0 left-0 p-8 bg-gradient-to-t from-black/80 to-transparent w-full z-20 pointer-events-none">
-                                    <span className="text-secondary-container font-bold text-xs uppercase tracking-widest">Phase 0{index + 1}</span>
+                                    <span className="text-secondary-container font-bold text-xs uppercase tracking-widest">{t('postPage.phase')} 0{index + 1}</span>
                                     <h4 className="text-white font-bold text-xl font-headline">{phase.title}</h4>
                                 </div>
                             </div>
@@ -396,7 +398,7 @@ const Post = () => {
             {/* Comments Section */}
             <section className="px-8 md:px-20 py-24 bg-surface max-w-5xl mx-auto w-full">
                 <div className="pt-8">
-                    <h3 className="text-2xl font-bold text-primary mb-8 font-headline">Comments ({comments.length})</h3>
+                    <h3 className="text-2xl font-bold text-primary mb-8 font-headline">{t('postPage.comments')} ({comments.length})</h3>
 
                     {/* Success Message */}
                     {commentSuccess && (
@@ -412,18 +414,18 @@ const Post = () => {
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             className="w-full bg-surface-container-low border border-outline-variant rounded-sm p-6 text-on-surface focus:outline-none focus:border-primary resize-none text-lg"
-                            placeholder="Add a comment..."
+                            placeholder={t('postPage.addComment')}
                             rows="4"
                         ></textarea>
                         <div className="flex justify-end mt-4">
-                            <button type="submit" disabled={!newComment.trim()} className="bg-primary text-white px-8 py-3 rounded-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Post Comment</button>
+                            <button type="submit" disabled={!newComment.trim()} className="bg-primary text-white px-8 py-3 rounded-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t('postPage.postComment')}</button>
                         </div>
                     </form>
 
                     {comments.length === 0 && !commentSuccess && (
                         <div className="text-center py-12 text-on-surface-variant">
                             <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">forum</span>
-                            <p>No comments yet. Be the first to share your thoughts!</p>
+                            <p>{t('postPage.noComments')}</p>
                         </div>
                     )}
 
@@ -445,10 +447,10 @@ const Post = () => {
             {relatedInstallations.length > 0 && (
                 <section className="px-8 md:px-20 py-24 border-t border-outline-variant/20">
                     <div className="flex justify-between items-end mb-12">
-                        <h2 className="text-2xl font-bold text-primary tracking-tight font-headline">Other Recent Installations</h2>
+                        <h2 className="text-2xl font-bold text-primary tracking-tight font-headline">{t('postPage.otherInstallations')}</h2>
                         <Link className="text-secondary font-bold text-sm tracking-widest uppercase flex items-center space-x-2 group"
                             to="/portfolio">
-                            <span>View all projects</span>
+                            <span>{t('postPage.viewAllProjects')}</span>
                             <span
                                 className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                         </Link>
@@ -466,7 +468,7 @@ const Post = () => {
                                     <h3 className="text-xl font-bold text-primary mb-2 line-clamp-2">{project.title}</h3>
                                     <p className="text-on-surface-variant text-sm line-clamp-2 mb-4">{project.subtitle}</p>
                                     <span className="text-secondary font-bold text-xs uppercase tracking-widest flex items-center gap-2 group-hover:text-primary transition-colors">
-                                        Read Case Study <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                        {t('postPage.readCaseStudy')} <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                     </span>
                                 </div>
                             </Link>
@@ -476,13 +478,11 @@ const Post = () => {
             )}
             {/* CTA Section */}
             <section className="bg-surface-container-low px-8 md:px-20 py-32 flex flex-col items-center text-center">
-                <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6 tracking-tighter font-headline">Ready to Optimize Your
-                    Output?</h2>
-                <p className="text-on-surface-variant max-w-2xl mb-12 text-lg">Ateka Tehnik provides end-to-end engineering
-                    solutions for the agricultural industry. From design to commissioning, we deliver precision.</p>
+                <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6 tracking-tighter font-headline whitespace-pre-line">{t('postPage.ctaTitle')}</h2>
+                <p className="text-on-surface-variant max-w-2xl mb-12 text-lg">{t('postPage.ctaDesc')}</p>
                 <Link to="/contact"
                     className="bg-secondary text-white px-10 py-5 rounded-sm font-black text-sm tracking-[0.2em] uppercase hover:bg-secondary/90 transition-all shadow-xl hover:-translate-y-1 block">
-                    Consult Your Project
+                    {t('postPage.ctaBtn')}
                 </Link>
             </section>
 
@@ -493,8 +493,8 @@ const Post = () => {
                         <button onClick={() => setShowCommentModal(false)} className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface">
                             <span className="material-symbols-outlined">close</span>
                         </button>
-                        <h3 className="text-xl font-bold text-primary mb-2">Confirm Your Comment</h3>
-                        <p className="text-on-surface-variant text-sm mb-6">Your comment will be reviewed before appearing publicly.</p>
+                        <h3 className="text-xl font-bold text-primary mb-2">{t('postPage.confirmComment')}</h3>
+                        <p className="text-on-surface-variant text-sm mb-6">{t('postPage.commentReview')}</p>
 
                         {/* Preview */}
                         <div className="bg-surface-container-low p-4 rounded-sm mb-6 border border-outline-variant/30">
@@ -503,7 +503,7 @@ const Post = () => {
 
                         {/* Anonymous Toggle */}
                         <div className="flex items-center justify-between mb-6">
-                            <span className="text-on-surface font-medium">Post as Anonymous</span>
+                            <span className="text-on-surface font-medium">{t('postPage.postAsAnonymous')}</span>
                             <button
                                 type="button"
                                 onClick={() => setIsAnonymous(!isAnonymous)}
@@ -516,13 +516,13 @@ const Post = () => {
                         {/* Name Input (only if not anonymous) */}
                         {!isAnonymous && (
                             <div className="mb-6">
-                                <label className="block text-sm font-bold text-on-surface mb-2">Your Name</label>
+                                <label className="block text-sm font-bold text-on-surface mb-2">{t('postPage.yourName')}</label>
                                 <input
                                     type="text"
                                     value={commentName}
                                     onChange={(e) => setCommentName(e.target.value)}
                                     className="w-full bg-surface-container-low border border-outline-variant rounded-sm p-3 text-on-surface focus:outline-none focus:border-primary"
-                                    placeholder="Enter your name..."
+                                    placeholder={t('postPage.enterName')}
                                     autoFocus
                                 />
                             </div>
@@ -534,7 +534,7 @@ const Post = () => {
                                 onClick={() => setShowCommentModal(false)}
                                 className="flex-1 border border-outline-variant text-on-surface-variant px-6 py-3 rounded-sm font-bold hover:bg-surface-container-low transition-colors"
                             >
-                                Cancel
+                                {t('postPage.cancel')}
                             </button>
                             <button
                                 onClick={handleCommentConfirm}
@@ -546,7 +546,7 @@ const Post = () => {
                                 ) : (
                                     <>
                                         <span className="material-symbols-outlined text-lg">send</span>
-                                        <span>Submit</span>
+                                        <span>{t('postPage.submit')}</span>
                                     </>
                                 )}
                             </button>
@@ -562,7 +562,7 @@ const Post = () => {
                         <button onClick={() => setShowShareModal(false)} className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface">
                             <span className="material-symbols-outlined">close</span>
                         </button>
-                        <h3 className="text-xl font-bold text-primary mb-6">Share this post</h3>
+                        <h3 className="text-xl font-bold text-primary mb-6">{t('postPage.sharePost')}</h3>
                         <div className="grid grid-cols-4 gap-4 mb-6">
                             <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#25D366] transition-colors">
                                 <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#25D366]/10">
@@ -586,7 +586,7 @@ const Post = () => {
                                 <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${isCopied ? 'bg-[#25D366]/10' : 'bg-surface-container hover:bg-primary/10'}`}>
                                     <span className="material-symbols-outlined">{isCopied ? 'check' : 'link'}</span>
                                 </div>
-                                <span className="text-[10px] font-medium text-center">{isCopied ? 'Copied!' : 'Copy Link'}</span>
+                                <span className="text-[10px] font-medium text-center">{isCopied ? t('postPage.copied') : t('postPage.copyLink')}</span>
                             </button>
                         </div>
                         <div className="flex items-center bg-surface-container-low p-2 rounded-sm w-full border border-outline-variant/50">

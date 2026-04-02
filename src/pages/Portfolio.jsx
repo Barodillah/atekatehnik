@@ -54,11 +54,11 @@ const Portfolio = () => {
                         <div className="w-full md:w-3/5 relative">
                             <div className="aspect-video overflow-hidden rounded-sm shadow-2xl">
                                 <img alt="Featured Project" className="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZYCn8vOZ-RrONT4PKUlZTn8DcaIciHS3OTQfU6GqLnaKSqc79Otbuc1NP16LhBwN5V0bO6MKp00CP13xuzAzeyAuhqfZWGRfV-8jKg3hT3GmWJDqh72I0rMwYcT3oGP7jbw9b-wV1HjMfz5Lwrq3RuEOH6KsFi3eTYWPF_1s2PyoNIjlBm0R_n34A3LhMxbrkR0sywTTakCyQ1F0qy0m4WOLO4cTz3-_gN7bZ9k6tU-V5me5gFckPwKPsbYFRkpX1-FlB0mIXqMI" />
+                                    src="https://atekatehnik.com/wp-content/uploads/RMU_2-3ton_Pati.jpeg" />
                             </div>
                             <div className="absolute -bottom-6 -right-6 bg-secondary p-8 rounded-sm hidden md:block">
                                 <span className="block text-white font-headline text-4xl font-black">2024</span>
-                                <span className="block text-white/80 font-label text-xs tracking-widest uppercase">Flagship Completion</span>
+                                <span className="block text-white/80 font-label text-xs tracking-widest uppercase">Pati, Jawa Tengah</span>
                             </div>
                         </div>
                         <div className="w-full md:w-2/5">
@@ -67,7 +67,7 @@ const Portfolio = () => {
                             <p className="text-on-surface-variant leading-relaxed mb-8">{t('portfolioPage.featuredDesc')}</p>
                             <div className="grid grid-cols-2 gap-6 mb-8">
                                 <div>
-                                    <span className="block text-2xl font-headline font-extrabold text-primary">5 Ton/Hr</span>
+                                    <span className="block text-2xl font-headline font-extrabold text-primary">2–3 Ton/Hr</span>
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statCapacity')}</span>
                                 </div>
                                 <div>
@@ -75,7 +75,7 @@ const Portfolio = () => {
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statPurity')}</span>
                                 </div>
                             </div>
-                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post">
+                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post/pemasangan-rmu-23-tonjam-di-pati-jawa-tengah">
                                 {t('portfolioPage.viewSpecs')} <span className="material-symbols-outlined">arrow_forward</span>
                             </Link>
                         </div>
