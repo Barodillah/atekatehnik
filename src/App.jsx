@@ -19,6 +19,7 @@ import OfficialChannels from './pages/OfficialChannels';
 import SearchResults from './pages/SearchResults';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import Edukasi from './pages/Edukasi';
 import { NotFound } from './pages/ErrorPage';
 
 // Admin Dashboard Components & Pages
@@ -66,6 +67,7 @@ function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/edukasi" element={<Edukasi />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

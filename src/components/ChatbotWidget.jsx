@@ -184,7 +184,7 @@ const ChatbotWidget = () => {
   const historyLoadedRef = useRef(false);
   const { t } = useLanguage();
 
-  const WA_LINK = 'https://wa.me/62881080634612?text=Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
+  const WA_LINK = 'https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
 
   const quickQuestions = [
     t('chatbot.q1'),

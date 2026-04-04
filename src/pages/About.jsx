@@ -148,30 +148,30 @@ const About = () => {
                         <h2 className="text-sm font-label text-outline tracking-[0.3em] uppercase mb-4">{t('about.certLabel')}</h2>
                         <h3 className="text-3xl font-headline font-bold text-primary tracking-tight">{t('about.certTitle')}</h3>
                     </div>
-                    <div className="flex flex-wrap justify-center items-center gap-16 md:gap-32 opacity-70 grayscale hover:grayscale-0 transition-all">
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
-                                <span className="material-symbols-outlined text-4xl text-primary">verified</span>
-                            </div>
-                            <span className="font-headline font-bold text-primary">SNI ISO 9001</span>
+                    <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-90 transition-opacity duration-500">
+                        <div className="flex flex-col items-center gap-3 group">
+                            <img 
+                                src="https://atekatehnik.com/wp-content/uploads/ISO9001.png" 
+                                alt="SNI ISO 9001" 
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            />
+                            <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">SNI ISO 9001</span>
                         </div>
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
-                                <span className="material-symbols-outlined text-4xl text-primary">account_balance</span>
-                            </div>
-                            <span className="font-headline font-bold text-primary">E-Katalog INAPROC</span>
+                        <div className="flex flex-col items-center gap-3 group">
+                            <img 
+                                src="https://atekatehnik.com/wp-content/uploads/inaproc.png" 
+                                alt="E-Katalog INAPROC" 
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            />
+                            <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">E-Katalog INAPROC</span>
                         </div>
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
-                                <span className="material-symbols-outlined text-4xl text-primary">security</span>
-                            </div>
-                            <span className="font-headline font-bold text-primary">TKDN Compliant</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 mb-4 flex items-center justify-center bg-surface-container-low rounded-full">
-                                <span className="material-symbols-outlined text-4xl text-primary">workspace_premium</span>
-                            </div>
-                            <span className="font-headline font-bold text-primary">ASAE Standard</span>
+                        <div className="flex flex-col items-center gap-3 group">
+                            <img 
+                                src="https://atekatehnik.com/wp-content/uploads/mentri_industri.png" 
+                                alt="TKDN Compliant" 
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            />
+                            <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">TKDN Compliant</span>
                         </div>
                     </div>
                 </div>

@@ -157,7 +157,7 @@ const Products = () => {
                                             </a>
                                         ) : (
                                             <a
-                                                href={`https://wa.me/6288108063461?text=${encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.nama}. Bisa info lebih lanjut?`)}`}
+                                                href={`https://wa.me/62881080634612?text=${encodeURIComponent(`Saya melihat dari website atekatehnik,com. Halo, saya tertarik dengan produk: ${product.nama}. Bisa info lebih lanjut?`)}`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="bg-[#25D366] text-white py-3 font-headline font-bold text-sm tracking-tight hover:bg-[#1da851] transition-colors text-center flex items-center justify-center gap-2 group"

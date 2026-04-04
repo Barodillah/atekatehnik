@@ -20,6 +20,10 @@ $db = getDB();
 $leadsTotalStmt = $db->query("SELECT COUNT(*) FROM leads");
 $totalLeads = (int) $leadsTotalStmt->fetchColumn();
 
+// New Leads
+$leadsNewStmt = $db->query("SELECT COUNT(*) FROM leads WHERE status = 'New'");
+$newLeads = (int) $leadsNewStmt->fetchColumn();
+
 // Total Products
 $productsTotalStmt = $db->query("SELECT COUNT(*) FROM products");
 $totalProducts = (int) $productsTotalStmt->fetchColumn();
@@ -32,36 +36,30 @@ $totalViews = (int) $viewsTotalStmt->fetchColumn();
 $commentsTotalStmt = $db->query("SELECT COUNT(*) FROM post_comments");
 $totalComments = (int) $commentsTotalStmt->fetchColumn();
 
-// ── 2. Chart Data: Monthly Lead Acquisition (Last 6 Months) ────────
+// ── 2. Chart Data: Page Views (Last 7 Days) ────────
 
-$months = [];
+$days = [];
 $chartData = [];
-// Generate last 6 months list (e.g. ['Jan', 'Feb', 'Mar'...])
-for ($i = 5; $i >= 0; $i--) {
-    $monthLabel = date('M', strtotime("-{$i} months"));
-    $monthNum = date('Y-m', strtotime("-{$i} months"));
-    $months[$monthNum] = $monthLabel;
-    $chartData[$monthLabel] = ['qualified' => 0, 'raw' => 0]; // Default 0
+for ($i = 6; $i >= 0; $i--) {
+    $dayLabel = date('D', strtotime("-{$i} days")); // Mon, Tue
+    $dayDate = date('Y-m-d', strtotime("-{$i} days"));
+    $days[$dayDate] = $dayLabel;
+    $chartData[$dayLabel] = ['views' => 0];
 }
 
-// Group leads by month
-$leadsChartStmt = $db->query("
-    SELECT DATE_FORMAT(created_at, '%Y-%m') as month, status, COUNT(*) as count 
-    FROM leads 
-    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-    GROUP BY month, status
+// Group page views by day
+$viewsChartStmt = $db->query("
+    SELECT DATE(viewed_at) as view_date, COUNT(*) as count 
+    FROM page_views 
+    WHERE viewed_at >= DATE_SUB(DATE(NOW()), INTERVAL 6 DAY)
+    GROUP BY view_date
 ");
-$leadsChartRaw = $leadsChartStmt->fetchAll();
+$viewsChartRaw = $viewsChartStmt->fetchAll();
 
-foreach ($leadsChartRaw as $row) {
-    if (isset($months[$row['month']])) {
-        $label = $months[$row['month']];
-        // Suppose 'new' and 'contacted' is Raw, 'qualified' and 'converted' is Qualified
-        if (in_array($row['status'], ['qualified', 'converted'])) {
-            $chartData[$label]['qualified'] += (int) $row['count'];
-        } else {
-            $chartData[$label]['raw'] += (int) $row['count'];
-        }
+foreach ($viewsChartRaw as $row) {
+    if (isset($days[$row['view_date']])) {
+        $label = $days[$row['view_date']];
+        $chartData[$label]['views'] += (int) $row['count'];
     }
 }
 
@@ -69,10 +67,9 @@ foreach ($leadsChartRaw as $row) {
 $chartArray = [];
 foreach ($chartData as $label => $data) {
     $chartArray[] = [
-        'month' => $label,
-        'qualified' => $data['qualified'],
-        'raw' => $data['raw'],
-        'total' => $data['qualified'] + $data['raw']
+        'day' => $label,
+        'views' => $data['views'],
+        'total' => $data['views'],
     ];
 }
 
@@ -92,11 +89,12 @@ $featuredProduct = $latestProductStmt->fetch();
 jsonSuccess([
     'kpis' => [
         'totalLeads' => $totalLeads,
+        'newLeads' => $newLeads,
         'totalProducts' => $totalProducts,
         'totalViews' => $totalViews,
         'totalComments' => $totalComments,
     ],
-    'leadChart' => $chartArray,
+    'viewChart' => $chartArray,
     'recentActivity' => $recentActivity,
     'featuredProduct' => $featuredProduct
 ]);

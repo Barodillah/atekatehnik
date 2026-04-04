@@ -103,7 +103,7 @@ const ProductDetail = () => {
         );
     }
 
-    const whatsappMessage = `Halo Ateka Tehnik, saya ingin konsultasi detail mengenai produk: ${product.nama}.`;
+    const whatsappMessage = `Saya melihat dari website atekatehnik,com. Halo Ateka Tehnik, saya ingin konsultasi detail mengenai produk: ${product.nama}.`;
 
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareTitle = product?.nama || 'Ateka Tehnik Product';
@@ -139,7 +139,7 @@ const ProductDetail = () => {
             )}
 
             <a
-                href={`https://wa.me/6288108063461?text=${encodeURIComponent(whatsappMessage)}`}
+                href={`https://wa.me/62881080634612?text=${encodeURIComponent(whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 min-w-[200px] bg-[#25D366] text-white px-6 py-4 rounded-xl font-headline font-extrabold text-sm tracking-widest uppercase hover:bg-[#1da851] hover:shadow-[0_15px_30px_-5px_rgba(37,211,102,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 text-center group"

@@ -12,7 +12,7 @@ const Analytics = () => {
   const [summary, setSummary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
-  const [overallStats, setOverallStats] = useState({ totalViews: 0, uniqueIps: 0, topCountries: [], topBrowsers: [], topDevices: [] });
+  const [overallStats, setOverallStats] = useState({ totalViews: 0, uniqueIps: 0, topCountries: [], topCities: [], topBrowsers: [], topDevices: [] });
 
   // Fetch page list with view counts
   const fetchPages = async () => {
@@ -91,9 +91,9 @@ const Analytics = () => {
           <span className="text-4xl font-extrabold text-primary font-headline mt-3">{overallStats.uniqueIps}</span>
         </div>
         <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Country</span>
-          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{overallStats.topCountries?.[0]?.country || '—'}</span>
-          <span className="text-xs text-on-surface-variant">{overallStats.topCountries?.[0]?.count || 0} views</span>
+          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top City</span>
+          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{overallStats.topCities?.[0]?.city || '—'}</span>
+          <span className="text-xs text-on-surface-variant">{overallStats.topCities?.[0]?.count || 0} views</span>
         </div>
         <div className="bg-surface-container-low p-6 flex flex-col">
           <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Browser</span>
@@ -180,7 +180,7 @@ const Analytics = () => {
 
           {/* Summary Cards */}
           {summary && (
-            <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-surface-container-low">
+            <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-5 gap-4 border-b border-surface-container-low">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total Views</span>
                 <span className="text-2xl font-extrabold text-primary">{summary.total}</span>
@@ -194,6 +194,14 @@ const Analytics = () => {
                 <div className="flex flex-wrap gap-1 mt-1">
                   {summary.countries.map((c, i) => (
                     <span key={i} className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{c.country} ({c.count})</span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Cities</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {summary.cities?.map((c, i) => (
+                    <span key={i} className="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{c.city} ({c.count})</span>
                   ))}
                 </div>
               </div>

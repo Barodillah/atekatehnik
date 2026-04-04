@@ -298,7 +298,82 @@ const translations = {
     "terms.liabilityLabel": "5. Batasan Kewajiban",
     "terms.liabilityDesc": "Dalam keadaan apa pun CV Ateka Tehnik tidak bertanggung jawab atas segala kerugian tidak langsung, insidental, atau konsekuensial yang timbul dari akses atau penggunaan materi pada Layanan web ini. Untuk jaminan produk fisik seperti RMU, hal tersebut dicakup dalam Syarat Garansi terpisah.",
     "terms.governingLabel": "6. Hukum yang Berlaku",
-    "terms.governingDesc": "Syarat ini akan diatur dan ditafsirkan sesuai dengan hukum Republik Indonesia. Segala perselisihan yang mungkin timbul akan diselesaikan di bawah yurisdiksi pengadilan di Indonesia yang sesuai."
+    "terms.governingDesc": "Syarat ini akan diatur dan ditafsirkan sesuai dengan hukum Republik Indonesia. Segala perselisihan yang mungkin timbul akan diselesaikan di bawah yurisdiksi pengadilan di Indonesia yang sesuai.",
+
+    // Edukasi Highlight (Home CTA)
+    "edukasi.highlightTitle": "Mengapa Anda Butuh Mesin Modern?",
+    "edukasi.highlightDesc": "Ketahuilah rahasia cara kerja mesin modern Rice Milling Unit (RMU) dan Vertical Dryer dalam mengatasi masalah susut hasil, kualitas patah, hingga menghemat biaya operasional Anda.",
+    "edukasi.highlightCta": "Pelajari Selengkapnya",
+
+    // Edukasi Page
+    "edukasi.badge": "Pusat Pengetahuan",
+    "edukasi.heroTitle": "Edukasi Teknologi ",
+    "edukasi.heroHighlight": "Pasca Panen",
+    "edukasi.heroDesc": "Pahami lebih dalam tentang proses penggilingan dan pengeringan modern untuk menghasilkan beras dengan kualitas super dan meminimalisir susut hasil pertanian.",
+    "edukasi.ctaTitle": "Siap Meningkatkan Produksi Anda?",
+    "edukasi.ctaDesc": "Ambil langkah selanjutnya untuk memajukan usaha penggilingan padi Anda dengan inovasi modern.",
+    "edukasi.ctaHome": "Kembali ke Beranda",
+    "edukasi.ctaTech": "Permintaan Teknis",
+    "edukasi.ctaWa": "Hubungi via WhatsApp",
+
+    // RMU Workflow Section
+    "rmuWorkflow.title": "Cara Kerja Mesin RMU",
+    "rmuWorkflow.desc": "Proses otomatisasi terpadu untuk mengubah gabah mentah menjadi beras kualitas premium siap konsumsi.",
+    "rmuWorkflow.step1Title": "Pembersihan Awal (Pre-Cleaning)",
+    "rmuWorkflow.step1Desc": "Pembersihan gabah dari kotoran, batu, dan benda asing lainnya.",
+    "rmuWorkflow.step2Title": "Pengupasan Kulit (Husking)",
+    "rmuWorkflow.step2Desc": "Memisahkan kulit gabah (sekam) dari butiran beras pecah kulit.",
+    "rmuWorkflow.step3Title": "Pemilahan Sekam & Beras",
+    "rmuWorkflow.step3Desc": "Pemisahan sempurna antara sekam, beras pecah kulit, dan gabah.",
+    "rmuWorkflow.step4Title": "Penyosohan (Polishing)",
+    "rmuWorkflow.step4Desc": "Menghilangkan lapisan bekatul untuk menghasilkan beras putih mengkilap.",
+    "rmuWorkflow.step5Title": "Pemisahan Beras (Grading)",
+    "rmuWorkflow.step5Desc": "Memisahkan beras kepala, beras patah, dan menir sesuai standar.",
+    "rmuWorkflow.step6Title": "Pengemasan (Packing)",
+    "rmuWorkflow.step6Desc": "Beras siap dikemas ke dalam karung dengan berat yang akurat.",
+
+    // RMU Advantages Section
+    "rmuAdv.title": "Keunggulan Mesin RMU",
+    "rmuAdv.desc": "Investasi cerdas untuk penggilingan padi modern. Kami menghadirkan nilai tambah yang signifikan pada setiap butir beras yang Anda produksi.",
+    "rmuAdv.efficiency": "Efisiensi Proses",
+    "rmuAdv.efficiencyDesc": "Hemat waktu, tenaga, dan biaya operasional harian.",
+    "rmuAdv.quality": "Beras Berkualitas",
+    "rmuAdv.qualityDesc": "Beras lebih bersih, putih, utuh, dan mengkilap.",
+    "rmuAdv.productivity": "Produktivitas Tinggi",
+    "rmuAdv.productivityDesc": "Kapasitas pengolahan besar dalam waktu singkat.",
+    "rmuAdv.multiFunc": "Multi-Fungsi",
+    "rmuAdv.multiFuncDesc": "Menghasilkan produk sampingan bermanfaat (bekatul, sekam).",
+    "rmuAdv.reduceLoss": "Kurangi Susut Hasil",
+    "rmuAdv.reduceLossDesc": "Meminimalisir kehilangan hasil selama proses giling.",
+    "rmuAdv.economic": "Nilai Ekonomi",
+    "rmuAdv.economicDesc": "Meningkatkan harga jual beras dengan kualitas premium.",
+
+    // Dryer Advantages Section
+    "dryerAdv.badge": "Teknologi Pasca Panen",
+    "dryerAdv.title": "Inovasi Pengeringan: Mesin Bed Dryer",
+    "dryerAdv.desc": "Solusi pengeringan gabah dan jagung dengan sistem alas datar (bed) untuk menjaga stabilitas kualitas hasil panen di segala cuaca.",
+    "dryerAdv.even": "Hasil Merata",
+    "dryerAdv.evenDesc": "Kualitas gabah/jagung lebih stabil dan konsisten.",
+    "dryerAdv.efficient": "Efisiensi Tinggi",
+    "dryerAdv.efficientDesc": "Waktu pengeringan jauh lebih cepat dibanding metode konvensional.",
+    "dryerAdv.minLoss": "Minim Susut",
+    "dryerAdv.minLossDesc": "Mengurangi kehilangan hasil dan kerusakan butiran.",
+    "dryerAdv.energy": "Hemat Energi",
+    "dryerAdv.energyDesc": "Optimalisasi penggunaan bahan bakar dan biaya operasional.",
+    "dryerAdv.profit": "Untung Meningkat",
+    "dryerAdv.profitDesc": "Meningkatkan nilai jual hasil pertanian di pasar.",
+
+    // Dryer Workflow Section
+    "dryerWorkflow.title": "Cara Kerja Bed Dryer",
+    "dryerWorkflow.desc": "Proses pengeringan modern dengan sistem alas datar bertingkat untuk menjaga kualitas hasil panen Anda.",
+    "dryerWorkflow.step1Title": "Pemuatan Bahan",
+    "dryerWorkflow.step1Desc": "Gabah/jagung dihamparkan di atas lantai pengering (bed) secara merata.",
+    "dryerWorkflow.step2Title": "Hembusan Udara Panas",
+    "dryerWorkflow.step2Desc": "Udara panas dari tungku dihembuskan ke atas melalui lantai berlubang secara merata.",
+    "dryerWorkflow.step3Title": "Kontrol Suhu & Kelembapan",
+    "dryerWorkflow.step3Desc": "Suhu dijaga konstan untuk menurunkan kadar air sesuai standar mutu.",
+    "dryerWorkflow.step4Title": "Bahan Kering Keluar",
+    "dryerWorkflow.step4Desc": "Hasil kering merata siap untuk proses penyimpanan atau penggilingan."
   },
 
   en: {
@@ -600,7 +675,82 @@ const translations = {
     "terms.liabilityLabel": "5. Limitation of Liability",
     "terms.liabilityDesc": "In no event shall CV Ateka Tehnik be liable for any indirect, incidental, or consequential damages arising out of accessing or using the materials on this web Service. For physical product warranties such as for RMUs, those are covered under separate Warranty Terms.",
     "terms.governingLabel": "6. Governing Law",
-    "terms.governingDesc": "These Terms shall be governed and construed in accordance with the laws of the Republic of Indonesia. Any disputes arising will be resolved under the jurisdiction of the appropriate Indonesian courts."
+    "terms.governingDesc": "These Terms shall be governed and construed in accordance with the laws of the Republic of Indonesia. Any disputes arising will be resolved under the jurisdiction of the appropriate Indonesian courts.",
+
+    // Edukasi Highlight (Home CTA)
+    "edukasi.highlightTitle": "Why Do You Need Modern Machines?",
+    "edukasi.highlightDesc": "Discover how modern Rice Milling Unit (RMU) and Vertical Dryer machines solve yield loss, grain breakage, and help reduce your operational costs.",
+    "edukasi.highlightCta": "Learn More",
+
+    // Edukasi Page
+    "edukasi.badge": "Knowledge Center",
+    "edukasi.heroTitle": "Post-Harvest ",
+    "edukasi.heroHighlight": "Technology Education",
+    "edukasi.heroDesc": "Gain deeper insight into modern milling and drying processes to produce super-quality rice and minimize agricultural yield losses.",
+    "edukasi.ctaTitle": "Ready to Boost Your Production?",
+    "edukasi.ctaDesc": "Take the next step to advance your rice milling business with modern innovation.",
+    "edukasi.ctaHome": "Back to Home",
+    "edukasi.ctaTech": "Technical Inquiry",
+    "edukasi.ctaWa": "Contact via WhatsApp",
+
+    // RMU Workflow Section
+    "rmuWorkflow.title": "How the RMU Machine Works",
+    "rmuWorkflow.desc": "An integrated automation process to transform raw paddy into premium-quality rice ready for consumption.",
+    "rmuWorkflow.step1Title": "Pre-Cleaning",
+    "rmuWorkflow.step1Desc": "Cleaning paddy from dirt, stones, and other foreign objects.",
+    "rmuWorkflow.step2Title": "Husking",
+    "rmuWorkflow.step2Desc": "Separating the husk (chaff) from brown rice grains.",
+    "rmuWorkflow.step3Title": "Husk & Rice Separation",
+    "rmuWorkflow.step3Desc": "Complete separation of husk, brown rice, and unhusked paddy.",
+    "rmuWorkflow.step4Title": "Polishing",
+    "rmuWorkflow.step4Desc": "Removing the bran layer to produce shiny white rice.",
+    "rmuWorkflow.step5Title": "Grading",
+    "rmuWorkflow.step5Desc": "Separating head rice, broken rice, and brewers according to standards.",
+    "rmuWorkflow.step6Title": "Packing",
+    "rmuWorkflow.step6Desc": "Rice is ready to be packed into sacks with accurate weight.",
+
+    // RMU Advantages Section
+    "rmuAdv.title": "RMU Machine Advantages",
+    "rmuAdv.desc": "A smart investment for modern rice milling. We deliver significant added value to every grain of rice you produce.",
+    "rmuAdv.efficiency": "Process Efficiency",
+    "rmuAdv.efficiencyDesc": "Save time, labor, and daily operational costs.",
+    "rmuAdv.quality": "Premium Rice Quality",
+    "rmuAdv.qualityDesc": "Cleaner, whiter, whole, and shinier rice grains.",
+    "rmuAdv.productivity": "High Productivity",
+    "rmuAdv.productivityDesc": "Large processing capacity in a short time.",
+    "rmuAdv.multiFunc": "Multi-Function",
+    "rmuAdv.multiFuncDesc": "Produces valuable by-products (bran, husk).",
+    "rmuAdv.reduceLoss": "Reduce Yield Loss",
+    "rmuAdv.reduceLossDesc": "Minimize grain loss during the milling process.",
+    "rmuAdv.economic": "Economic Value",
+    "rmuAdv.economicDesc": "Increase rice selling price with premium quality.",
+
+    // Dryer Advantages Section
+    "dryerAdv.badge": "Post-Harvest Technology",
+    "dryerAdv.title": "Drying Innovation: Bed Dryer Machine",
+    "dryerAdv.desc": "A flat-bed drying solution for paddy and corn to maintain harvest quality stability in all weather conditions.",
+    "dryerAdv.even": "Even Results",
+    "dryerAdv.evenDesc": "More stable and consistent paddy/corn quality.",
+    "dryerAdv.efficient": "High Efficiency",
+    "dryerAdv.efficientDesc": "Drying time is much faster than conventional methods.",
+    "dryerAdv.minLoss": "Minimal Loss",
+    "dryerAdv.minLossDesc": "Reduces yield loss and grain damage.",
+    "dryerAdv.energy": "Energy Saving",
+    "dryerAdv.energyDesc": "Optimized fuel usage and operational costs.",
+    "dryerAdv.profit": "Increased Profit",
+    "dryerAdv.profitDesc": "Increases the market value of agricultural products.",
+
+    // Dryer Workflow Section
+    "dryerWorkflow.title": "How the Bed Dryer Works",
+    "dryerWorkflow.desc": "A modern flat-bed drying process to maintain the quality of your harvest.",
+    "dryerWorkflow.step1Title": "Material Loading",
+    "dryerWorkflow.step1Desc": "Paddy/corn is spread evenly on the drying bed floor.",
+    "dryerWorkflow.step2Title": "Hot Air Blowing",
+    "dryerWorkflow.step2Desc": "Hot air from the furnace is blown upward through the perforated floor evenly.",
+    "dryerWorkflow.step3Title": "Temperature & Humidity Control",
+    "dryerWorkflow.step3Desc": "Temperature is kept constant to reduce moisture content to quality standards.",
+    "dryerWorkflow.step4Title": "Dried Material Output",
+    "dryerWorkflow.step4Desc": "Evenly dried product ready for storage or milling."
   }
 };
 

@@ -92,7 +92,13 @@ const Navbar = () => {
       return location.pathname.startsWith('/portfolio') || location.pathname.startsWith('/post');
     }
     if (path === '/products') {
-      return location.pathname.startsWith('/products') || location.pathname.startsWith('/product');
+      return location.pathname.startsWith('/products') || location.pathname.startsWith('/product') || location.pathname.startsWith('/edukasi');
+    }
+    if (path === '/about') {
+      return location.pathname.startsWith('/about');
+    }
+    if (path === '/contact') {
+      return location.pathname.startsWith('/contact') || location.pathname.startsWith('/official-channels');
     }
     if (path === '/') {
       return location.pathname === '/';

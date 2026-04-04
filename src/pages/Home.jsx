@@ -4,6 +4,7 @@ import HeroSection from '../components/HeroSection';
 import TrustBar from '../components/TrustBar';
 import OfficialChannelNotice from '../components/OfficialChannelNotice';
 import ProductGrid from '../components/ProductGrid';
+import EdukasiHighlight from '../components/sections/EdukasiHighlight';
 import ValueProp from '../components/ValueProp';
 import ContactMe from '../components/ContactMe';
 import Portfolio from '../components/Portfolio';
@@ -16,6 +17,7 @@ const Home = () => {
       <TrustBar />
       <OfficialChannelNotice />
       <ProductGrid />
+      <EdukasiHighlight />
       <ValueProp />
       <ContactMe />
       <Portfolio />

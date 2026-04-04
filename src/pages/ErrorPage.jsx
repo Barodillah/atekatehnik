@@ -196,7 +196,7 @@ const ErrorPage = ({ code = 404 }) => {
             {lang === 'id' ? 'Permintaan Teknis' : 'Technical Inquiry'}
           </Link>
           <a
-            href="https://wa.me/62881080634612"
+            href="https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3 bg-transparent text-on-surface-variant font-bold text-sm uppercase tracking-widest rounded-sm border border-outline-variant/30 hover:border-green-600 hover:text-green-600 transition-all duration-200"

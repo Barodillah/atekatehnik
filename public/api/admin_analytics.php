@@ -51,12 +51,17 @@ if ($slug) {
     $browserStmt->execute([':type' => $type, ':slug' => $slug]);
     $browsers = $browserStmt->fetchAll();
 
+    $cityStmt = $db->prepare("SELECT city, COUNT(*) as count FROM page_views WHERE page_type = :type AND page_slug = :slug AND city != '' GROUP BY city ORDER BY count DESC LIMIT 10");
+    $cityStmt->execute([':type' => $type, ':slug' => $slug]);
+    $cities = $cityStmt->fetchAll();
+
     jsonSuccess([
         'views'   => $views,
         'summary' => [
             'total'     => $total,
             'uniqueIps' => $uniqueIps,
             'countries' => $countries,
+            'cities'    => $cities,
             'browsers'  => $browsers,
         ],
     ]);
@@ -100,12 +105,17 @@ $topDevicesStmt = $db->prepare("SELECT device_type, COUNT(*) as count FROM page_
 $topDevicesStmt->execute([':type' => $type]);
 $topDevices = $topDevicesStmt->fetchAll();
 
+$topCitiesStmt = $db->prepare("SELECT city, COUNT(*) as count FROM page_views WHERE page_type = :type AND city != '' GROUP BY city ORDER BY count DESC LIMIT 5");
+$topCitiesStmt->execute([':type' => $type]);
+$topCities = $topCitiesStmt->fetchAll();
+
 jsonSuccess([
     'pages'   => $pages,
     'overall' => [
         'totalViews'   => $totalViews,
         'uniqueIps'    => $uniqueIps,
         'topCountries' => $topCountries,
+        'topCities'    => $topCities,
         'topBrowsers'  => $topBrowsers,
         'topDevices'   => $topDevices,
     ],

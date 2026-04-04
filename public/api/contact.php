@@ -195,7 +195,7 @@ try {
                     
                     <div style='margin-top: 15px;'>
                         <a href='mailto:info@atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Email Support</a> &bull; 
-                        <a href='https://wa.me/62881080634612' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
+                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
                         <a href='https://www.atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Website</a>
                     </div>
                 </div>
@@ -239,7 +239,7 @@ try {
                     
                     <div style='margin-top: 15px;'>
                         <a href='mailto:info@atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Email Support</a> &bull; 
-                        <a href='https://wa.me/62881080634612' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
+                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
                         <a href='https://www.atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Website</a>
                     </div>
                 </div>

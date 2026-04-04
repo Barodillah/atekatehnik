@@ -66,7 +66,7 @@ const ContactMe = () => {
 
               <div className="pt-2 flex flex-col sm:flex-row gap-4 items-center">
                 <a
-                  href="https://wa.me/62881080634612?text=Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20mesin%20penggilingan%20padi%20Anda.%20Bisa%20konsultasi%3F"
+                  href="https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20mesin%20penggilingan%20padi%20Anda.%20Bisa%20konsultasi%3F"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#20B038] to-[#25D366] text-white rounded-2xl font-bold flex items-center justify-center gap-2.5 hover:shadow-lg hover:shadow-[#25D366]/40 hover:-translate-y-1 transition-all duration-300"
