@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
+import { trackWaClick } from '../utils/trackWaClick';
 
 // ── Markdown Parser ──────────────────────────────────────────────────
 const parseMarkdown = (text) => {
@@ -184,7 +185,7 @@ const ChatbotWidget = () => {
   const historyLoadedRef = useRef(false);
   const { t } = useLanguage();
 
-  const WA_LINK = 'https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
+  const WA_LINK = 'https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
 
   const quickQuestions = [
     t('chatbot.q1'),
@@ -480,8 +481,8 @@ const ChatbotWidget = () => {
                   {/* Message Bubble */}
                   <div
                     className={`p-3 text-sm leading-relaxed ${msg.role === 'user'
-                        ? 'bg-secondary text-white rounded-2xl rounded-tr-none shadow-md'
-                        : `bg-white text-on-surface rounded-2xl rounded-tl-none shadow-[0_2px_4px_rgba(0,0,0,0.04)] border border-outline-variant/10 ${msg.isError ? 'border-red-300 bg-red-50' : ''}`
+                      ? 'bg-secondary text-white rounded-2xl rounded-tr-none shadow-md'
+                      : `bg-white text-on-surface rounded-2xl rounded-tl-none shadow-[0_2px_4px_rgba(0,0,0,0.04)] border border-outline-variant/10 ${msg.isError ? 'border-red-300 bg-red-50' : ''}`
                       }`}
                   >
                     {msg.role === 'assistant' ? (
@@ -506,6 +507,7 @@ const ChatbotWidget = () => {
                         href={WA_LINK}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackWaClick('chatbot', 'contact-agent')}
                         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold bg-green-500/10 text-green-700 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all duration-200 group"
                       >
                         <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">

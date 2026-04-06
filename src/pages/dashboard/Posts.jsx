@@ -93,20 +93,21 @@ const Posts = () => {
                 <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest">Language</th>
                 <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest">Date</th>
                 <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest">Category</th>
+                <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-center">Engagement</th>
                 <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center">
+                  <td colSpan="6" className="px-6 py-12 text-center">
                     <span className="material-symbols-outlined text-primary animate-spin text-3xl">progress_activity</span>
                     <p className="text-sm text-on-surface-variant mt-2">Memuat data...</p>
                   </td>
                 </tr>
               ) : posts.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-on-surface-variant">
+                  <td colSpan="6" className="px-6 py-12 text-center text-on-surface-variant">
                     <span className="material-symbols-outlined text-4xl mb-2 block">article</span>
                     Belum ada post. Buat post pertama Anda!
                   </td>
@@ -143,6 +144,22 @@ const Posts = () => {
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${categoryStyles[post.category] || 'bg-surface-container-high text-on-surface-variant'}`}>
                         {post.category}
                       </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center gap-3">
+                        <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant" title="Views">
+                          <span className="material-symbols-outlined text-[14px] text-blue-500">visibility</span>
+                          <span className="font-bold">{post.view_count || 0}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant" title="Likes">
+                          <span className="material-symbols-outlined text-[14px] text-red-400">favorite</span>
+                          <span className="font-bold">{post.like_count || 0}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant" title="Comments">
+                          <span className="material-symbols-outlined text-[14px] text-amber-500">forum</span>
+                          <span className="font-bold">{post.comment_count || 0}</span>
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex justify-end gap-2">

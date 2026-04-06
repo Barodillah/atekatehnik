@@ -16,10 +16,43 @@ if ($html === false) {
     die('Frontend not ready. Please run build or check index.html');
 }
 
-// Default meta values
 $title = "ATEKA TEHNIK | Supplier Penggilingan Padi Terbaik di Indonesia";
 $description = "ATEKA TEHNIK menyediakan solusi modernisasi penggilingan padi dengan teknologi terbaru untuk meningkatkan efisiensi, kualitas beras, dan hasil produksi.";
 $image = "https://atekatehnik.com/preview.jpg";
+
+$baseUri = parse_url($requestUri, PHP_URL_PATH);
+$baseUri = rtrim($baseUri, '/');
+if (empty($baseUri)) $baseUri = '/';
+
+switch ($baseUri) {
+    case '/products':
+        $title = "Produk | ATEKA TEHNIK";
+        break;
+    case '/about':
+        $title = "Tentang Kami | ATEKA TEHNIK";
+        break;
+    case '/contact':
+        $title = "Hubungi Kami | ATEKA TEHNIK";
+        break;
+    case '/portfolio':
+        $title = "Portofolio | ATEKA TEHNIK";
+        break;
+    case '/edukasi':
+        $title = "Edukasi Pasca Panen | ATEKA TEHNIK";
+        break;
+    case '/search':
+        $title = "Hasil Pencarian | ATEKA TEHNIK";
+        break;
+    case '/official-channels':
+        $title = "Official Channels | ATEKA TEHNIK";
+        break;
+    case '/privacy-policy':
+        $title = "Kebijakan Privasi | ATEKA TEHNIK";
+        break;
+    case '/terms-of-service':
+        $title = "Syarat Ketentuan | ATEKA TEHNIK";
+        break;
+}
 
 $isPost = preg_match('/^\/post\/([^\/?]+)/', $requestUri, $postMatches);
 $isProduct = preg_match('/^\/product\/([^\/?]+)/', $requestUri, $productMatches);

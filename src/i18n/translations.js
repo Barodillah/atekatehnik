@@ -16,6 +16,7 @@ const translations = {
     "hero.subtitle": "Lebih dari 20 tahun memimpin manufaktur dan instalasi Rice Milling Unit (RMU) berstandar nasional. Kami hadirkan teknologi efisien untuk ketahanan pangan Indonesia.",
     "hero.cta1": "Konsultasi Rencana Usaha",
     "hero.cta2": "Lihat Katalog INAPROC",
+    "hero.ctaWa": "Hubungi Langsung Kami",
     "hero.stat": "Tahun Pengalaman",
 
     // TrustBar
@@ -41,7 +42,7 @@ const translations = {
     // Portfolio (component)
     "portfolio.title": "Instalasi & Proyek Kami",
     "portfolio.subtitle": "Lebih dari 20 tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.",
-    "portfolio.viewMore": "Lihat Lebih Banyak Proyek",
+    "portfolio.viewMore": "Lihat Lebih Banyak",
 
     // ContactMe / Contact Home
     "contact.title": "Hubungi Kami",
@@ -140,6 +141,8 @@ const translations = {
     "products.heroSub": "Rasakan konvergensi stabilitas struktural dan inovasi pertanian. Setiap RMU adalah mahakarya baja yang diproduksi presisi.",
     "products.catAll": "Semua Produk",
     "products.catPaketLengkap": "Paket Lengkap",
+    "products.catUnitMesin": "Unit Mesin Tunggal",
+    "products.catPeralatan": "Peralatan Pendukung",
     "products.catSukuCadang": "Suku Cadang",
     "products.inquire": "Tanyakan Sekarang",
     "products.buyOnShopee": "Beli di Shopee",
@@ -223,8 +226,7 @@ const translations = {
     "postPage.keyDeliverables": "Deliverable Utama",
     "postPage.techSpecs": "Spesifikasi Teknis",
     "postPage.viewEquipment": "Lihat Peralatan",
-    "postPage.installationPhases": "Fase Instalasi",
-    "postPage.phase": "Fase",
+    "postPage.mediaGallery": "Galeri Media",
     "postPage.comments": "Komentar",
     "postPage.addComment": "Tambahkan komentar...",
     "postPage.postComment": "Kirim Komentar",
@@ -302,7 +304,7 @@ const translations = {
 
     // Edukasi Highlight (Home CTA)
     "edukasi.highlightTitle": "Mengapa Anda Butuh Mesin Modern?",
-    "edukasi.highlightDesc": "Ketahuilah rahasia cara kerja mesin modern Rice Milling Unit (RMU) dan Vertical Dryer dalam mengatasi masalah susut hasil, kualitas patah, hingga menghemat biaya operasional Anda.",
+    "edukasi.highlightDesc": "Ketahuilah rahasia cara kerja mesin modern Rice Milling Unit (RMU) dan Bed Dryer dalam mengatasi masalah susut hasil, kualitas patah, hingga menghemat biaya operasional Anda.",
     "edukasi.highlightCta": "Pelajari Selengkapnya",
 
     // Edukasi Page
@@ -387,12 +389,13 @@ const translations = {
 
     // Hero Section
     "hero.badge": "Industrial Leader Since 2004",
-    "hero.title": "Supplier Rice Milling: ",
+    "hero.title": "Rice Mill Supplier: ",
     "hero.titleHighlight": "Precision Solutions",
     "hero.titleSuffix": " for Premium Rice Output",
     "hero.subtitle": "Over 20 years leading the manufacture and installation of nationally standardized Rice Milling Units (RMU). We deliver efficient technology for Indonesia's food security.",
     "hero.cta1": "Business Plan Consultation",
     "hero.cta2": "View INAPROC Catalog",
+    "hero.ctaWa": "Contact Us Directly",
     "hero.stat": "Years Experience",
 
     // TrustBar
@@ -418,7 +421,7 @@ const translations = {
     // Portfolio (component)
     "portfolio.title": "Our Installations & Projects",
     "portfolio.subtitle": "Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.",
-    "portfolio.viewMore": "View More Projects",
+    "portfolio.viewMore": "View More",
 
     // ContactMe / Contact Home
     "contact.title": "Contact Us",
@@ -517,6 +520,8 @@ const translations = {
     "products.heroSub": "Experience the convergence of structural stability and agricultural innovation. Each RMU is a masterpiece of precision-machined steel.",
     "products.catAll": "All Products",
     "products.catPaketLengkap": "Complete Package",
+    "products.catUnitMesin": "Single Machine Unit",
+    "products.catPeralatan": "Supporting Equipment",
     "products.catSukuCadang": "Spare Parts",
     "products.inquire": "Inquire Now",
     "products.buyOnShopee": "Buy on Shopee",
@@ -600,8 +605,7 @@ const translations = {
     "postPage.keyDeliverables": "Key Deliverables",
     "postPage.techSpecs": "Technical Specifications",
     "postPage.viewEquipment": "View Equipment",
-    "postPage.installationPhases": "Installation Phases",
-    "postPage.phase": "Phase",
+    "postPage.mediaGallery": "Media Gallery",
     "postPage.comments": "Comments",
     "postPage.addComment": "Add a comment...",
     "postPage.postComment": "Post Comment",
@@ -679,7 +683,7 @@ const translations = {
 
     // Edukasi Highlight (Home CTA)
     "edukasi.highlightTitle": "Why Do You Need Modern Machines?",
-    "edukasi.highlightDesc": "Discover how modern Rice Milling Unit (RMU) and Vertical Dryer machines solve yield loss, grain breakage, and help reduce your operational costs.",
+    "edukasi.highlightDesc": "Discover how modern Rice Milling Unit (RMU) and Bed Dryer machines solve yield loss, grain breakage, and help reduce your operational costs.",
     "edukasi.highlightCta": "Learn More",
 
     // Edukasi Page

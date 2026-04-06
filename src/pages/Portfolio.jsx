@@ -9,6 +9,47 @@ const Portfolio = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const industrialProjects = projects.filter(p => p.category === 'Industrial Installations');
+    const newsProjects = projects.filter(p => p.category !== 'Industrial Installations');
+
+    const ProjectCard = ({ project }) => (
+        <Link to={`/post/${project.slug}`} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
+            <div className="aspect-[4/3] overflow-hidden bg-surface-container">
+                {project.cover_image ? (
+                    <img
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        src={project.cover_image}
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-outline">
+                        <span className="material-symbols-outlined text-5xl">image</span>
+                    </div>
+                )}
+            </div>
+            <div className="p-6 flex flex-col flex-grow">
+                <div className="flex justify-between items-start mb-4">
+                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
+                        {project.category}
+                    </span>
+                    <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                        {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                </div>
+                <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">{project.title}</h3>
+                <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">
+                    {project.subtitle}
+                </p>
+                {project.location && (
+                    <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
+                        <span className="material-symbols-outlined text-sm">location_on</span>
+                        <span className="truncate">{project.location}</span>
+                    </div>
+                )}
+            </div>
+        </Link>
+    );
+
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -97,46 +138,33 @@ const Portfolio = () => {
                             <div className="col-span-full py-20 flex justify-center">
                                 <span className="material-symbols-outlined animate-spin text-5xl text-primary">progress_activity</span>
                             </div>
-                        ) : projects.map((project) => (
-                            <Link to={`/post/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
-                                <div className="aspect-[4/3] overflow-hidden bg-surface-container">
-                                    {project.cover_image ? (
-                                        <img
-                                            alt={project.title}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                            src={project.cover_image}
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-outline">
-                                            <span className="material-symbols-outlined text-5xl">image</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="p-6 flex flex-col flex-grow">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <span className="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
-                                            {project.category}
-                                        </span>
-                                        <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">
-                                            {new Date(project.publish_date || project.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </span>
-                                    </div>
-                                    <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">{project.title}</h3>
-                                    <p className="text-xs font-label text-on-surface-variant font-medium mb-4 line-clamp-2">
-                                        {project.subtitle}
-                                    </p>
-                                    {project.location && (
-                                        <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center gap-2 text-on-surface-variant text-sm">
-                                            <span className="material-symbols-outlined text-sm">location_on</span>
-                                            <span className="truncate">{project.location}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </Link>
+                        ) : industrialProjects.map((project) => (
+                            <ProjectCard key={project.id} project={project} />
                         ))}
                     </div>
                 </div>
             </section>
+
+            {/* News and Updates Grid */}
+            {!loading && newsProjects.length > 0 && (
+                <section className="bg-surface-container-low py-16">
+                    <div className="max-w-7xl mx-auto px-8">
+                        <div className="mb-12">
+                            <h3 className="text-sm font-label font-bold text-secondary uppercase tracking-[0.2em] mb-2">
+                                {lang === 'id' ? 'Kabar & Pembaruan' : 'News & Updates'}
+                            </h3>
+                            <h2 className="text-4xl font-headline font-extrabold text-primary tracking-tight">
+                                {lang === 'id' ? 'Berita Terbaru' : 'Latest News'}
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {newsProjects.map((project) => (
+                                <ProjectCard key={project.id} project={project} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Nationwide Reach */}
             <section className="bg-surface-container py-24">

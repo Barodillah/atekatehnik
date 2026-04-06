@@ -3,6 +3,16 @@ import { useLocation, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 
+const highlightKeyword = (text, keyword) => {
+  if (!keyword || !text) return text;
+  const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
+  return parts.map((part, index) => 
+    part.toLowerCase() === keyword.toLowerCase() 
+      ? <mark key={index} className="bg-[#ffb776]/40 dark:bg-[#904d00]/60 text-[#001f5b] dark:text-white rounded-sm px-0.5 font-bold">{part}</mark>
+      : part
+  );
+};
+
 const SearchResults = () => {
   const { lang } = useLanguage();
   const location = useLocation();
@@ -90,7 +100,11 @@ const SearchResults = () => {
                   <h3 className="font-headline font-bold text-lg text-[#001f5b] dark:text-white group-hover:text-[#904d00] transition-colors mb-2 line-clamp-2">
                     {item.title}
                   </h3>
-                  {item.desc && (
+                  {item.snippet ? (
+                    <p className="text-xs font-label text-outline dark:text-slate-400 font-medium mb-4 line-clamp-3 leading-relaxed">
+                      {highlightKeyword(item.snippet, query)}
+                    </p>
+                  ) : item.desc && (
                     <p className="text-xs font-label text-outline dark:text-slate-400 font-medium mb-4 line-clamp-2">
                       {item.desc}
                     </p>

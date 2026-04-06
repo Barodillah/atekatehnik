@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
+import { parseMarkdown } from '../utils/markdownParser';
 
 const Post = () => {
     const { slug } = useParams();
@@ -13,7 +14,7 @@ const Post = () => {
     const commentInputRef = useRef(null);
 
     // Feature States
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewIndex, setPreviewIndex] = useState(null);
     const [showShareModal, setShowShareModal] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
     const [showCommentModal, setShowCommentModal] = useState(false);
@@ -30,22 +31,29 @@ const Post = () => {
 
     usePageTitle(post?.title || null);
 
-    // ── Fetch Related Installations ──────────────────────────────────
+    // ── Fetch Related Items ──────────────────────────────────
     useEffect(() => {
+        if (!post) return;
         const fetchRelated = async () => {
             try {
-                const res = await fetch(`/api/posts.php?lang=${lang}&category=Industrial%20Installations&sort=views_asc&limit=4`);
+                let url;
+                if (post.category === 'Industrial Installations') {
+                    url = `/api/posts.php?lang=${lang}&category=Industrial%20Installations&sort=views_asc&limit=4`;
+                } else {
+                    url = `/api/posts.php?lang=${lang}&sort=views_asc&limit=10`;
+                }
+                const res = await fetch(url);
                 const data = await res.json();
                 if (data.success && data.posts) {
-                    const filtered = data.posts.filter(p => p.slug !== slug).slice(0, 3);
+                    const filtered = data.posts.filter(p => p.slug !== slug && (post.category === 'Industrial Installations' ? true : p.category !== 'Industrial Installations')).slice(0, 3);
                     setRelatedInstallations(filtered);
                 }
             } catch (e) {
-                console.error("Failed to fetch related installations");
+                console.error("Failed to fetch related posts");
             }
         };
         fetchRelated();
-    }, [slug, lang]);
+    }, [slug, lang, post?.category]);
 
     // ── Fetch Post ───────────────────────────────────────────────────
     useEffect(() => {
@@ -241,8 +249,13 @@ const Post = () => {
             <section className="grid grid-cols-1 md:grid-cols-12 gap-12 px-8 md:px-20 py-24 bg-surface">
                 <div className="md:col-span-8">
                     <div className="space-y-8">
-                        <h2 className="text-3xl font-bold text-primary tracking-tight font-headline">{t('postPage.projectOverview')}</h2>
-
+                        <h2 className="text-3xl font-bold text-primary tracking-tight font-headline">
+                            {post.category === 'Industrial Installations' ? t('postPage.projectOverview') :
+                             post.category === 'Product News' ? (lang === 'id' ? 'Ringkasan Berita' : 'News Overview') :
+                             post.category === 'Maintenance Tips' ? (lang === 'id' ? 'Panduan Perawatan' : 'Maintenance Guide') :
+                             post.category === 'Company Update' ? (lang === 'id' ? 'Detail Pembaruan' : 'Update Details') :
+                             t('postPage.projectOverview')}
+                        </h2>
                         {/* Actions Bar */}
                         <div className="flex items-center space-x-6 py-4 border-y border-outline-variant/30 my-8">
                             <div className="flex items-center space-x-2 text-on-surface-variant">
@@ -265,7 +278,7 @@ const Post = () => {
 
                         <div
                             className="prose prose-lg text-on-surface-variant leading-relaxed font-light"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
+                            dangerouslySetInnerHTML={{ __html: parseMarkdown(post.content) }}
                         />
 
                     </div>
@@ -337,27 +350,26 @@ const Post = () => {
                     </div>
                 </section>
             )}
-            {/* Process Gallery: Bento Grid */}
+            {/* Media Gallery */}
             {post.phases && post.phases.length > 0 && (
                 <section className="px-8 md:px-20 py-24 bg-surface-container-low">
-                    <h2 className="text-3xl font-bold text-primary mb-12 tracking-tight font-headline">{t('postPage.installationPhases')}</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-[800px]">
+                    <h2 className="text-3xl font-bold text-primary mb-12 tracking-tight font-headline">{t('postPage.mediaGallery')}</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                         {post.phases.map((phase, index) => (
                             <div key={index}
-                                className={`relative group overflow-hidden cursor-pointer ${index === 0 ? 'md:col-span-2 md:row-span-2' : index === 1 ? 'md:col-span-2' : ''}`}
-                                onClick={() => setPreviewImage(phase.image_url)}
+                                className={`relative group overflow-hidden cursor-pointer aspect-square ${index === 0 ? 'col-span-2 row-span-2' : ''}`}
+                                onClick={() => setPreviewIndex(index)}
                             >
                                 <img alt={phase.title}
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                     src={phase.image_url || 'https://via.placeholder.com/800'} />
-                                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-all duration-300 flex items-center justify-center z-10 pointer-events-none">
-                                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
-                                        <span className="material-symbols-outlined text-white text-3xl block">fullscreen</span>
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                                    <div className="bg-white/15 backdrop-blur-sm p-3 md:p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
+                                        <span className="material-symbols-outlined text-white text-2xl md:text-3xl block">zoom_in</span>
                                     </div>
                                 </div>
-                                <div className="absolute bottom-0 left-0 p-8 bg-gradient-to-t from-black/80 to-transparent w-full z-20 pointer-events-none">
-                                    <span className="text-secondary-container font-bold text-xs uppercase tracking-widest">{t('postPage.phase')} 0{index + 1}</span>
-                                    <h4 className="text-white font-bold text-xl font-headline">{phase.title}</h4>
+                                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                                    <h4 className="text-white font-bold text-sm md:text-base font-headline line-clamp-2">{phase.title}</h4>
                                 </div>
                             </div>
                         ))}
@@ -370,7 +382,7 @@ const Post = () => {
                     <div className="w-full md:w-1/2">
                         <h2 className="text-4xl font-extrabold text-primary mb-8 tracking-tight font-headline">{post.impact.title}</h2>
                         <div className="space-y-6 text-on-surface-variant leading-relaxed text-lg">
-                            <p dangerouslySetInnerHTML={{ __html: post.impact.description }} />
+                            <div dangerouslySetInnerHTML={{ __html: parseMarkdown(post.impact.description) }} />
                             {post.impact.stats && post.impact.stats.length > 0 && (
                                 <div className="grid grid-cols-2 gap-8 py-4">
                                     {post.impact.stats.map((stat, i) => (
@@ -450,10 +462,12 @@ const Post = () => {
             {relatedInstallations.length > 0 && (
                 <section className="px-8 md:px-20 py-24 border-t border-outline-variant/20">
                     <div className="flex justify-between items-end mb-12">
-                        <h2 className="text-2xl font-bold text-primary tracking-tight font-headline">{t('postPage.otherInstallations')}</h2>
+                        <h2 className="text-2xl font-bold text-primary tracking-tight font-headline">
+                            {post.category === 'Industrial Installations' ? t('postPage.otherInstallations') : (lang === 'id' ? 'Berita & Pembaruan Lainnya' : 'Other News & Updates')}
+                        </h2>
                         <Link className="text-secondary font-bold text-sm tracking-widest uppercase flex items-center space-x-2 group"
                             to="/portfolio">
-                            <span>{t('postPage.viewAllProjects')}</span>
+                            <span>{post.category === 'Industrial Installations' ? t('postPage.viewAllProjects') : (lang === 'id' ? 'Lihat Semua Berita' : 'View All News')}</span>
                             <span
                                 className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                         </Link>
@@ -464,14 +478,14 @@ const Post = () => {
                                 <div className="aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
                                     <img src={project.cover_image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000'} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 font-bold text-[10px] tracking-widest uppercase text-primary">
-                                        {project.location || 'Indonesia'}
+                                        {project.category === 'Industrial Installations' ? (project.location || 'Indonesia') : project.category}
                                     </div>
                                 </div>
                                 <div className="p-6">
                                     <h3 className="text-xl font-bold text-primary mb-2 line-clamp-2">{project.title}</h3>
                                     <p className="text-on-surface-variant text-sm line-clamp-2 mb-4">{project.subtitle}</p>
                                     <span className="text-secondary font-bold text-xs uppercase tracking-widest flex items-center gap-2 group-hover:text-primary transition-colors">
-                                        {t('postPage.readCaseStudy')} <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                        {project.category === 'Industrial Installations' ? t('postPage.readCaseStudy') : (lang === 'id' ? 'Baca Selengkapnya' : 'Read More')} <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                     </span>
                                 </div>
                             </Link>
@@ -602,20 +616,85 @@ const Post = () => {
                 </div>
             )}
 
-            {/* Image Preview Modal */}
-            {previewImage && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={() => setPreviewImage(null)}>
-                    <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
-                        <span className="material-symbols-outlined text-4xl">close</span>
-                    </button>
-                    <img
-                        src={previewImage}
-                        alt="Preview fullscreen"
-                        className="max-w-full max-h-[90vh] object-contain rounded-sm shadow-2xl"
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                </div>
-            )}
+            {/* Image Preview Modal with Slideshow */}
+            {previewIndex !== null && post.phases && post.phases[previewIndex] && (() => {
+                const currentPhase = post.phases[previewIndex];
+                const total = post.phases.length;
+                const goPrev = (e) => { e.stopPropagation(); setPreviewIndex((previewIndex - 1 + total) % total); };
+                const goNext = (e) => { e.stopPropagation(); setPreviewIndex((previewIndex + 1) % total); };
+                const handleKey = (e) => {
+                    if (e.key === 'ArrowLeft') goPrev(e);
+                    else if (e.key === 'ArrowRight') goNext(e);
+                    else if (e.key === 'Escape') setPreviewIndex(null);
+                };
+                return (
+                    <div
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl"
+                        onClick={() => setPreviewIndex(null)}
+                        onKeyDown={handleKey}
+                        tabIndex={0}
+                        ref={(el) => el && el.focus()}
+                    >
+                        {/* Close */}
+                        <button onClick={() => setPreviewIndex(null)} className="absolute top-5 right-5 z-20 text-white/40 hover:text-white transition-colors">
+                            <span className="material-symbols-outlined text-3xl">close</span>
+                        </button>
+
+                        {/* Counter */}
+                        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-white/50 text-sm font-medium tracking-widest">
+                            {previewIndex + 1} / {total}
+                        </div>
+
+                        {/* Prev Button */}
+                        {total > 1 && (
+                            <button
+                                onClick={goPrev}
+                                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-sm transition-all hover:scale-110"
+                            >
+                                <span className="material-symbols-outlined text-2xl md:text-3xl">chevron_left</span>
+                            </button>
+                        )}
+
+                        {/* Next Button */}
+                        {total > 1 && (
+                            <button
+                                onClick={goNext}
+                                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-sm transition-all hover:scale-110"
+                            >
+                                <span className="material-symbols-outlined text-2xl md:text-3xl">chevron_right</span>
+                            </button>
+                        )}
+
+                        {/* Image + Description */}
+                        <div className="flex flex-col items-center max-w-5xl w-full px-16 md:px-20" onClick={(e) => e.stopPropagation()}>
+                            <img
+                                src={currentPhase.image_url}
+                                alt={currentPhase.title}
+                                className="max-w-full max-h-[70vh] object-contain rounded-sm shadow-2xl"
+                            />
+                            <div className="mt-6 text-center max-w-2xl">
+                                <h3 className="text-white font-bold text-lg md:text-xl font-headline mb-2">{currentPhase.title}</h3>
+                                {currentPhase.description && (
+                                    <p className="text-white/60 text-sm md:text-base leading-relaxed">{currentPhase.description}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Dot Indicators */}
+                        {total > 1 && (
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                                {post.phases.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={(e) => { e.stopPropagation(); setPreviewIndex(i); }}
+                                        className={`rounded-full transition-all duration-300 ${i === previewIndex ? 'w-8 h-2.5 bg-white' : 'w-2.5 h-2.5 bg-white/30 hover:bg-white/60'}`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
         </main>
     );
 };

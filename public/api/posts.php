@@ -206,7 +206,11 @@ switch ($method) {
                 $orderBy = "(SELECT COUNT(*) FROM page_views WHERE page_slug = posts.slug AND page_type = 'post') ASC";
             }
             
-            $sql = "SELECT id, title, subtitle, category, publish_date, cover_image, language, location, slug, created_at FROM posts $where ORDER BY $orderBy LIMIT :limit OFFSET :offset";
+            $sql = "SELECT id, title, subtitle, category, publish_date, cover_image, language, location, slug, created_at,
+                (SELECT COUNT(*) FROM page_views WHERE page_slug = posts.slug AND page_type = 'post') AS view_count,
+                (SELECT COUNT(*) FROM post_likes WHERE post_slug = posts.slug) AS like_count,
+                (SELECT COUNT(*) FROM post_comments WHERE post_slug = posts.slug) AS comment_count
+                FROM posts $where ORDER BY $orderBy LIMIT :limit OFFSET :offset";
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v)
                 $stmt->bindValue($k, $v);

@@ -34,6 +34,7 @@ import AdminComments from './pages/dashboard/Comments';
 import AdminAnalytics from './pages/dashboard/Analytics';
 import ActivityLogs from './pages/dashboard/ActivityLogs';
 import ChatHistory from './pages/dashboard/ChatHistory';
+import WaClicks from './pages/dashboard/WaClicks';
 import AdminLogin from './pages/dashboard/Login';
 
 const PublicLayout = () => {
@@ -86,6 +87,7 @@ function App() {
             <Route path="comments" element={<AdminComments />} />
             <Route path="chat-history" element={<ChatHistory />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="wa-clicks" element={<WaClicks />} />
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="*" element={<NotFound />} />
           </Route>

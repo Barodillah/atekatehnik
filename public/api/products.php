@@ -97,7 +97,10 @@ switch ($method) {
             $total = (int)$countStmt->fetchColumn();
 
             // Fetch products
-            $sql = "SELECT p.* FROM products p $where ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
+            $sortOrder = strtoupper(trim($_GET['sort'] ?? 'DESC'));
+            if ($sortOrder !== 'ASC') $sortOrder = 'DESC';
+            
+            $sql = "SELECT p.* FROM products p $where ORDER BY p.created_at $sortOrder LIMIT :limit OFFSET :offset";
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v) {
                 $stmt->bindValue($k, $v);

@@ -224,6 +224,8 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
                     className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none text-sm font-semibold cursor-pointer"
                   >
                     <option value="Paket">Paket Lengkap</option>
+                    <option value="Unit Mesin Tunggal">Unit Mesin Tunggal</option>
+                    <option value="Peralatan Pendukung">Peralatan Pendukung</option>
                     <option value="Suku Cadang">Suku Cadang</option>
                   </select>
                 </div>

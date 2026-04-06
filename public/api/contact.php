@@ -20,7 +20,8 @@ $envPath = __DIR__ . '/../../.env';
 if (file_exists($envPath)) {
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos(trim($line), '#') === 0)
+            continue;
         if (strpos($line, '=') !== false) {
             list($name, $value) = explode('=', $line, 2);
             $_ENV[trim($name)] = trim($value);
@@ -39,14 +40,14 @@ if (!$input) {
 
 // Prepare Data Structure suitable for future MySQL Table implementation
 $contactData = [
-    'name'       => trim($input['name'] ?? ''),
-    'company'    => trim($input['company'] ?? ''),
-    'capacity'   => trim($input['capacity'] ?? ''),
-    'location'   => trim($input['location'] ?? ''),
-    'email'      => trim($input['email'] ?? ''),
-    'phone'      => trim($input['phone'] ?? ''),
-    'message'    => trim($input['message'] ?? ''),
-    'lang'       => trim($input['lang'] ?? 'id'),
+    'name' => trim($input['name'] ?? ''),
+    'company' => trim($input['company'] ?? ''),
+    'capacity' => trim($input['capacity'] ?? ''),
+    'location' => trim($input['location'] ?? ''),
+    'email' => trim($input['email'] ?? ''),
+    'phone' => trim($input['phone'] ?? ''),
+    'message' => trim($input['message'] ?? ''),
+    'lang' => trim($input['lang'] ?? 'id'),
     'created_at' => date('Y-m-d H:i:s')
 ];
 
@@ -58,9 +59,9 @@ if (empty($contactData['name']) || empty($contactData['email']) || empty($contac
 }
 
 if (!filter_var($contactData['email'], FILTER_VALIDATE_EMAIL)) {
-     http_response_code(400);
-     echo json_encode(['error' => 'Invalid email address.']);
-     exit;
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid email address.']);
+    exit;
 }
 
 require_once __DIR__ . '/helpers.php';
@@ -72,13 +73,13 @@ try {
         VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New')
     ");
     $stmt->execute([
-        ':name'    => $contactData['name'],
+        ':name' => $contactData['name'],
         ':company' => $contactData['company'],
-        ':cap'     => $contactData['capacity'],
-        ':loc'     => $contactData['location'],
-        ':email'   => $contactData['email'],
-        ':phone'   => $contactData['phone'],
-        ':svc'     => $contactData['message'],
+        ':cap' => $contactData['capacity'],
+        ':loc' => $contactData['location'],
+        ':email' => $contactData['email'],
+        ':phone' => $contactData['phone'],
+        ':svc' => $contactData['message'],
     ]);
 } catch (Exception $e) {
     // Log db error but don't fail the request completely if we still want to send email
@@ -95,15 +96,16 @@ require __DIR__ . '/PHPMailer/SMTP.php';
 
 try {
     // Shared SMTP Configuration
-    function createMailerConfig() {
+    function createMailerConfig()
+    {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
-        $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.hostinger.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $_ENV['MAIL_USERNAME'] ?? 'noreply@atekatehnik.com';
-        $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? 'Ateka.354';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            
-        $mail->Port       = $_ENV['MAIL_PORT'] ?? 465;                                    
+        $mail->Host = $_ENV['MAIL_HOST'] ?? 'smtp.hostinger.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = $_ENV['MAIL_USERNAME'] ?? 'noreply@atekatehnik.com';
+        $mail->Password = $_ENV['MAIL_PASSWORD'] ?? 'Ateka.354';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = $_ENV['MAIL_PORT'] ?? 465;
         return $mail;
     }
 
@@ -117,7 +119,7 @@ try {
 
     $mailCompany->isHTML(true);
     $mailCompany->Subject = 'Pertanyaan Masuk: ' . $contactData['name'];
-    
+
     // HTML Body for Company
     $bodyCompany = "
     <div style='background-color: #f4f7f6; padding: 40px 20px; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;'>
@@ -146,7 +148,7 @@ try {
         </div>
     </div>
     ";
-    
+
     $mailCompany->Body = $bodyCompany;
     $mailCompany->send();
 
@@ -154,7 +156,7 @@ try {
     $mailCustomer = createMailerConfig();
     $mailCustomer->setFrom($_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@atekatehnik.com', 'Ateka Tehnik');
     $mailCustomer->addAddress($contactData['email'], $contactData['name']);
-    
+
     $mailCustomer->isHTML(true);
     $lang = $contactData['lang'] ?? 'id';
 
@@ -195,7 +197,7 @@ try {
                     
                     <div style='margin-top: 15px;'>
                         <a href='mailto:info@atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Email Support</a> &bull; 
-                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
+                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
                         <a href='https://www.atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Website</a>
                     </div>
                 </div>
@@ -239,7 +241,7 @@ try {
                     
                     <div style='margin-top: 15px;'>
                         <a href='mailto:info@atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Email Support</a> &bull; 
-                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik,com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
+                        <a href='https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan.' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>WhatsApp</a> &bull; 
                         <a href='https://www.atekatehnik.com' style='color: #0056b3; text-decoration: none; margin: 0 10px;'>Website</a>
                     </div>
                 </div>
@@ -253,7 +255,7 @@ try {
     // Success response
     http_response_code(200);
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'message' => 'Your message has been sent successfully.',
         'data' => $contactData // Useful for debugging or frontend confirmation
     ]);

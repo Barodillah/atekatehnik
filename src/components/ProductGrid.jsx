@@ -10,7 +10,7 @@ const ProductGrid = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/products.php?kategori=Paket&limit=4');
+        const res = await fetch('/api/products.php?kategori=Paket&limit=4&sort=asc');
         const data = await res.json();
         if (data.success) {
           setProducts(data.products);
