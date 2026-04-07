@@ -312,27 +312,7 @@ const Post = () => {
                                 <span className="w-8 md:w-12 h-0.5 bg-secondary-container inline-block"></span>
                                 <span>{t('postPage.techSpecs')}</span>
                             </h2>
-                            {post?.related_products && post.related_products.length > 0 ? (
-                                <div className="flex flex-wrap gap-2 md:gap-4 justify-start md:justify-end items-center w-full md:w-auto">
-                                    {post.related_products.map((prod) => (
-                                        <Link
-                                            key={prod.product_slug}
-                                            to={`/product/${prod.product_slug}`}
-                                            className="text-secondary font-bold text-[10px] md:text-sm tracking-widest uppercase flex items-center gap-1.5 md:space-x-2 group hover:text-white transition-colors border border-secondary/30 px-3 py-2 md:px-4 md:py-2 rounded-sm hover:bg-secondary/10 bg-primary/20 backdrop-blur-sm"
-                                            title={`View ${prod.nama}`}
-                                        >
-                                            <span className="material-symbols-outlined text-[14px] md:text-[18px]">precision_manufacturing</span>
-                                            <span className="max-w-[140px] md:max-w-[250px] truncate">{prod.nama || t('postPage.viewEquipment')}</span>
-                                            <span className="material-symbols-outlined text-[14px] md:text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            ) : (
-                                <Link to="/products" className="text-secondary font-bold text-xs md:text-sm tracking-widest uppercase flex items-center space-x-2 group hover:text-white transition-colors">
-                                    <span>{t('postPage.viewEquipment')}</span>
-                                    <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-                                </Link>
-                            )}
+                            {/* Removed Related Products rendering from here */}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-px md:bg-white/10">
                             {post.techSpecs.map((spec, index) => (
@@ -347,6 +327,62 @@ const Post = () => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+            )}
+            
+            {/* Related Products Section (Independent) */}
+            {post.related_products && post.related_products.length > 0 && (
+                <section className="px-8 md:px-20 py-20 bg-surface border-b border-outline-variant/10">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+                        <div>
+                            <h2 className="text-3xl font-bold text-primary tracking-tight font-headline mb-3">
+                                {lang === 'id' ? 'Peralatan & Mesin Terkait' : 'Related Equipment & Machines'}
+                            </h2>
+                            <p className="text-on-surface-variant font-body">
+                                {lang === 'id' ? 'Jelajahi produk yang kami rekomendasikan khusus untuk kebutuhan di atas.' : 'Explore recommend products tailored for the needs above.'}
+                            </p>
+                        </div>
+                        <Link to="/products" className="text-secondary font-bold text-sm tracking-widest uppercase flex items-center space-x-2 group mt-6 md:mt-0">
+                            <span>{t('postPage.viewEquipment') || (lang === 'id' ? 'Lihat Katalog Peralatan' : 'Explore Equipment Catalog')}</span>
+                            <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                        </Link>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {post.related_products.map((prod) => (
+                            <Link
+                                key={prod.product_slug}
+                                to={`/product/${prod.product_slug}`}
+                                className="group bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 flex flex-col relative overflow-hidden h-full"
+                            >
+                                <div className="flex gap-4">
+                                    <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-surface rounded-lg overflow-hidden relative border border-outline-variant/10">
+                                        {prod.gambar ? (
+                                            <img src={prod.gambar} alt={prod.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-outline bg-surface-container-highest">
+                                                <span className="material-symbols-outlined text-2xl">precision_manufacturing</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col flex-grow justify-start">
+                                        <h3 className="text-sm font-bold text-primary font-headline line-clamp-2 leading-tight group-hover:text-secondary transition-colors mb-1">
+                                            {prod.nama}
+                                        </h3>
+                                        <p className="text-[11px] text-on-surface-variant line-clamp-2 font-body leading-relaxed w-full">
+                                            {prod.description || (lang === 'id' ? 'Unit industri berkualitas tinggi.' : 'High quality industrial unit.')}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between border-t border-outline-variant/20 pt-3">
+                                     <span className="text-[9px] font-bold text-secondary tracking-widest uppercase">
+                                         {lang === 'id' ? 'Lihat Spesifikasi' : 'View Specifications'}
+                                     </span>
+                                     <span className="material-symbols-outlined text-[14px] text-secondary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </section>
             )}
@@ -580,7 +616,7 @@ const Post = () => {
                             <span className="material-symbols-outlined">close</span>
                         </button>
                         <h3 className="text-xl font-bold text-primary mb-6">{t('postPage.sharePost')}</h3>
-                        <div className="grid grid-cols-4 gap-4 mb-6">
+                        <div className="grid grid-cols-3 gap-6 gap-y-8 mb-8">
                             <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#25D366] transition-colors">
                                 <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#25D366]/10">
                                     <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><title>WhatsApp icon</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
@@ -593,11 +629,23 @@ const Post = () => {
                                 </div>
                                 <span className="text-[10px] font-medium text-center">Facebook</span>
                             </a>
-                            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#1DA1F2] transition-colors">
-                                <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#1DA1F2]/10">
-                                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" /></svg>
+                            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#0f1419] transition-colors">
+                                <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#0f1419]/10">
+                                    <svg className="w-5 h-5 fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg>
                                 </div>
                                 <span className="text-[10px] font-medium text-center">X / Twitter</span>
+                            </a>
+                            <a href={`fb-messenger://share/?link=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#00B2FF] transition-colors">
+                                <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#00B2FF]/10">
+                                    <svg className="w-6 h-6 fill-current" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M 16 4 C 9.410156 4 4 9.136719 4 15.5 C 4 18.890625 5.570313 21.902344 8 24 L 8 28.625 L 12.4375 26.40625 C 13.566406 26.746094 14.746094 27 16 27 C 22.589844 27 28 21.863281 28 15.5 C 28 9.136719 22.589844 4 16 4 Z M 16 6 C 21.558594 6 26 10.265625 26 15.5 C 26 20.734375 21.558594 25 16 25 C 14.804688 25 13.664063 24.773438 12.59375 24.40625 L 12.1875 24.28125 L 10 25.375 L 10 23.125 L 9.625 22.8125 C 7.40625 21.0625 6 18.441406 6 15.5 C 6 10.265625 10.441406 6 16 6 Z M 14.875 12.34375 L 8.84375 18.71875 L 14.25 15.71875 L 17.125 18.8125 L 23.09375 12.34375 L 17.8125 15.3125 Z"/></svg>
+                                </div>
+                                <span className="text-[10px] font-medium text-center">Messenger</span>
+                            </a>
+                            <a href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&description=${encodeURIComponent(shareTitle)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-2 text-on-surface hover:text-[#E60023] transition-colors">
+                                <div className="w-12 h-12 bg-surface-container flex items-center justify-center rounded-full hover:bg-[#E60023]/10">
+                                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.168 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.605 0 12.017 0z"/></svg>
+                                </div>
+                                <span className="text-[10px] font-medium text-center">Pinterest</span>
                             </a>
                             <button onClick={copyToClipboard} className={`flex flex-col items-center space-y-2 transition-colors ${isCopied ? 'text-[#25D366]' : 'text-on-surface hover:text-primary'}`}>
                                 <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${isCopied ? 'bg-[#25D366]/10' : 'bg-surface-container hover:bg-primary/10'}`}>

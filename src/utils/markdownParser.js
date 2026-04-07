@@ -62,6 +62,56 @@ export const parseMarkdown = (text) => {
     // 12. Strikethrough
     html = html.replace(/(<[^>]+>)|~~(.*?)~~/g, (m, tag, text) => tag ? tag : `<del class="text-on-surface-variant/60">${text}</del>`);
 
+    // 12.5 Tables
+    html = html.replace(/^(?:\|[^\n]*\n?)+/gm, (match) => {
+        const rows = match.trim().split('\n');
+        // Validate if it has header separator row
+        if (rows.length < 2 || !/^\|?[-\s:|]+\|?$/.test(rows[1].trim())) {
+            return match;
+        }
+        
+        let tableHtml = '<div class="overflow-x-auto my-6"><table class="w-full text-left border-collapse border border-outline-variant/30 shadow-sm">';
+        tableHtml += '<thead class="bg-surface-container-low">';
+        
+        let hasTbody = false;
+
+        rows.forEach((row, index) => {
+            if (index === 1) return; // Skip delimiter row
+            
+            const isHeader = index === 0;
+            const tag = isHeader ? 'th' : 'td';
+            const cellClass = isHeader 
+                ? 'px-4 py-3 font-bold text-on-surface border border-outline-variant/30 text-sm whitespace-nowrap' 
+                : 'px-4 py-3 border border-outline-variant/30 text-sm text-on-surface-variant';
+            
+            let cells = row.trim().split('|');
+            if (row.trim().startsWith('|')) cells.shift();
+            if (row.trim().endsWith('|')) cells.pop();
+            
+            if (isHeader) {
+                tableHtml += '<tr>';
+            } else {
+                if (!hasTbody) {
+                    tableHtml += '</thead><tbody class="divide-y divide-outline-variant/20">';
+                    hasTbody = true;
+                }
+                tableHtml += '<tr class="bg-white hover:bg-surface-container-lowest transition-colors">';
+            }
+            
+            cells.forEach(cell => {
+                tableHtml += `<${tag} class="${cellClass}">${cell.trim()}</${tag}>`;
+            });
+            tableHtml += '</tr>';
+        });
+        
+        if (!hasTbody) {
+             tableHtml += '</thead><tbody>'; // If no data rows
+        }
+
+        tableHtml += '</tbody></table></div>\n';
+        return tableHtml;
+    });
+
     // 13. Lists
     // Unordered
     html = html.replace(/^[-*+] (.*$)/gim, '<ul class="list-disc list-inside ml-4 my-2"><li class="mb-1">$1</li></ul>');
@@ -80,7 +130,7 @@ export const parseMarkdown = (text) => {
     let paragraphs = html.split(/\n\s*\n/);
     html = paragraphs.map(p => {
         // Don't wrap if it's already a block tag
-        if (p.trim().match(/^(<h|<ul|<ol|<li|<blockquote|<pre|<hr|<img|<div)/i)) {
+        if (p.trim().match(/^(<h|<ul|<ol|<li|<blockquote|<pre|<hr|<img|<div|<table)/i)) {
             return p;
         }
         return `<p class="mb-4 text-inherit">${p.replace(/\n/g, '<br />')}</p>`;

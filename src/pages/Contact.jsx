@@ -1,23 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { trackWaClick } from '../utils/trackWaClick';
 
 const Contact = () => {
     const { t, lang } = useLanguage();
+    const routerLocation = useLocation();
     usePageTitle(lang === 'id' ? 'Hubungi Kami' : 'Contact Us');
 
     const [formData, setFormData] = useState({
         name: '',
         company: '',
         capacity: '',
-        location: '',
+        location: routerLocation.state?.location || '',
         email: '',
         phone: '',
-        message: ''
+        message: routerLocation.state?.message || ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
+
+    useEffect(() => {
+        if (!routerLocation.state?.location) {
+            const fetchLocation = async () => {
+                try {
+                    const res = await fetch('/api/get_location.php');
+                    const data = await res.json();
+                    if (data.success && (data.city || data.country) && data.country !== 'Local') {
+                        const locString = [data.city, data.country].filter(Boolean).join(', ');
+                        setFormData(prev => ({ ...prev, location: locString }));
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch location:', err);
+                }
+            };
+            fetchLocation();
+        }
+    }, [routerLocation.state]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

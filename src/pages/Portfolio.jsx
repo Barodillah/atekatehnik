@@ -50,6 +50,44 @@ const Portfolio = () => {
         </Link>
     );
 
+    const NewsCard = ({ project }) => (
+        <Link to={`/post/${project.slug}`} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300 text-left">
+            <div className="w-[120px] sm:w-[180px] shrink-0 bg-surface-container overflow-hidden relative min-h-[120px] sm:min-h-[140px]">
+                {project.cover_image ? (
+                    <img
+                        alt={project.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        src={project.cover_image}
+                    />
+                ) : (
+                    <div className="absolute inset-0 w-full h-full flex items-center justify-center text-outline">
+                        <span className="material-symbols-outlined text-2xl">image</span>
+                    </div>
+                )}
+            </div>
+            <div className="p-3 sm:p-5 flex flex-col flex-grow justify-center">
+                <div className="flex justify-between items-center mb-2 gap-2">
+                   <span className="text-[10px] sm:text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                      {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                   </span>
+                   <span className="bg-secondary-fixed text-on-secondary-fixed text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
+                     {project.category}
+                   </span>
+                </div>
+                <h3 className="font-headline font-bold text-sm sm:text-base text-primary mb-1 sm:mb-2 line-clamp-2 group-hover:text-secondary transition-colors leading-tight">
+                  {project.title}
+                </h3>
+                <p className="text-[11px] sm:text-xs text-on-surface-variant font-medium line-clamp-2 mb-3">
+                  {project.subtitle}
+                </p>
+                <div className="mt-auto flex items-center gap-1.5 text-[11px] sm:text-xs text-secondary font-bold group-hover:gap-2 transition-all">
+                  {lang === 'id' ? 'Lihat Selengkapnya' : 'Read More'}
+                  <span className="material-symbols-outlined text-[14px] sm:text-base">arrow_forward</span>
+                </div>
+            </div>
+        </Link>
+    );
+
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -157,9 +195,9 @@ const Portfolio = () => {
                                 {lang === 'id' ? 'Berita Terbaru' : 'Latest News'}
                             </h2>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             {newsProjects.map((project) => (
-                                <ProjectCard key={project.id} project={project} />
+                                <NewsCard key={project.id} project={project} />
                             ))}
                         </div>
                     </div>

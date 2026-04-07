@@ -7,8 +7,6 @@ const Portfolio = () => {
   const [industrialProjects, setIndustrialProjects] = useState([]);
   const [otherProjects, setOtherProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -17,7 +15,7 @@ const Portfolio = () => {
         const data = await res.json();
         if (data.success) {
           const ind = data.posts.filter(p => p.category === 'Industrial Installations').slice(0, 3);
-          const oth = data.posts.filter(p => p.category !== 'Industrial Installations').slice(0, 3);
+          const oth = data.posts.filter(p => p.category !== 'Industrial Installations').slice(0, 4);
           setIndustrialProjects(ind);
           setOtherProjects(oth);
         }
@@ -30,27 +28,11 @@ const Portfolio = () => {
     fetchProjects();
   }, [lang]);
 
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev === 0 ? 1 : 0));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [isPaused]);
-
-  const slideTitle = activeSlide === 0
-    ? (lang === 'id' ? 'Pemasangan Proyek Industrial' : 'Industrial Installations Projects')
-    : (lang === 'id' ? 'Berita & Tips Lainnya' : 'News & Other Tips');
-
-  const slideSubtitle = activeSlide === 0
-    ? (lang === 'id' ? 'Lebih dari 20 tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.' : 'Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.')
-    : (lang === 'id' ? 'Berbagai instalasi, pembaruan operasional, dan inovasi teknologi layanan purnajual kami.' : 'Various installations, operational updates, and innovations in our after-sales service.');
-
-  const renderProjects = (projectList) => (
+  const renderPortfolio = (projectList) => (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {projectList.map((project) => (
         <Link to={`/post/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
-          <div className="aspect-[4/3] overflow-hidden bg-surface-container">
+          <div className="aspect-[4/3] overflow-hidden bg-surface-container relative">
             {project.cover_image ? (
               <img
                 alt={project.title}
@@ -69,7 +51,7 @@ const Portfolio = () => {
                 {project.category}
               </span>
               <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">
-                {new Date(project.publish_date || project.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
             <h3 className="font-headline font-bold text-lg text-primary mb-2 line-clamp-2">{project.title}</h3>
@@ -88,64 +70,106 @@ const Portfolio = () => {
     </div>
   );
 
+  const renderNews = (projectList) => (
+    <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+      {projectList.map((project) => (
+        <Link to={`/post/${project.slug}`} key={project.id} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300">
+          <div className="w-[120px] sm:w-[180px] shrink-0 bg-surface-container overflow-hidden relative min-h-[120px] sm:min-h-[140px]">
+            {project.cover_image ? (
+              <img
+                alt={project.title}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                src={project.cover_image}
+              />
+            ) : (
+              <div className="absolute inset-0 w-full h-full flex items-center justify-center text-outline">
+                <span className="material-symbols-outlined text-2xl">image</span>
+              </div>
+            )}
+          </div>
+          <div className="p-3 sm:p-5 flex flex-col flex-grow justify-center">
+            <div className="flex justify-between items-center mb-2 gap-2">
+              <span className="text-[10px] sm:text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+              <span className="bg-secondary-fixed text-on-secondary-fixed text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
+                {project.category}
+              </span>
+            </div>
+            <h3 className="font-headline font-bold text-sm sm:text-base text-primary mb-1 sm:mb-2 line-clamp-2 group-hover:text-secondary transition-colors leading-tight">
+              {project.title}
+            </h3>
+            <p className="text-[11px] sm:text-xs text-on-surface-variant font-medium line-clamp-2 mb-3">
+              {project.subtitle}
+            </p>
+            <div className="mt-auto flex items-center gap-1.5 text-[11px] sm:text-xs text-secondary font-bold group-hover:gap-2 transition-all">
+              {lang === 'id' ? 'Lihat Selengkapnya' : 'Read More'}
+              <span className="material-symbols-outlined text-[14px] sm:text-base">arrow_forward</span>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
-    <section className="py-24 bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-4xl font-headline font-extrabold text-primary transition-opacity duration-500">{slideTitle}</h2>
-          <p className="text-on-surface-variant leading-relaxed transition-opacity duration-500">
-            {slideSubtitle}
-          </p>
-        </div>
+    <section className="py-20 sm:py-24 bg-surface-container-low">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
 
-        <div className="mb-16">
-          {loading ? (
-            <div className="py-10 flex justify-center">
-              <span className="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
-            </div>
-          ) : (
-            <div
-              className="overflow-hidden relative pb-8"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-                <div className="w-full flex-shrink-0 px-[2px]">
-                  {industrialProjects.length > 0 ? (
-                    renderProjects(industrialProjects)
-                  ) : (
-                    <div className="py-10 flex justify-center text-on-surface-variant">Belum ada portofolio Industrial Installations.</div>
-                  )}
-                </div>
-                <div className="w-full flex-shrink-0 px-[2px]">
-                  {otherProjects.length > 0 ? (
-                    renderProjects(otherProjects)
-                  ) : (
-                    <div className="py-10 flex justify-center text-on-surface-variant">Belum ada portofolio lainnya.</div>
-                  )}
-                </div>
+        {loading ? (
+          <div className="py-20 flex justify-center">
+            <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+          </div>
+        ) : (
+          <div className="space-y-20">
+            {/* PORTFOLIO SECTION */}
+            <div>
+              <div className="max-w-3xl mb-10">
+                <h2 className="text-3xl sm:text-4xl font-headline font-extrabold text-primary mb-4">
+                  {lang === 'id' ? 'Pemasangan Proyek Industrial' : 'Industrial Installations Projects'}
+                </h2>
+                <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
+                  {lang === 'id' ? 'Lebih dari 20 tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.' : 'Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.'}
+                </p>
               </div>
-              <div className="flex justify-center mt-8 gap-3">
-                <button
-                  onClick={() => setActiveSlide(0)}
-                  className={`w-3 h-3 rounded-full transition-colors ${activeSlide === 0 ? 'bg-primary' : 'bg-outline-variant/40'}`}
-                  aria-label="Slide 1"
-                />
-                <button
-                  onClick={() => setActiveSlide(1)}
-                  className={`w-3 h-3 rounded-full transition-colors ${activeSlide === 1 ? 'bg-primary' : 'bg-outline-variant/40'}`}
-                  aria-label="Slide 2"
-                />
-              </div>
-            </div>
-          )}
-        </div>
 
-        <div className="flex justify-center">
-          <Link to="/portfolio" className="border-2 border-primary text-primary px-10 py-3 rounded-sm font-bold hover:bg-primary hover:text-white transition-all duration-300">
-            {t('portfolio.viewMore')}
-          </Link>
-        </div>
+              {industrialProjects.length > 0 ? (
+                renderPortfolio(industrialProjects)
+              ) : (
+                <div className="py-10 bg-surface-container-lowest rounded-sm border border-outline-variant/20 flex justify-center text-on-surface-variant">
+                  {lang === 'id' ? 'Belum ada portofolio Industrial Installations.' : 'No Industrial Installations portfolio yet.'}
+                </div>
+              )}
+            </div>
+
+            {/* NEWS SECTION */}
+            <div>
+              <div className="max-w-3xl mb-10">
+                <h2 className="text-3xl sm:text-4xl font-headline font-extrabold text-primary mb-4">
+                  {lang === 'id' ? 'Berita & Tips Lainnya' : 'News & Other Tips'}
+                </h2>
+                <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
+                  {lang === 'id' ? 'Berbagai tips, edukasi, berita, dan inovasi teknologi layanan purnajual kami.' : 'Various tips, education, news, and innovations in our after-sales service.'}
+                </p>
+              </div>
+
+              {otherProjects.length > 0 ? (
+                renderNews(otherProjects)
+              ) : (
+                <div className="py-10 bg-surface-container-lowest rounded-sm border border-outline-variant/20 flex justify-center text-on-surface-variant">
+                  {lang === 'id' ? 'Belum ada berita lainnya.' : 'No other news yet.'}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-center pt-8">
+              <Link to="/portfolio" className="border-2 border-primary text-primary px-10 py-3 rounded-sm font-bold hover:bg-primary hover:text-white transition-all duration-300">
+                {t('portfolio.viewMore')}
+              </Link>
+            </div>
+          </div>
+        )}
+
       </div>
     </section>
   );

@@ -161,11 +161,11 @@ switch ($method) {
             $post['impact'] = $impact ?: null;
 
             // Related Products
-            $rp = $db->prepare("SELECT r.product_slug, p.nama FROM post_product_relations r LEFT JOIN products p ON r.product_slug = p.slug WHERE r.post_slug = :slug");
+            $rp = $db->prepare("SELECT r.product_slug, p.nama, p.gambar, p.description FROM post_product_relations r LEFT JOIN products p ON r.product_slug = p.slug WHERE r.post_slug = :slug");
             $rp->execute([':slug' => $post['slug']]);
             $relatedProductsData = $rp->fetchAll();
             $post['related_product_slug'] = !empty($relatedProductsData) ? $relatedProductsData[0]['product_slug'] : null;
-            $post['related_products'] = $relatedProductsData; // array of {product_slug, nama}
+            $post['related_products'] = $relatedProductsData; // array of {product_slug, nama, gambar, description}
 
             jsonSuccess(['post' => $post]);
         } else {
