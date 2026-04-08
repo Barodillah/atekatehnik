@@ -38,13 +38,28 @@ switch ($method) {
             $status = 'pending';
         }
 
+        $search = trim($_GET['search'] ?? '');
+
+        $conditions = ["status = :status"];
+        $params = [':status' => $status];
+
+        if ($search) {
+            $conditions[] = "(user_name LIKE :search OR comment_text LIKE :search2 OR post_slug LIKE :search3 OR ip_address LIKE :search4)";
+            $params[':search']  = "%$search%";
+            $params[':search2'] = "%$search%";
+            $params[':search3'] = "%$search%";
+            $params[':search4'] = "%$search%";
+        }
+
+        $whereClause = 'WHERE ' . implode(' AND ', $conditions);
+
         $stmt = $db->prepare("
             SELECT id, post_slug, user_name, is_anonymous, comment_text, ip_address, status, created_at
             FROM post_comments
-            WHERE status = :status
+            $whereClause
             ORDER BY created_at DESC
         ");
-        $stmt->execute([':status' => $status]);
+        $stmt->execute($params);
         $comments = $stmt->fetchAll();
 
         jsonSuccess([

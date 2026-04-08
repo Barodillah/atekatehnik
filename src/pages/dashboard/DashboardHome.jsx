@@ -40,6 +40,7 @@ const DashboardHome = () => {
   let chart = data.viewChart || data.leadChart || [];
   const activities = data.recentActivity || [];
   const featured = data.featuredProduct || {};
+  const featuredPost = data.featuredPost || {};
 
   // Jika data view belum ada/nol, gunakan chart dummy agar chart 'aktif' dan terlihat
   const isChartEmpty = chart.length === 0 || chart.every(c => (c.views || c.total || 0) === 0);
@@ -87,14 +88,14 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8">
       {/* Page Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary tracking-tight">Dashboard Overview</h2>
-          <p className="text-on-surface-variant font-body">Operational performance and engagement metrics.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">Dashboard Overview</h2>
+          <p className="text-sm md:text-base text-on-surface-variant font-body">Operational performance and engagement metrics.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button className="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">
             Generate Report
           </button>
@@ -133,50 +134,55 @@ const DashboardHome = () => {
           </div>
           <div>
             <h3 className="text-4xl font-headline font-extrabold text-primary tracking-tighter">{kpis.totalProducts}</h3>
-            <p className="text-xs text-on-surface-variant font-medium mt-1">Live in product catalog</p>
-          </div>
-        </div>
-        
-        {/* Total Views (Engagement) */}
-        <div className="bg-primary-container p-6 flex flex-col justify-between h-40 text-on-primary group transition-all hover:shadow-xl hover:shadow-primary/20 rounded-sm">
-          <div className="flex justify-between items-start">
-            <span className="text-[10px] font-label font-bold text-on-primary/60 uppercase tracking-widest">Total Page Views</span>
-            <div className="p-2 bg-secondary-container text-on-secondary-container rounded-sm hidden md:block">
-              <span className="material-symbols-outlined">visibility</span>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-4xl font-headline font-extrabold tracking-tighter">{kpis.totalViews}</h3>
-            <p className="text-xs text-secondary-container font-medium mt-1 flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs">public</span> Overall reach & traffic
+            <p className="text-[11px] text-on-surface-variant font-medium mt-1 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px]">visibility</span>
+              {kpis.productViews || 0} Views ({(kpis.productUniqueIps || 0)} Unique — {kpis.productViews > 0 ? Math.round((kpis.productUniqueIps/kpis.productViews)*100) : 0}%)
             </p>
           </div>
         </div>
         
-        {/* Total Comments (Engagement) */}
+        {/* Total Posts */}
+        <div className="bg-primary-container p-6 flex flex-col justify-between h-40 text-on-primary group transition-all hover:shadow-xl hover:shadow-primary/20 rounded-sm">
+          <div className="flex justify-between items-start">
+            <span className="text-[10px] font-label font-bold text-on-primary/60 uppercase tracking-widest">Total Articles/Posts</span>
+            <div className="p-2 bg-secondary-container text-on-secondary-container rounded-sm hidden md:block">
+              <span className="material-symbols-outlined">article</span>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-4xl font-headline font-extrabold tracking-tighter">{kpis.totalPosts}</h3>
+            <p className="text-[11px] text-secondary-container font-medium mt-1 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px]">visibility</span>
+              {kpis.postViews || 0} Views ({(kpis.postUniqueIps || 0)} Unique — {kpis.postViews > 0 ? Math.round((kpis.postUniqueIps/kpis.postViews)*100) : 0}%)
+            </p>
+          </div>
+        </div>
+        
+        {/* Total WA Clicks */}
         <div className="bg-surface-container-lowest border border-surface-container-low p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5 rounded-sm">
           <div className="flex justify-between items-start">
-            <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Post Comments</span>
-            <div className="p-2 bg-surface-container-highest text-primary rounded-sm hidden md:block">
+            <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Total WA Clicks</span>
+            <div className="p-2 bg-surface-container-highest text-[#25D366] rounded-sm hidden md:block">
               <span className="material-symbols-outlined">forum</span>
             </div>
           </div>
           <div>
-            <h3 className="text-4xl font-headline font-extrabold text-primary tracking-tighter">{kpis.totalComments}</h3>
-            <p className="text-xs text-secondary font-medium mt-1 flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs">chat</span> User engagement
+            <h3 className="text-4xl font-headline font-extrabold text-[#25D366] tracking-tighter">{kpis.totalWaClicks}</h3>
+            <p className="text-[11px] text-secondary font-medium mt-1 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px]">person</span>
+              {kpis.waUniqueIps || 0} Unique IPs ({kpis.totalWaClicks > 0 ? Math.round((kpis.waUniqueIps/kpis.totalWaClicks)*100) : 0}% unique rate)
             </p>
           </div>
         </div>
       </div>
 
       {/* Main Analytics Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
         
         {/* Page Views Chart */}
-        <div className="xl:col-span-2 bg-surface-container-lowest border border-surface-container-low rounded-sm p-8 shadow-sm">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-10 gap-4">
-            <h4 className="text-lg font-bold text-primary flex items-center gap-2">
+        <div className="xl:col-span-2 bg-surface-container-lowest border border-surface-container-low rounded-sm p-4 md:p-8 shadow-sm">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10 gap-4">
+            <h4 className="text-base md:text-lg font-bold text-primary flex items-center gap-2">
               <span className="w-1 h-6 bg-secondary-container"></span>
               Page Views (Last 7 Days)
             </h4>
@@ -219,8 +225,8 @@ const DashboardHome = () => {
         </div>
         
         {/* Recent Activity */}
-        <div className="bg-surface-container-lowest border border-surface-container-low rounded-sm p-6 flex flex-col shadow-sm max-h-[420px]">
-          <h4 className="text-lg font-bold text-primary mb-6 flex items-center justify-between">
+        <div className="bg-surface-container-lowest border border-surface-container-low rounded-sm p-4 md:p-6 flex flex-col shadow-sm max-h-[420px]">
+          <h4 className="text-base md:text-lg font-bold text-primary mb-6 flex items-center justify-between">
             Recent Activity
             <span className="material-symbols-outlined text-outline text-sm">history</span>
           </h4>
@@ -254,37 +260,93 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* Featured Equipment Slot */}
-      {featured && featured.nama && (
-        <div className="bg-primary-container relative overflow-hidden rounded-sm min-h-[300px] flex items-center border border-primary/20 shadow-md">
-          <div className="absolute right-0 top-0 w-2/3 h-full opacity-20 pointer-events-none">
-            <img
-              alt="Technical Background"
-              className="w-full h-full object-cover mix-blend-overlay"
-              src="https://images.unsplash.com/photo-1565439390118-bbf375f46401?q=80&w=2000&auto=format&fit=crop"
-            />
-          </div>
-          <div className="relative z-10 p-8 md:p-12 max-w-xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">
-              Latest Additions
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-headline font-extrabold text-white tracking-tighter leading-tight">
-              {featured.nama}
-            </h2>
-            <div className="flex gap-8 pt-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Category</span>
-                <p className="text-xl font-bold text-white uppercase">{featured.kategori}</p>
+      {/* Featured Slots (Products & Posts) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
+        
+        {/* Featured Equipment Slot */}
+        {featured && featured.nama && (
+          <div className="bg-primary-container relative overflow-hidden rounded-sm min-h-[300px] flex items-center shadow-md">
+            {/* Real Image Background with Gradient Fade */}
+            {featured.gambar && (
+              <div className="absolute inset-0 z-0">
+                <img
+                  alt={featured.nama}
+                  className="w-full h-full object-cover mix-blend-overlay opacity-60"
+                  src={featured.gambar}
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/60 to-transparent border border-primary/20"></div>
               </div>
-              <div className="w-px h-10 bg-white/10"></div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Page Views</span>
-                <p className="text-xl font-bold text-secondary-container flex items-center gap-2"><span className="material-symbols-outlined text-xl">visibility</span> {featured.views || 0}</p>
+            )}
+            
+            <div className="relative z-10 p-6 md:p-8 space-y-6">
+              <div className="inline-flex items-center w-max gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">
+                Latest Product
+              </div>
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold text-white tracking-tighter leading-tight drop-shadow-md">
+                {featured.nama}
+              </h2>
+              <div className="flex gap-6 pt-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Category</span>
+                  <p className="text-lg font-bold text-white drop-shadow-sm uppercase">{featured.kategori}</p>
+                </div>
+                <div className="w-px h-10 bg-white/10"></div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-label font-bold text-white/50 uppercase tracking-widest">Page Views</span>
+                  <p className="text-lg font-bold text-secondary-container flex items-center gap-2 drop-shadow-sm"><span className="material-symbols-outlined text-xl">visibility</span> {featured.views || 0}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Featured Post Slot */}
+        {featuredPost && featuredPost.title && (
+          <div className="bg-surface-container-highest relative overflow-hidden rounded-sm min-h-[300px] flex items-center shadow-md">
+            {/* Real Image Background with Gradient Fade */}
+            {featuredPost.cover_image && (
+              <div className="absolute inset-0 z-0">
+                <img
+                  alt={featuredPost.title}
+                  className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+                  src={featuredPost.cover_image}
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-surface-container-highest via-surface-container-highest/70 to-transparent border border-surface-container-low"></div>
+              </div>
+            )}
+
+            <div className="relative z-10 p-6 md:p-8 space-y-6">
+              <div className="inline-flex items-center w-max gap-2 px-3 py-1 bg-secondary text-on-secondary text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">
+                Latest Article
+              </div>
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold text-primary tracking-tighter leading-tight drop-shadow-md">
+                {featuredPost.title}
+              </h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-4 pt-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Category</span>
+                  <p className="text-lg font-bold text-primary uppercase">{featuredPost.category}</p>
+                </div>
+                <div className="w-px h-10 bg-outline-variant/30 hidden sm:block"></div>
+                <div className="flex gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Views</span>
+                    <p className="text-lg font-bold text-secondary flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">visibility</span> {featuredPost.views || 0}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Likes</span>
+                    <p className="text-lg font-bold text-error flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">favorite</span> {featuredPost.likes || 0}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-label font-bold text-outline uppercase tracking-widest">Comments</span>
+                    <p className="text-lg font-bold text-tertiary flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">forum</span> {featuredPost.comments || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

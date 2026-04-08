@@ -19,7 +19,32 @@ switch ($method) {
 
     case 'GET':
         $postSlug = trim($_GET['post_slug'] ?? '');
-        if (empty($postSlug)) jsonError(400, 'post_slug is required.');
+        $productSlug = trim($_GET['product_slug'] ?? '');
+
+        // Inverse lookup: given a product_slug, find all related posts
+        if (!empty($productSlug)) {
+            $lang = trim($_GET['lang'] ?? '');
+            $langCondition = '';
+            $params = [':slug' => $productSlug];
+            if (!empty($lang)) {
+                $langCondition = ' AND ps.language = :lang';
+                $params[':lang'] = $lang;
+            }
+            $stmt = $db->prepare("
+                SELECT ps.slug, ps.title, ps.subtitle, ps.cover_image, ps.category, ps.publish_date, ps.created_at
+                FROM post_product_relations ppr
+                LEFT JOIN posts ps ON ps.slug = ppr.post_slug
+                WHERE ppr.product_slug = :slug AND ps.slug IS NOT NULL{$langCondition}
+                ORDER BY ps.publish_date DESC
+            ");
+            $stmt->execute($params);
+            $posts = $stmt->fetchAll();
+
+            jsonSuccess(['posts' => $posts]);
+            break;
+        }
+
+        if (empty($postSlug)) jsonError(400, 'post_slug or product_slug is required.');
 
         $stmt = $db->prepare("
             SELECT ppr.product_slug, p.nama as product_name

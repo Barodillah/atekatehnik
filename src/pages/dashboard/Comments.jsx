@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate } from '../../utils/dateUtils';
 
 const Comments = () => {
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const [comments, setComments] = useState([]);
   const [filter, setFilter] = useState('pending'); // pending, approved, spam
@@ -15,7 +17,9 @@ const Comments = () => {
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/admin_comments.php?status=${filter}`);
+      const params = new URLSearchParams({ status: filter });
+      if (searchQuery) params.append('search', searchQuery);
+      const res = await fetch(`/api/admin_comments.php?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setComments(data.comments);
@@ -28,7 +32,7 @@ const Comments = () => {
     }
   };
 
-  useEffect(() => { fetchComments(); }, [filter]);
+  useEffect(() => { fetchComments(); }, [filter, searchQuery]);
 
   // Handle status change
   const handleStatusChange = async (commentId, newStatus) => {
@@ -71,12 +75,12 @@ const Comments = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary font-headline tracking-tight">Comment Moderation</h2>
-          <p className="text-on-surface-variant mt-1">Review and manage user comments on blog posts.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tight">Comment Moderation</h2>
+          <p className="text-sm md:text-base text-on-surface-variant mt-1">Review and manage user comments on blog posts.</p>
         </div>
       </div>
 
@@ -93,26 +97,26 @@ const Comments = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button onClick={() => setFilter('pending')} className={`p-6 flex flex-col justify-between text-left transition-all ${filter === 'pending' ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-surface-container-low hover:bg-amber-50/50'}`}>
+        <button onClick={() => setFilter('pending')} className={`p-4 md:p-6 flex flex-col justify-between text-left transition-all ${filter === 'pending' ? 'bg-amber-50 ring-2 ring-amber-400' : 'bg-surface-container-low hover:bg-amber-50/50'}`}>
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-amber-500">pending</span>
-            <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Pending Review</span>
+            <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Pending Review</span>
           </div>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-4">{stats.pending}</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-4">{stats.pending}</span>
         </button>
-        <button onClick={() => setFilter('approved')} className={`p-6 flex flex-col justify-between text-left transition-all ${filter === 'approved' ? 'bg-green-50 ring-2 ring-green-400' : 'bg-surface-container-low hover:bg-green-50/50'}`}>
+        <button onClick={() => setFilter('approved')} className={`p-4 md:p-6 flex flex-col justify-between text-left transition-all ${filter === 'approved' ? 'bg-green-50 ring-2 ring-green-400' : 'bg-surface-container-low hover:bg-green-50/50'}`}>
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-green-500">check_circle</span>
-            <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Approved</span>
+            <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Approved</span>
           </div>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-4">{stats.approved}</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-4">{stats.approved}</span>
         </button>
-        <button onClick={() => setFilter('spam')} className={`p-6 flex flex-col justify-between text-left transition-all ${filter === 'spam' ? 'bg-red-50 ring-2 ring-red-400' : 'bg-surface-container-low hover:bg-red-50/50'}`}>
+        <button onClick={() => setFilter('spam')} className={`p-4 md:p-6 flex flex-col justify-between text-left transition-all ${filter === 'spam' ? 'bg-red-50 ring-2 ring-red-400' : 'bg-surface-container-low hover:bg-red-50/50'}`}>
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-red-500">report</span>
-            <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Spam</span>
+            <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Spam</span>
           </div>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-4">{stats.spam}</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-4">{stats.spam}</span>
         </button>
       </div>
 

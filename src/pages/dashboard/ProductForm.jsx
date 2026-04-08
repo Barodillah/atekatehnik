@@ -162,7 +162,7 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8 w-full font-body">
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto space-y-6 md:space-y-8 w-full font-body">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button 
@@ -172,8 +172,8 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div>
-          <h2 className="text-3xl font-extrabold text-primary font-headline tracking-tight">{isEdit ? 'Edit Produk' : 'Tambah Produk Baru'}</h2>
-          <p className="text-on-surface-variant mt-1 text-sm">{isEdit ? 'Ubah detail produk, gambar, dan spesifikasi.' : 'Masukkan detail produk, gambar, dan spesifikasi teknis.'}</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tight">{isEdit ? 'Edit Produk' : 'Tambah Produk Baru'}</h2>
+          <p className="text-on-surface-variant mt-1 text-xs md:text-sm">{isEdit ? 'Ubah detail produk, gambar, dan spesifikasi.' : 'Masukkan detail produk, gambar, dan spesifikasi teknis.'}</p>
         </div>
       </div>
 
@@ -195,7 +195,7 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
         </div>
       ) : (
         <div className="bg-surface-container-lowest shadow-sm rounded-sm overflow-hidden border border-surface-container-low">
-          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-8">
           
           {/* General Information */}
           <div>
@@ -261,11 +261,11 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
               </div>
 
               <div className="relative">
-                <div className="flex justify-between items-end mb-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-2 gap-2">
                   <label className="block text-[10px] uppercase tracking-widest font-bold text-outline">Deskripsi Produk (Opsional)</label>
                   
                   {/* AI Generation Tools */}
-                  <div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+                  <div className="flex items-center flex-wrap gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
                     <span className="text-[10px] font-bold text-secondary flex items-center gap-1 mr-1">
                       <span className="material-symbols-outlined text-[14px]">smart_toy</span>
                       Generate AI:
@@ -361,18 +361,18 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
           </div>
 
           {/* Footer Actions */}
-          <div className="flex justify-end gap-4 pt-8 border-t border-surface-container-low">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-surface-container-low">
             <button 
               type="button"
               onClick={() => navigate('/admin/products')}
-              className="px-8 py-3 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
             >
               Batalkan
             </button>
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 bg-primary-container text-white font-bold text-sm uppercase tracking-widest rounded-sm shadow-md hover:bg-primary transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-8 py-3 bg-primary-container text-white font-bold text-sm uppercase tracking-widest rounded-sm shadow-md hover:bg-primary transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

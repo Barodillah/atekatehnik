@@ -172,6 +172,7 @@ switch ($method) {
             $search = trim($_GET['search'] ?? '');
             $language = $_GET['lang'] ?? '';
             $category = $_GET['category'] ?? '';
+            $excludeCategory = $_GET['exclude_category'] ?? '';
             $page = max(1, (int) ($_GET['page'] ?? 1));
             $limit = min(50, max(1, (int) ($_GET['limit'] ?? 10)));
             $offset = ($page - 1) * $limit;
@@ -193,12 +194,31 @@ switch ($method) {
                 $conditions[] = "category = :cat";
                 $params[':cat'] = $category;
             }
+            if ($excludeCategory) {
+                $conditions[] = "category != :xcat";
+                $params[':xcat'] = $excludeCategory;
+            }
 
             $where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
             $countStmt = $db->prepare("SELECT COUNT(*) FROM posts $where");
             $countStmt->execute($params);
             $total = (int) $countStmt->fetchColumn();
+
+            // Calculate requested stats
+            $statsStmt = $db->query("
+                SELECT 
+                    SUM(category = 'Industrial Installations' AND language = 'id') as inst_id,
+                    SUM(category = 'Industrial Installations' AND language = 'en') as inst_en,
+                    SUM(category != 'Industrial Installations' AND language = 'id') as other_id,
+                    SUM(category != 'Industrial Installations' AND language = 'en') as other_en,
+                    COUNT(*) as total_posts,
+                    (SELECT COUNT(*) FROM page_views WHERE page_type = 'post') as total_views,
+                    (SELECT COUNT(*) FROM post_likes) as total_likes,
+                    (SELECT COUNT(*) FROM post_comments) as total_comments
+                FROM posts
+            ");
+            $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
             $sort = $_GET['sort'] ?? '';
             $orderBy = "created_at DESC";
@@ -225,6 +245,16 @@ switch ($method) {
                 'page' => $page,
                 'limit' => $limit,
                 'totalPages' => ceil($total / $limit),
+                'stats' => [
+                    'inst_id' => (int) ($stats['inst_id'] ?? 0),
+                    'inst_en' => (int) ($stats['inst_en'] ?? 0),
+                    'other_id' => (int) ($stats['other_id'] ?? 0),
+                    'other_en' => (int) ($stats['other_en'] ?? 0),
+                    'total_posts' => (int) ($stats['total_posts'] ?? 0),
+                    'total_views' => (int) ($stats['total_views'] ?? 0),
+                    'total_likes' => (int) ($stats['total_likes'] ?? 0),
+                    'total_comments' => (int) ($stats['total_comments'] ?? 0),
+                ]
             ]);
         }
         break;

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDateTime } from '../../utils/dateUtils';
 
 const Analytics = () => {
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const [viewType, setViewType] = useState('post'); // post or product
   const [pages, setPages] = useState([]);
@@ -57,12 +59,12 @@ const Analytics = () => {
   }, [viewType]);
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary font-headline tracking-tight">Page Analytics</h2>
-          <p className="text-on-surface-variant mt-1">Detailed view analytics for posts and products.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tight">Page Analytics</h2>
+          <p className="text-sm md:text-base text-on-surface-variant mt-1">Detailed view analytics for posts and products.</p>
         </div>
         <div className="flex bg-surface-container-low rounded-sm overflow-hidden border border-outline-variant/30">
           <button
@@ -82,28 +84,28 @@ const Analytics = () => {
 
       {/* Overall Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Total Views</span>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-3">{overallStats.totalViews}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Total Views</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.totalViews}</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Unique Visitors</span>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-3">{overallStats.uniqueIps}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Unique Visitors</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.uniqueIps}</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top City</span>
-          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{overallStats.topCities?.[0]?.city || '—'}</span>
-          <span className="text-xs text-on-surface-variant">{overallStats.topCities?.[0]?.count || 0} views</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top City</span>
+          <span className="text-xl md:text-2xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.topCities?.[0]?.city || '—'}</span>
+          <span className="text-[10px] md:text-xs text-on-surface-variant">{overallStats.topCities?.[0]?.count || 0} views</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Browser</span>
-          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{overallStats.topBrowsers?.[0]?.browser || '—'}</span>
-          <span className="text-xs text-on-surface-variant">{overallStats.topBrowsers?.[0]?.count || 0} views</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Browser</span>
+          <span className="text-xl md:text-2xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.topBrowsers?.[0]?.browser || '—'}</span>
+          <span className="text-[10px] md:text-xs text-on-surface-variant">{overallStats.topBrowsers?.[0]?.count || 0} views</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Device</span>
-          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{overallStats.topDevices?.[0]?.device_type || '—'}</span>
-          <span className="text-xs text-on-surface-variant">{overallStats.topDevices?.[0]?.count || 0} views</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Device</span>
+          <span className="text-xl md:text-2xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.topDevices?.[0]?.device_type || '—'}</span>
+          <span className="text-[10px] md:text-xs text-on-surface-variant">{overallStats.topDevices?.[0]?.count || 0} views</span>
         </div>
       </div>
 
@@ -136,8 +138,18 @@ const Analytics = () => {
                     No view data recorded yet.
                   </td>
                 </tr>
-              ) : (
-                pages.map((p, i) => (
+              ) : (() => {
+                const filteredPages = searchQuery
+                  ? pages.filter(p => p.slug.toLowerCase().includes(searchQuery.toLowerCase()))
+                  : pages;
+                return filteredPages.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">search_off</span>
+                      No pages match "{searchQuery}".
+                    </td>
+                  </tr>
+                ) : filteredPages.map((p, i) => (
                   <tr key={p.slug} className={`hover:bg-surface-container-low transition-colors cursor-pointer ${selectedSlug === p.slug ? 'bg-blue-50' : ''}`} onClick={() => fetchDetails(p.slug)}>
                     <td className="px-6 py-4 text-sm font-bold text-on-surface-variant">{i + 1}</td>
                     <td className="px-6 py-4">
@@ -158,8 +170,8 @@ const Analytics = () => {
                       <span className="material-symbols-outlined text-on-surface-variant text-lg">{selectedSlug === p.slug ? 'expand_less' : 'expand_more'}</span>
                     </td>
                   </tr>
-                ))
-              )}
+                ));
+              })()}
             </tbody>
           </table>
         </div>

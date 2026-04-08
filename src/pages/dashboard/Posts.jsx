@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate } from '../../utils/dateUtils';
 
 const Posts = () => {
   const navigate = useNavigate();
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+  const [stats, setStats] = useState({ 
+    inst_id: 0, inst_en: 0, other_id: 0, other_en: 0,
+    total_posts: 0, total_views: 0, total_likes: 0, total_comments: 0
+  });
+  const [filterPreset, setFilterPreset] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
 
   const categoryStyles = {
@@ -21,11 +27,29 @@ const Posts = () => {
   const fetchPosts = async (page = 1) => {
     setIsLoading(true);
     try {
-      const res = await authFetch(`/api/posts.php?page=${page}&limit=10`);
+      const params = new URLSearchParams({ page, limit: 10 });
+      if (searchQuery) params.append('search', searchQuery);
+      
+      if (filterPreset === 'inst_id') {
+        params.append('category', 'Industrial Installations');
+        params.append('lang', 'id');
+      } else if (filterPreset === 'inst_en') {
+        params.append('category', 'Industrial Installations');
+        params.append('lang', 'en');
+      } else if (filterPreset === 'other_id') {
+        params.append('exclude_category', 'Industrial Installations');
+        params.append('lang', 'id');
+      } else if (filterPreset === 'other_en') {
+        params.append('exclude_category', 'Industrial Installations');
+        params.append('lang', 'en');
+      }
+
+      const res = await authFetch(`/api/posts.php?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setPosts(data.posts);
         setPagination({ page: data.page, totalPages: data.totalPages, total: data.total });
+        if (data.stats) setStats(data.stats);
       }
     } catch {
     } finally {
@@ -33,7 +57,7 @@ const Posts = () => {
     }
   };
 
-  useEffect(() => { fetchPosts(); }, []);
+  useEffect(() => { fetchPosts(1); }, [searchQuery, filterPreset]);
 
   const handleDelete = async (id, title) => {
     if (!window.confirm(`Hapus post "${title}"?`)) return;
@@ -44,42 +68,74 @@ const Posts = () => {
   };
 
   return (
-    <div className="p-8 max-w-7xl">
+    <div className="p-4 md:p-8 w-full">
       {/* Hero Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="space-y-2">
-          <span className="text-secondary font-bold text-xs tracking-widest uppercase">Content Management</span>
-          <h1 className="text-4xl font-extrabold text-primary tracking-tight">Article Repository</h1>
-          <p className="text-on-surface-variant max-w-lg">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-8 md:mb-12">
+        <div className="space-y-1 md:space-y-2">
+          <span className="text-secondary font-bold text-[10px] md:text-xs tracking-widest uppercase">Content Management</span>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-primary tracking-tight">Article Repository</h1>
+          <p className="text-sm md:text-base text-on-surface-variant max-w-lg">
             Manage your industrial insights, project installations, and technical maintenance guides for the Ateka Tehnik audience.
           </p>
         </div>
         <button 
           onClick={() => navigate('/admin/posts/new')}
-          className="flex items-center gap-2 bg-primary-container text-white px-6 py-3 rounded-sm font-bold shadow-md hover:translate-y-[-1px] cursor-pointer transition-all"
+          className="flex items-center justify-center gap-2 bg-primary-container text-white px-6 py-3 rounded-sm font-bold shadow-md hover:translate-y-[-1px] cursor-pointer transition-all w-full md:w-auto"
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'wght' 600" }}>add</span>
           <span>Create New Post</span>
         </button>
       </div>
 
-      {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <div className="bg-surface-container-lowest p-6 rounded-sm border-b-2 border-primary-container shadow-sm">
-          <p className="text-xs font-bold text-outline uppercase tracking-wider mb-1">Total Posts</p>
-          <p className="text-3xl font-extrabold text-primary">{pagination.total}</p>
+      {/* Overall Performance Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-4 md:mb-6">
+        <div className="bg-surface-container-lowest p-6 rounded-sm border-l-4 border-slate-700 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[14px]">article</span> Total Posts</p>
+          <p className="text-3xl font-extrabold text-slate-800">{stats.total_posts}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm shadow-sm">
-          <p className="text-xs font-bold text-outline uppercase tracking-wider mb-1">Published</p>
-          <p className="text-3xl font-extrabold text-primary">{posts.filter(p => p.language === 'id').length}</p>
+        <div className="bg-surface-container-lowest p-6 rounded-sm border-l-4 border-blue-500 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[14px]">visibility</span> Total Views</p>
+          <p className="text-3xl font-extrabold text-blue-600">{stats.total_views}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm shadow-sm">
-          <p className="text-xs font-bold text-outline uppercase tracking-wider mb-1">English (AI)</p>
-          <p className="text-3xl font-extrabold text-secondary">{posts.filter(p => p.language === 'en').length}</p>
+        <div className="bg-surface-container-lowest p-6 rounded-sm border-l-4 border-red-500 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[14px]">favorite</span> Total Likes</p>
+          <p className="text-3xl font-extrabold text-red-500">{stats.total_likes}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm shadow-sm">
-          <p className="text-xs font-bold text-outline uppercase tracking-wider mb-1">Pages</p>
-          <p className="text-3xl font-extrabold text-primary">{pagination.totalPages}</p>
+        <div className="bg-surface-container-lowest p-6 rounded-sm border-l-4 border-emerald-500 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[14px]">forum</span> Total Comments</p>
+          <p className="text-3xl font-extrabold text-emerald-600">{stats.total_comments}</p>
+        </div>
+      </div>
+
+      {/* Category Filter Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+        <div 
+          onClick={() => setFilterPreset(filterPreset === 'inst_id' ? 'all' : 'inst_id')}
+          className={`p-6 rounded-sm border-b-2 shadow-sm cursor-pointer transition-colors ${filterPreset === 'inst_id' ? 'bg-primary/10 border-primary' : 'bg-surface-container-lowest border-transparent hover:bg-surface-container-low'}`}
+        >
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-1">Ind. Installations (ID)</p>
+          <p className="text-3xl font-extrabold text-primary">{stats.inst_id}</p>
+        </div>
+        <div 
+          onClick={() => setFilterPreset(filterPreset === 'inst_en' ? 'all' : 'inst_en')}
+          className={`p-6 rounded-sm border-b-2 shadow-sm cursor-pointer transition-colors ${filterPreset === 'inst_en' ? 'bg-secondary/10 border-secondary' : 'bg-surface-container-lowest border-transparent hover:bg-surface-container-low'}`}
+        >
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-1">Ind. Installations (EN)</p>
+          <p className="text-3xl font-extrabold text-secondary">{stats.inst_en}</p>
+        </div>
+        <div 
+          onClick={() => setFilterPreset(filterPreset === 'other_id' ? 'all' : 'other_id')}
+          className={`p-6 rounded-sm border-b-2 shadow-sm cursor-pointer transition-colors ${filterPreset === 'other_id' ? 'bg-primary/10 border-primary' : 'bg-surface-container-lowest border-transparent hover:bg-surface-container-low'}`}
+        >
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-1">Other Articles (ID)</p>
+          <p className="text-3xl font-extrabold text-primary">{stats.other_id}</p>
+        </div>
+        <div 
+          onClick={() => setFilterPreset(filterPreset === 'other_en' ? 'all' : 'other_en')}
+          className={`p-6 rounded-sm border-b-2 shadow-sm cursor-pointer transition-colors ${filterPreset === 'other_en' ? 'bg-secondary/10 border-secondary' : 'bg-surface-container-lowest border-transparent hover:bg-surface-container-low'}`}
+        >
+          <p className="text-[10px] font-bold text-outline uppercase tracking-wider mb-1">Other Articles (EN)</p>
+          <p className="text-3xl font-extrabold text-secondary">{stats.other_en}</p>
         </div>
       </div>
 
@@ -218,15 +274,15 @@ const Posts = () => {
       </div>
 
       {/* Contextual CTA */}
-      <div className="mt-16 bg-primary-container p-8 rounded-sm text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-        <div className="relative z-10">
-          <h3 className="text-2xl font-extrabold mb-2">Need to announce a new project?</h3>
-          <p className="text-blue-200 text-sm max-w-md">Our documentation standards ensure every installation is featured with technical precision. Use the pre-built templates for consistency.</p>
+      <div className="mt-8 md:mt-16 bg-primary-container p-6 md:p-8 rounded-sm text-white flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative overflow-hidden">
+        <div className="relative z-10 text-center md:text-left">
+          <h3 className="text-xl md:text-2xl font-extrabold mb-2">Need to announce a new project?</h3>
+          <p className="text-blue-200 text-xs md:text-sm max-w-md mx-auto md:mx-0">Our documentation standards ensure every installation is featured with technical precision. Use the pre-built templates for consistency.</p>
         </div>
-        <div className="flex gap-4 relative z-10">
+        <div className="flex gap-4 relative z-10 w-full md:w-auto mt-2 md:mt-0">
           <button 
             onClick={() => navigate('/admin/posts/new')}
-            className="px-6 py-3 bg-secondary text-white rounded-sm text-sm font-bold uppercase tracking-widest hover:bg-secondary-container shadow-lg cursor-pointer"
+            className="w-full md:w-auto px-6 py-3 bg-secondary text-white rounded-sm text-sm font-bold uppercase tracking-widest hover:bg-secondary-container shadow-lg cursor-pointer"
           >
             New Post
           </button>

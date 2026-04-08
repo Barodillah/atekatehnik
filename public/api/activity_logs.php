@@ -25,8 +25,9 @@ $conditions = [];
 $params = [];
 
 if ($search) {
-    $conditions[] = "(action LIKE :search OR details LIKE :search)";
-    $params[':search'] = "%$search%";
+    $conditions[] = "(action LIKE :search1 OR details LIKE :search2)";
+    $params[':search1'] = "%$search%";
+    $params[':search2'] = "%$search%";
 }
 
 if ($entityType) {

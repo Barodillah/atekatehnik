@@ -28,11 +28,33 @@ $newLeads = (int) $leadsNewStmt->fetchColumn();
 $productsTotalStmt = $db->query("SELECT COUNT(*) FROM products");
 $totalProducts = (int) $productsTotalStmt->fetchColumn();
 
-// Total Page Views (Engagement)
+// Product Video/Page Views
+$productViewsStmt = $db->query("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM page_views WHERE page_type = 'product'");
+$productViewsData = $productViewsStmt->fetch();
+$productViews = (int) ($productViewsData['total'] ?? 0);
+$productUniqueIps = (int) ($productViewsData['unique_ips'] ?? 0);
+
+// Total Posts
+$postsTotalStmt = $db->query("SELECT COUNT(*) FROM posts");
+$totalPosts = (int) $postsTotalStmt->fetchColumn();
+
+// Post Views
+$postViewsStmt = $db->query("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM page_views WHERE page_type = 'post'");
+$postViewsData = $postViewsStmt->fetch();
+$postViews = (int) ($postViewsData['total'] ?? 0);
+$postUniqueIps = (int) ($postViewsData['unique_ips'] ?? 0);
+
+// Total WA Clicks
+$waClicksStmt = $db->query("SELECT COUNT(*) as total, COUNT(DISTINCT ip_address) as unique_ips FROM wa_cta_clicks");
+$waClicksData = $waClicksStmt->fetch();
+$totalWaClicks = (int) ($waClicksData['total'] ?? 0);
+$waUniqueIps = (int) ($waClicksData['unique_ips'] ?? 0);
+
+// Total Views (Overall)
 $viewsTotalStmt = $db->query("SELECT COUNT(*) FROM page_views");
 $totalViews = (int) $viewsTotalStmt->fetchColumn();
 
-// Total Comments (Engagement)
+// Total Comments (Overall)
 $commentsTotalStmt = $db->query("SELECT COUNT(*) FROM post_comments");
 $totalComments = (int) $commentsTotalStmt->fetchColumn();
 
@@ -83,18 +105,34 @@ $activityStmt = $db->query("
 $recentActivity = $activityStmt->fetchAll();
 
 // ── 4. Featured Product Overview ──────────────────────────────────────
-$latestProductStmt = $db->query("SELECT p.nama, p.kategori, (SELECT COUNT(*) FROM page_views pv WHERE pv.page_slug = p.slug AND pv.page_type = 'product') as views FROM products p ORDER BY p.id DESC LIMIT 1");
+$latestProductStmt = $db->query("SELECT p.nama, p.kategori, p.gambar, (SELECT COUNT(*) FROM page_views pv WHERE pv.page_slug = p.slug AND pv.page_type = 'product') as views FROM products p ORDER BY p.id DESC LIMIT 1");
 $featuredProduct = $latestProductStmt->fetch();
+
+// ── 5. Featured Post Overview ──────────────────────────────────────
+$latestPostStmt = $db->query("SELECT p.title, p.category, p.cover_image, p.slug, 
+    (SELECT COUNT(*) FROM page_views pv WHERE pv.page_slug = p.slug AND pv.page_type = 'post') as views,
+    (SELECT COUNT(*) FROM post_likes l WHERE l.post_slug = p.slug) as likes,
+    (SELECT COUNT(*) FROM post_comments c WHERE c.post_slug = p.slug) as comments
+    FROM posts p ORDER BY p.id DESC LIMIT 1");
+$featuredPost = $latestPostStmt->fetch();
 
 jsonSuccess([
     'kpis' => [
         'totalLeads' => $totalLeads,
         'newLeads' => $newLeads,
         'totalProducts' => $totalProducts,
+        'productViews' => $productViews,
+        'productUniqueIps' => $productUniqueIps,
+        'totalPosts' => $totalPosts,
+        'postViews' => $postViews,
+        'postUniqueIps' => $postUniqueIps,
+        'totalWaClicks' => $totalWaClicks,
+        'waUniqueIps' => $waUniqueIps,
         'totalViews' => $totalViews,
         'totalComments' => $totalComments,
     ],
     'viewChart' => $chartArray,
     'recentActivity' => $recentActivity,
-    'featuredProduct' => $featuredProduct
+    'featuredProduct' => $featuredProduct,
+    'featuredPost' => $featuredPost
 ]);

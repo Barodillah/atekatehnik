@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const Products = () => {
   const navigate = useNavigate();
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
@@ -13,7 +14,9 @@ const Products = () => {
   const fetchProducts = async (page = 1) => {
     setIsLoading(true);
     try {
-      const res = await authFetch(`/api/products.php?page=${page}&limit=12`);
+      const params = new URLSearchParams({ page, limit: 12 });
+      if (searchQuery) params.append('search', searchQuery);
+      const res = await authFetch(`/api/products.php?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setProducts(data.products);
@@ -25,7 +28,7 @@ const Products = () => {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(1); }, [searchQuery]);
 
   const handleDelete = async (id, nama) => {
     if (!window.confirm(`Hapus produk "${nama}"?`)) return;
@@ -36,13 +39,13 @@ const Products = () => {
   };
 
   return (
-    <section className="p-8 max-w-7xl">
+    <section className="p-4 md:p-8 w-full">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4 md:gap-6">
         <div className="max-w-2xl">
-          <span className="font-label text-xs tracking-widest text-secondary uppercase font-bold mb-2 block">Inventory Control</span>
-          <h2 className="font-headline text-4xl font-extrabold text-primary tracking-tight leading-none mb-4">Product Management</h2>
-          <p className="text-on-surface-variant max-w-lg leading-relaxed">
+          <span className="font-label text-[10px] md:text-xs tracking-widest text-secondary uppercase font-bold mb-1 md:mb-2 block">Inventory Control</span>
+          <h2 className="font-headline text-3xl md:text-4xl font-extrabold text-primary tracking-tight leading-none mb-2 md:mb-4">Product Management</h2>
+          <p className="text-sm md:text-base text-on-surface-variant max-w-lg leading-relaxed">
             Configure and monitor the Ateka Tehnik industrial rice milling units. Manage technical specifications, inventory status, and regional pricing tiers from a central control hub.
           </p>
         </div>
@@ -58,22 +61,22 @@ const Products = () => {
       </div>
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-        <div className="bg-surface-container-low p-6 rounded-sm">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 md:mb-12">
+        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
           <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Products</p>
           <p className="text-3xl font-headline font-bold text-primary">{pagination.total}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm">
+        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
           <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Paket</p>
-          <p className="text-3xl font-headline font-bold text-primary">{products.filter(p => p.kategori === 'Paket').length}</p>
+          <p className="text-2xl md:text-3xl font-headline font-bold text-primary">{products.filter(p => p.kategori === 'Paket').length}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm">
+        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
           <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Suku Cadang</p>
-          <p className="text-3xl font-headline font-bold text-secondary">{products.filter(p => p.kategori === 'Suku Cadang').length}</p>
+          <p className="text-2xl md:text-3xl font-headline font-bold text-secondary">{products.filter(p => p.kategori === 'Suku Cadang').length}</p>
         </div>
-        <div className="bg-surface-container-low p-6 rounded-sm border-l-4 border-secondary">
+        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm border-l-4 border-secondary">
           <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Pages</p>
-          <p className="text-3xl font-headline font-bold text-primary">{pagination.totalPages}</p>
+          <p className="text-2xl md:text-3xl font-headline font-bold text-primary">{pagination.totalPages}</p>
         </div>
       </div>
 
@@ -169,7 +172,7 @@ const Products = () => {
 
       {/* Pagination Controls */}
       {pagination.totalPages > 1 && (
-        <div className="mt-16 pt-8 border-t border-outline-variant/10 flex justify-between items-center">
+        <div className="mt-12 md:mt-16 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-label uppercase tracking-widest text-outline">
             Displaying page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
           </p>

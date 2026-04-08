@@ -337,7 +337,7 @@ const PostForm = () => {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8 w-full font-body">
+    <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-6 md:space-y-8 w-full font-body">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button 
@@ -348,8 +348,8 @@ const PostForm = () => {
         </button>
         <div>
           <span className="text-secondary font-bold text-xs tracking-widest uppercase">Content Entry</span>
-          <h1 className="text-3xl font-extrabold text-primary tracking-tight">{id ? 'Edit Post' : 'Log New Project / Post'}</h1>
-          <p className="text-sm text-on-surface-variant max-w-lg mt-1">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">{id ? 'Edit Post' : 'Log New Project / Post'}</h1>
+          <p className="text-xs md:text-sm text-on-surface-variant max-w-lg mt-1">
             {id ? 'Perbarui informasi dan struktur laporan proyek atau artikel Anda di sini.' : 'Lengkapi detail proyek untuk menampilkannya di halaman portofolio utama.'}
           </p>
         </div>
@@ -368,7 +368,7 @@ const PostForm = () => {
       )}
 
       <div className="bg-surface-container-lowest shadow-sm rounded-sm overflow-hidden border border-surface-container-low">
-        <form onSubmit={handleSubmit} className="p-8 space-y-12">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12">
           
           {/* General Information */}
           <div>

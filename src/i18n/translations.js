@@ -164,6 +164,7 @@ const translations = {
     "products.isoDesc": "Standar rekayasa global diterapkan secara lokal.",
     "products.globalExport": "Ekspor Global",
     "products.globalDesc": "Melayani Asia Tenggara, Afrika, dan seterusnya.",
+    "productDetail.engineeringIntro": "Selama lebih dari dua dekade, Ateka Tehnik telah berada di garis depan rekayasa pertanian di Indonesia. Produk {product} mewakili komitmen kami untuk menjembatani kesenjangan antara pertanian skala kecil dan pemrosesan industri raksasa.",
 
     // Contact Page
     "contactPage.heroTitle": "Mulai Konsultasi Industri Anda",
@@ -543,6 +544,7 @@ const translations = {
     "products.isoDesc": "Global engineering standards applied locally.",
     "products.globalExport": "Global Export",
     "products.globalDesc": "Serving SEA, Africa, and beyond.",
+    "productDetail.engineeringIntro": "For over two decades, Ateka Tehnik has been at the forefront of agricultural engineering in Indonesia. The {product} represents our commitment to bridging the gap between small-scale farming and massive industrial processing.",
 
     // Contact Page
     "contactPage.heroTitle": "Start Your Industrial Consultation",

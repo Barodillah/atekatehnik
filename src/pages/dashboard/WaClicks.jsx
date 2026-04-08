@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDateTime } from '../../utils/dateUtils';
 
 const WaClicks = () => {
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +17,7 @@ const WaClicks = () => {
   const fetchOverview = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin_wa_clicks.php');
+      const res = await authFetch('/api/admin_wa_clicks.php');
       const json = await res.json();
       if (json.success) {
         setData(json);
@@ -32,7 +34,7 @@ const WaClicks = () => {
     setIsDetailLoading(true);
     setSelectedSource(sourcePage);
     try {
-      const res = await fetch(`/api/admin_wa_clicks.php?source_page=${encodeURIComponent(sourcePage)}`);
+      const res = await authFetch(`/api/admin_wa_clicks.php?source_page=${encodeURIComponent(sourcePage)}`);
       const json = await res.json();
       if (json.success) {
         setSourceDetail(json);
@@ -47,6 +49,42 @@ const WaClicks = () => {
   useEffect(() => {
     fetchOverview();
   }, []);
+
+  // Page name mapping for display
+  const sourcePageLabels = {
+    'hero': 'Hero Section',
+    'chatbot': 'Chatbot Widget',
+    'home-contact': 'Home — Contact CTA',
+    'contact-page': 'Contact Page',
+    'edukasi': 'Edukasi',
+    'error-page': 'Error Page',
+    'product-detail': 'Product Detail',
+    'products-list': 'Products List',
+    'artikel': 'Artikel Content',
+  };
+
+  // Client-side filtering based on global search
+  const matchesSearch = (text) => {
+    if (!searchQuery) return true;
+    return (text || '').toLowerCase().includes(searchQuery.toLowerCase());
+  };
+
+  const filteredSources = useMemo(() => {
+    if (!data) return [];
+    if (!searchQuery) return data.sources || [];
+    return data.sources.filter(s =>
+      matchesSearch(s.source_page) || matchesSearch(sourcePageLabels[s.source_page])
+    );
+  }, [data, searchQuery]);
+
+  const filteredRecentClicks = useMemo(() => {
+    if (!data) return [];
+    if (!searchQuery) return data.recentClicks || [];
+    return data.recentClicks.filter(c =>
+      matchesSearch(c.source_page) || matchesSearch(sourcePageLabels[c.source_page]) ||
+      matchesSearch(c.source_label) || matchesSearch(c.city) || matchesSearch(c.ip_address)
+    );
+  }, [data, searchQuery]);
 
   if (isLoading) {
     return (
@@ -70,33 +108,21 @@ const WaClicks = () => {
 
   const maxTrend = Math.max(...data.trend.map(t => t.count), 1);
 
-  // Page name mapping for display
-  const sourcePageLabels = {
-    'hero': 'Hero Section',
-    'chatbot': 'Chatbot Widget',
-    'home-contact': 'Home — Contact CTA',
-    'contact-page': 'Contact Page',
-    'edukasi': 'Edukasi',
-    'error-page': 'Error Page',
-    'product-detail': 'Product Detail',
-    'products-list': 'Products List',
-    'artikel': 'Artikel Content',
-  };
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary font-headline tracking-tight flex items-center gap-3">
-            <span className="material-symbols-outlined text-3xl text-[#25D366]">ads_click</span>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tight flex items-center gap-2 md:gap-3">
+            <span className="material-symbols-outlined text-2xl md:text-3xl text-[#25D366]">ads_click</span>
             WA CTA Clicks
           </h2>
-          <p className="text-on-surface-variant mt-1">Track every WhatsApp CTA button click across the website.</p>
+          <p className="text-sm md:text-base text-on-surface-variant mt-1">Track every WhatsApp CTA button click across the website.</p>
         </div>
         <button
           onClick={fetchOverview}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-container-low text-on-surface-variant font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-surface-container-high transition-colors border border-outline-variant/30"
+          className="w-full md:w-auto inline-flex justify-center items-center gap-2 px-5 py-2.5 bg-surface-container-low text-on-surface-variant font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-surface-container-high transition-colors border border-outline-variant/30"
         >
           <span className="material-symbols-outlined text-sm">refresh</span>
           Refresh
@@ -105,31 +131,31 @@ const WaClicks = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Total Clicks</span>
-          <span className="text-4xl font-extrabold text-primary font-headline mt-3">{data.totalClicks}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Total Clicks</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline mt-2 md:mt-3">{data.totalClicks}</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Today's Clicks</span>
-          <span className="text-4xl font-extrabold text-[#25D366] font-headline mt-3">{data.todayClicks}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Today's Clicks</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-[#25D366] font-headline mt-2 md:mt-3">{data.todayClicks}</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Source</span>
-          <span className="text-2xl font-extrabold text-primary font-headline mt-3">{sourcePageLabels[data.topSource] || data.topSource}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Source</span>
+          <span className="text-xl md:text-2xl font-extrabold text-primary font-headline mt-2 md:mt-3">{sourcePageLabels[data.topSource] || data.topSource}</span>
         </div>
-        <div className="bg-surface-container-low p-6 flex flex-col">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Unique Visitors</span>
-          <span className="text-4xl font-extrabold text-secondary font-headline mt-3">{data.uniqueVisitors}</span>
+        <div className="bg-surface-container-low p-4 md:p-6 flex flex-col">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Unique Visitors</span>
+          <span className="text-3xl md:text-4xl font-extrabold text-secondary font-headline mt-2 md:mt-3">{data.uniqueVisitors}</span>
         </div>
       </div>
 
       {/* 7-Day Trend Chart */}
       <div className="bg-surface-container-lowest shadow-sm rounded-sm border border-surface-container-low overflow-hidden">
-        <div className="px-6 py-4 bg-surface-container-low flex items-center gap-3">
+        <div className="px-4 md:px-6 py-4 bg-surface-container-low flex items-center gap-3">
           <span className="material-symbols-outlined text-primary">trending_up</span>
-          <h3 className="font-bold text-primary text-lg">7-Day Click Trend</h3>
+          <h3 className="font-bold text-primary text-base md:text-lg">7-Day Click Trend</h3>
         </div>
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <div className="flex items-end gap-3 h-48">
             {data.trend.map((day, i) => {
               const height = maxTrend > 0 ? (day.count / maxTrend) * 100 : 0;
@@ -175,15 +201,15 @@ const WaClicks = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-container-low">
-                {data.sources.length === 0 ? (
+                {filteredSources.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-on-surface-variant">
-                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">ads_click</span>
-                      No click data recorded yet.
+                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">{searchQuery ? 'search_off' : 'ads_click'}</span>
+                      {searchQuery ? `No sources match "${searchQuery}".` : 'No click data recorded yet.'}
                     </td>
                   </tr>
                 ) : (
-                  data.sources.map((s, i) => (
+                  filteredSources.map((s, i) => (
                     <tr
                       key={s.source_page}
                       className={`hover:bg-surface-container-low transition-colors cursor-pointer ${selectedSource === s.source_page ? 'bg-green-50' : ''}`}
@@ -399,14 +425,14 @@ const WaClicks = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
-              {data.recentClicks.length === 0 ? (
+              {filteredRecentClicks.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-6 py-12 text-center text-on-surface-variant opacity-60">
-                    No clicks recorded yet. They will appear here once users click WA CTA buttons.
+                    {searchQuery ? `No recent clicks match "${searchQuery}".` : 'No clicks recorded yet. They will appear here once users click WA CTA buttons.'}
                   </td>
                 </tr>
               ) : (
-                data.recentClicks.map((c, i) => (
+                filteredRecentClicks.map((c, i) => (
                   <tr key={i} className="hover:bg-surface-container-low transition-colors">
                     <td className="px-4 py-2.5">
                       <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#25D366] bg-[#25D366]/10 px-2 py-0.5 rounded-full">

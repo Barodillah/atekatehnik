@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate, formatAdminDateTime } from '../../utils/dateUtils';
 
 const Leads = () => {
   const { authFetch } = useAuth();
   const location = useLocation();
+  const { searchQuery } = useOutletContext();
 
   const [modalMode, setModalMode] = useState(null); // 'create', 'edit', 'view'
   const [selectedLead, setSelectedLead] = useState(null);
@@ -35,7 +36,9 @@ const Leads = () => {
   const fetchLeads = async (page = 1) => {
     setIsLoading(true);
     try {
-      const res = await authFetch(`/api/leads.php?page=${page}&limit=10`);
+      const params = new URLSearchParams({ page, limit: 10 });
+      if (searchQuery) params.append('search', searchQuery);
+      const res = await authFetch(`/api/leads.php?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setLeads(data.leads);
@@ -58,9 +61,9 @@ const Leads = () => {
   };
 
   useEffect(() => {
-    fetchLeads(pagination.page);
+    fetchLeads(1);
     fetchStats();
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (location.state?.openNewLeadModal) {
@@ -161,24 +164,24 @@ const Leads = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-primary font-headline tracking-tight">Customer Leads</h2>
-          <p className="text-on-surface-variant mt-1">Real-time overview of incoming service requests and industrial inquiries.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tight">Customer Leads</h2>
+          <p className="text-sm md:text-base text-on-surface-variant mt-1">Real-time overview of incoming service requests and industrial inquiries.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-surface-container-highest text-primary font-semibold rounded-sm hover:bg-slate-200 transition-all text-sm">
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container-highest text-primary font-semibold rounded-sm hover:bg-slate-200 transition-all text-sm">
             <span className="material-symbols-outlined text-[18px]">file_download</span>
-            Export CSV
+            CSV
           </button>
           <button 
             onClick={() => openModal('create')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary-container text-on-primary font-semibold rounded-sm hover:opacity-90 transition-all text-sm cursor-pointer"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-container text-on-primary font-semibold rounded-sm hover:opacity-90 transition-all text-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
-            New Entry
+            New
           </button>
         </div>
       </div>
@@ -195,30 +198,30 @@ const Leads = () => {
       )}
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-1 bg-surface-container-low p-6 flex flex-col justify-between">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Active Leads</span>
-          <div className="mt-4">
-            <span className="text-4xl font-extrabold text-primary font-headline">{stats.total}</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="col-span-1 bg-surface-container-low p-4 md:p-6 flex flex-col justify-between">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Active Leads</span>
+          <div className="mt-2 md:mt-4">
+            <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline">{stats.total}</span>
           </div>
         </div>
-        <div className="md:col-span-1 bg-surface-container-low p-6 flex flex-col justify-between">
-          <span className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">New</span>
-          <div className="mt-4">
-            <span className="text-4xl font-extrabold text-primary font-headline">{stats.new}</span>
+        <div className="col-span-1 bg-surface-container-low p-4 md:p-6 flex flex-col justify-between">
+          <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">New</span>
+          <div className="mt-2 md:mt-4">
+            <span className="text-3xl md:text-4xl font-extrabold text-primary font-headline">{stats.new}</span>
           </div>
         </div>
-        <div className="md:col-span-2 bg-primary-container p-6 relative overflow-hidden group">
+        <div className="col-span-2 bg-primary-container p-4 md:p-6 relative overflow-hidden group">
           <div className="relative z-10 flex flex-col h-full justify-between">
-            <span className="text-xs font-bold font-label uppercase tracking-widest text-on-primary-container">Conversion Rate</span>
-            <div className="mt-4 flex items-end gap-6">
-              <span className="text-4xl font-extrabold text-white font-headline tracking-tighter">{stats.conversionRate}%</span>
+            <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-primary-container">Conversion Rate</span>
+            <div className="mt-2 md:mt-4 flex items-end gap-4 md:gap-6">
+              <span className="text-3xl md:text-4xl font-extrabold text-white font-headline tracking-tighter">{stats.conversionRate}%</span>
               <div className="flex-1 h-2 bg-blue-900 mb-2 overflow-hidden">
                 <div className="h-full bg-secondary-container" style={{ width: `${stats.conversionRate}%` }}></div>
               </div>
             </div>
           </div>
-          <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none">monitoring</span>
+          <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none hidden md:block">monitoring</span>
         </div>
       </div>
 
@@ -545,11 +548,11 @@ const Leads = () => {
               )}
             </div>
 
-            <div className="flex justify-end gap-3 px-8 py-5 border-t border-surface-container-low bg-surface">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 px-4 md:px-8 py-4 md:py-5 border-t border-surface-container-low bg-surface">
               <button 
                 type="button"
                 onClick={closeModal}
-                className="px-6 py-2.5 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
               >
                 {modalMode === 'view' ? 'Close' : 'Cancel'}
               </button>
@@ -558,7 +561,7 @@ const Leads = () => {
                   type="submit"
                   form="lead-form"
                   disabled={isSubmitting}
-                  className="px-8 py-2.5 bg-primary-container text-white font-bold text-sm uppercase tracking-widest rounded-sm shadow-md hover:bg-secondary transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full sm:w-auto px-8 py-2.5 bg-primary-container text-white font-bold text-sm uppercase tracking-widest rounded-sm shadow-md hover:bg-secondary transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   {isSubmitting ? (
                     <>
