@@ -326,7 +326,7 @@ const DashboardLayout = () => {
                                 <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
                               </div>
                               {item.image && (
-                                <img src={item.image} alt="" className="w-9 h-9 rounded-sm object-cover shrink-0 bg-slate-100" />
+                                <img src={item.image.split(',')[0].trim()} alt="" className="w-9 h-9 rounded-sm object-cover shrink-0 bg-slate-100" />
                               )}
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-bold text-slate-800 truncate group-hover:text-blue-900 transition-colors">{item.title}</p>

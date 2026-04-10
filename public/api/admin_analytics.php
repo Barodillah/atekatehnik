@@ -69,6 +69,15 @@ if ($slug) {
 
 // ── Overview: List all pages with view stats ─────────────────────────
 
+$cityFilter = trim($_GET['city'] ?? '');
+$whereClause = "WHERE page_type = :type";
+$params = [':type' => $type];
+
+if ($cityFilter) {
+    $whereClause .= " AND city = :city";
+    $params[':city'] = $cityFilter;
+}
+
 // Pages grouped by slug, sorted by total views
 $pagesStmt = $db->prepare("
     SELECT 
@@ -77,11 +86,11 @@ $pagesStmt = $db->prepare("
         COUNT(DISTINCT ip_address) as unique_ips,
         MAX(viewed_at) as last_view
     FROM page_views
-    WHERE page_type = :type
+    $whereClause
     GROUP BY page_slug
     ORDER BY total_views DESC
 ");
-$pagesStmt->execute([':type' => $type]);
+$pagesStmt->execute($params);
 $pages = $pagesStmt->fetchAll();
 
 // Overall stats
@@ -105,9 +114,19 @@ $topDevicesStmt = $db->prepare("SELECT device_type, COUNT(*) as count FROM page_
 $topDevicesStmt->execute([':type' => $type]);
 $topDevices = $topDevicesStmt->fetchAll();
 
-$topCitiesStmt = $db->prepare("SELECT city, COUNT(*) as count FROM page_views WHERE page_type = :type AND city != '' GROUP BY city ORDER BY count DESC LIMIT 5");
+$topCitiesStmt = $db->prepare("SELECT city, COUNT(*) as count FROM page_views WHERE page_type = :type AND city != '' GROUP BY city ORDER BY count DESC");
 $topCitiesStmt->execute([':type' => $type]);
 $topCities = $topCitiesStmt->fetchAll();
+
+$latestViewsStmt = $db->prepare("
+    SELECT ip_address, browser, os, device_type, country, city, referrer, viewed_at, page_slug
+    FROM page_views 
+    WHERE page_type = :type 
+    ORDER BY viewed_at DESC 
+    LIMIT 10
+");
+$latestViewsStmt->execute([':type' => $type]);
+$latestViews = $latestViewsStmt->fetchAll();
 
 jsonSuccess([
     'pages'   => $pages,
@@ -118,5 +137,6 @@ jsonSuccess([
         'topCities'    => $topCities,
         'topBrowsers'  => $topBrowsers,
         'topDevices'   => $topDevices,
+        'latestViews'  => $latestViews,
     ],
 ]);

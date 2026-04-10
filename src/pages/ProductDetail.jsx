@@ -12,6 +12,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
     const [showShareModal, setShowShareModal] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
@@ -55,13 +56,38 @@ const ProductDetail = () => {
 
     useEffect(() => {
         if (product?.gambar) {
-            const img = new Image();
-            img.src = product.gambar;
-            img.onload = () => {
-                setImageRatio(img.width > img.height ? 'horizontal' : 'vertical');
-            };
+            const firstImg = product.gambar.split(',')[0].trim();
+            if (!isVideo(firstImg)) {
+                const img = new Image();
+                img.src = firstImg;
+            }
         }
     }, [product]);
+
+    const isVideo = (url) => {
+        if (!url) return false;
+        const lower = url.toLowerCase();
+        return lower.match(/\.(mp4|webm|ogg|mov)$/) || lower.includes('youtube.com') || lower.includes('youtu.be');
+    };
+
+    const renderMedia = (url, className, props = {}) => {
+        if (!url) return null;
+        if (isVideo(url)) {
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                // Sangat sederhana untuk youtube iframe, tapi lebih aman gunakan link video langsung seperti mp4
+                const videoId = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+                return <iframe src={`https://www.youtube.com/embed/${videoId}`} className={`${className} bg-black`} allowFullScreen {...props}></iframe>
+            }
+            return (
+                <video src={url} className={className} controls preload="metadata" {...props}>
+                    Your browser does not support the video tag.
+                </video>
+            );
+        }
+        return <img alt={product?.nama || "Product Media"} src={url} className={className} {...props} />;
+    };
+
+    const mediaItems = product?.gambar ? product.gambar.split(',').map(s => s.trim()).filter(s => s) : [];
 
     useEffect(() => {
         if (!product || !product.kategori) return;
@@ -101,25 +127,33 @@ const ProductDetail = () => {
         if (!product?.slug) return;
         const fetchRelatedPosts = async () => {
             try {
-                // 1. Fetch posts linked via post_product_relations
+                // Fetch posts linked via post_product_relations
                 const res = await fetch(`/api/post_relations.php?product_slug=${encodeURIComponent(product.slug)}&lang=${lang}`);
                 const data = await res.json();
-                let items = (data.success && data.posts) ? data.posts.filter(p => p.slug) : [];
+                const linkedItems = (data.success && data.posts) ? data.posts.filter(p => p.slug) : [];
 
-                // 2. If fewer than 2, backfill with random posts
-                if (items.length < 2) {
-                    const existingSlugs = new Set(items.map(p => p.slug));
-                    const backfillRes = await fetch(`/api/posts.php?lang=${lang}&sort=views_asc&limit=6`);
-                    const backfillData = await backfillRes.json();
-                    if (backfillData.success && backfillData.posts) {
-                        const extras = backfillData.posts
-                            .filter(p => !existingSlugs.has(p.slug))
-                            .slice(0, 2 - items.length);
-                        items = [...items, ...extras];
+                // Sort: Industrial Installations first, then others
+                const sorted = linkedItems.sort((a, b) => {
+                    const aIsIndustrial = a.category === 'Industrial Installations' ? 0 : 1;
+                    const bIsIndustrial = b.category === 'Industrial Installations' ? 0 : 1;
+                    return aIsIndustrial - bIsIndustrial;
+                });
+
+                let finalList = sorted.slice(0, 6);
+
+                // Backfill with random articles if fewer than 6
+                if (finalList.length < 6) {
+                    const allRes = await fetch(`/api/posts.php?lang=${lang}&limit=20`);
+                    const allData = await allRes.json();
+                    if (allData.success && allData.posts) {
+                        const usedSlugs = new Set(finalList.map(p => p.slug));
+                        const available = allData.posts.filter(p => !usedSlugs.has(p.slug));
+                        const shuffled = available.sort(() => 0.5 - Math.random());
+                        finalList = [...finalList, ...shuffled.slice(0, 6 - finalList.length)];
                     }
                 }
 
-                setRelatedPosts(items);
+                setRelatedPosts(finalList);
             } catch (error) {
                 console.error("Failed to fetch related posts", error);
             }
@@ -253,19 +287,31 @@ const ProductDetail = () => {
                                 <span className="material-symbols-outlined text-[20px] md:text-[24px] block group-hover:scale-110 transition-transform">share</span>
                             </button>
                             <div className="absolute inset-0 bg-primary/5 rounded-3xl -rotate-2 scale-105 hidden lg:block"></div>
-                            <div className="relative bg-surface-container-lowest p-2 md:p-4 rounded-lg shadow-xl md:shadow-2xl cursor-pointer group" onClick={() => setIsModalOpen(true)}>
-                                {product.gambar ? (
+                            <div className="relative bg-surface-container-lowest p-2 md:p-4 rounded-lg shadow-xl md:shadow-2xl cursor-pointer group" onClick={() => { setIsModalOpen(true); setCurrentMediaIndex(0); }}>
+                                {mediaItems.length > 0 ? (
                                     <>
-                                        <img
-                                            alt={product.nama}
-                                            className="w-full aspect-[4/3] object-cover rounded-sm grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
-                                            src={product.gambar}
-                                        />
-                                        <div className="absolute inset-0 bg-[#001f5b]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm rounded-sm m-2 md:m-4">
+                                        {isVideo(mediaItems[0]) ? (
+                                            <div className="w-full aspect-[4/3] rounded-sm overflow-hidden bg-black relative">
+                                                {renderMedia(mediaItems[0], "w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700", { muted: true, autoPlay: true, loop: true, playsInline: true, controls: false })}
+                                            </div>
+                                        ) : (
+                                            <img
+                                                alt={product.nama}
+                                                className="w-full aspect-[4/3] object-cover rounded-sm grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
+                                                src={mediaItems[0]}
+                                            />
+                                        )}
+                                        {mediaItems.length > 1 && (
+                                            <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md z-10 flex items-center gap-1 shadow-lg">
+                                                <span className="material-symbols-outlined text-[14px]">photo_library</span>
+                                                {mediaItems.length}
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-x-2 inset-y-2 md:inset-x-4 md:inset-y-4 bg-[#001f5b]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm rounded-sm z-20 pointer-events-none">
                                             <div className="text-white flex flex-col items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                                 <span className="material-symbols-outlined text-5xl shadow-black/50 drop-shadow-lg">zoom_in</span>
-                                                <span className="font-headline font-bold tracking-widest text-sm uppercase shadow-black/50 drop-shadow-md">
-                                                    {lang === 'id' ? 'Lihat Gambar Full' : 'View Full Image'}
+                                                <span className="font-headline font-bold tracking-widest text-sm uppercase shadow-black/50 drop-shadow-md text-center">
+                                                    {lang === 'id' ? 'Lihat Semua Media' : 'View All Media'}
                                                 </span>
                                             </div>
                                         </div>
@@ -384,7 +430,7 @@ const ProductDetail = () => {
                                     <Link to={`/product/${relProduct.slug}`} key={relProduct.slug || relProduct.id} className="group block bg-white border border-outline-variant/20 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,31,91,0.15)] transition-all duration-300 transform hover:-translate-y-1 relative">
                                         <div className="aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
                                             {relProduct.gambar ? (
-                                                <img src={relProduct.gambar} alt={relProduct.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <img src={relProduct.gambar.split(',')[0].trim()} alt={relProduct.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             ) : (
                                                 <div className="w-full h-full flex flex-col items-center justify-center bg-surface-container-lowest text-outline">
                                                     <span className="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
@@ -469,6 +515,11 @@ const ProductDetail = () => {
                                     </Link>
                                 ))}
                             </div>
+                            <div className="flex justify-center mt-10">
+                                <Link to="/news" className="px-10 py-3 border border-primary-container text-primary-container font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary-container hover:text-on-primary transition-all duration-300 active:scale-95">
+                                    {lang === 'id' ? 'Lihat Semua Berita' : 'View All News'}
+                                </Link>
+                            </div>
                         </div>
                     </section>
                 )}
@@ -530,22 +581,83 @@ const ProductDetail = () => {
                 </div>
             )}
 
-            {/* Fullscreen Image Modal */}
-            {isModalOpen && product?.gambar && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm transition-all duration-300" onClick={() => setIsModalOpen(false)}>
-                    <button
-                        className="absolute top-6 right-6 text-white hover:text-primary transition-colors bg-black/50 p-2 rounded-full cursor-pointer z-10"
-                        onClick={(e) => { e.stopPropagation(); setIsModalOpen(false); }}
-                    >
-                        <span className="material-symbols-outlined text-3xl block">close</span>
-                    </button>
-                    <div className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                        <img
-                            src={product.gambar}
-                            alt={product.nama}
-                            className="max-w-full max-h-[90vh] object-contain rounded-sm shadow-2xl animate-in zoom-in duration-300"
-                        />
+            {/* Fullscreen Media Modal */}
+            {isModalOpen && mediaItems.length > 0 && (
+                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-0 sm:p-4 backdrop-blur-md transition-opacity duration-300" onClick={() => setIsModalOpen(false)}>
+                    <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-between items-center z-20 bg-gradient-to-b from-black/60 to-transparent">
+                        <div className="text-white font-bold tracking-widest text-sm uppercase drop-shadow-md">
+                            {currentMediaIndex + 1} / {mediaItems.length}
+                        </div>
+                        <button
+                            className="text-white hover:text-primary transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-full cursor-pointer backdrop-blur-sm"
+                            onClick={(e) => { e.stopPropagation(); setIsModalOpen(false); }}
+                        >
+                            <span className="material-symbols-outlined text-2xl sm:text-3xl block">close</span>
+                        </button>
                     </div>
+                    
+                    <div className="w-full h-full sm:h-auto sm:max-w-5xl relative flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="w-full h-full sm:h-[80vh] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar smooth-scroll" 
+                             onScroll={(e) => {
+                                 const index = Math.round(e.target.scrollLeft / e.target.clientWidth);
+                                 setCurrentMediaIndex(index);
+                             }}
+                             tabIndex={0}
+                        >
+                            {mediaItems.map((item, index) => (
+                                <div key={index} id={`media-slide-${index}`} className="flex-none w-full h-full snap-center flex items-center justify-center p-0 sm:p-4 opacity-100 transition-opacity">
+                                    <div className="relative w-full h-full flex items-center justify-center">
+                                        {isVideo(item) ? (
+                                            <div className="w-full h-full sm:max-w-5xl bg-black rounded-none sm:rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
+                                                {renderMedia(item, "w-full max-h-full object-contain")}
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={item}
+                                                alt={`${product.nama} - ${index + 1}`}
+                                                className="w-full h-full sm:max-h-full object-contain rounded-none sm:rounded-lg shadow-2xl bg-black/20"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {mediaItems.length > 1 && (
+                            <>
+                                <button 
+                                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm transition-all hidden sm:block disabled:opacity-30 disabled:cursor-not-allowed"
+                                    disabled={currentMediaIndex === 0}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const el = document.getElementById(`media-slide-${currentMediaIndex - 1}`);
+                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+                                </button>
+                                <button 
+                                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm transition-all hidden sm:block disabled:opacity-30 disabled:cursor-not-allowed"
+                                    disabled={currentMediaIndex === mediaItems.length - 1}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const el = document.getElementById(`media-slide-${currentMediaIndex + 1}`);
+                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined text-2xl">arrow_forward_ios</span>
+                                </button>
+                            </>
+                        )}
+                    </div>
+
+                    {mediaItems.length > 1 && (
+                        <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+                            {mediaItems.map((_, i) => (
+                                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === currentMediaIndex ? 'w-6 bg-primary' : 'w-1.5 bg-white/40'}`}></div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </>

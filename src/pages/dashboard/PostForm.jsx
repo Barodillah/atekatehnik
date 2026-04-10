@@ -414,6 +414,7 @@ const PostForm = () => {
                     <option value="Product News">Product News</option>
                     <option value="Maintenance Tips">Maintenance Tips</option>
                     <option value="Company Update">Company Update</option>
+                    <option value="Insight">Insight</option>
                   </select>
                 </div>
 

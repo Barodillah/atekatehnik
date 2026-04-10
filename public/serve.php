@@ -96,13 +96,17 @@ if ($isPost || $isProduct) {
                 }
 
                 if (!empty($imageRaw)) {
+                    // If multiple images are comma-separated, take the first one
+                    $imageParts = explode(',', $imageRaw);
+                    $firstImage = trim($imageParts[0]);
+
                     // If it's a relative path, make it absolute using hostname
                     // Otherwise keep it as is
-                    if (strpos($imageRaw, 'http') === 0) {
-                        $image = $imageRaw;
+                    if (strpos($firstImage, 'http') === 0) {
+                        $image = $firstImage;
                     } else {
                         $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'atekatehnik.com';
-                        $image = "https://" . $host . (strpos($imageRaw, '/') === 0 ? '' : '/') . $imageRaw;
+                        $image = "https://" . $host . (strpos($firstImage, '/') === 0 ? '' : '/') . $firstImage;
                     }
                 }
             }

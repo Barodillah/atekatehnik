@@ -14,6 +14,7 @@ import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Portfolio from './pages/Portfolio';
+import News from './pages/News';
 import Post from './pages/Post';
 import OfficialChannels from './pages/OfficialChannels';
 import SearchResults from './pages/SearchResults';
@@ -63,6 +64,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/news" element={<News />} />
           <Route path="/post/:slug" element={<Post />} />
           <Route path="/official-channels" element={<OfficialChannels />} />
           <Route path="/search" element={<SearchResults />} />

@@ -91,7 +91,7 @@ const Portfolio = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch(`/api/posts.php?lang=${lang}&limit=20`);
+                const res = await fetch(`/api/posts.php?lang=${lang}&limit=50`);
                 const data = await res.json();
                 if (data.success) {
                     setProjects(data.posts);
@@ -195,10 +195,15 @@ const Portfolio = () => {
                                 {lang === 'id' ? 'Berita Terbaru' : 'Latest News'}
                             </h2>
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            {newsProjects.map((project) => (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-12">
+                            {newsProjects.slice(0, 8).map((project) => (
                                 <NewsCard key={project.id} project={project} />
                             ))}
+                        </div>
+                        <div className="flex justify-center">
+                            <Link to="/news" className="px-10 py-3 border border-primary-container text-primary-container font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary-container hover:text-on-primary transition-all duration-300 active:scale-95">
+                                {lang === 'id' ? 'Lihat Semua Berita' : 'View All News'}
+                            </Link>
                         </div>
                     </div>
                 </section>

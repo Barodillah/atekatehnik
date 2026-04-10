@@ -8,6 +8,7 @@ const Analytics = () => {
   const { searchQuery } = useOutletContext();
 
   const [viewType, setViewType] = useState('post'); // post or product
+  const [selectedCityFilter, setSelectedCityFilter] = useState('');
   const [pages, setPages] = useState([]);
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [details, setDetails] = useState([]);
@@ -20,7 +21,8 @@ const Analytics = () => {
   const fetchPages = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/admin_analytics.php?type=${viewType}`);
+      const url = `/api/admin_analytics.php?type=${viewType}${selectedCityFilter ? `&city=${encodeURIComponent(selectedCityFilter)}` : ''}`;
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
         setPages(data.pages);
@@ -52,11 +54,15 @@ const Analytics = () => {
   };
 
   useEffect(() => {
+    setSelectedCityFilter('');
+  }, [viewType]);
+
+  useEffect(() => {
     fetchPages();
     setSelectedSlug(null);
     setDetails([]);
     setSummary(null);
-  }, [viewType]);
+  }, [viewType, selectedCityFilter]);
 
   return (
     <div className="p-4 md:p-8 space-y-6 md:space-y-8 w-full">
@@ -106,6 +112,76 @@ const Analytics = () => {
           <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Top Device</span>
           <span className="text-xl md:text-2xl font-extrabold text-primary font-headline mt-2 md:mt-3">{overallStats.topDevices?.[0]?.device_type || '—'}</span>
           <span className="text-[10px] md:text-xs text-on-surface-variant">{overallStats.topDevices?.[0]?.count || 0} views</span>
+        </div>
+      </div>
+
+      {/* Latest Views Card */}
+      <div className="bg-surface-container-low p-4 md:p-6 flex flex-col rounded-sm">
+        <h3 className="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+           <span className="material-symbols-outlined text-sm">history</span>
+           Recent Global Views
+        </h3>
+        <div className="overflow-x-auto">
+           <table className="w-full text-left border-collapse text-sm">
+             <thead>
+               <tr className="bg-surface-container-lowest">
+                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Page Slug</th>
+                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">IP Address</th>
+                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Device</th>
+                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Location</th>
+                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Time</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-surface-container-lowest">
+               {overallStats.latestViews?.map((v, i) => (
+                 <tr key={i} className="hover:bg-surface-container-lowest transition-colors">
+                   <td className="px-4 py-2.5 font-bold text-xs text-primary">{v.page_slug}</td>
+                   <td className="px-4 py-2.5 font-mono text-xs text-on-surface">{v.ip_address}</td>
+                   <td className="px-4 py-2.5">
+                     <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${v.device_type === 'Mobile' ? 'bg-purple-50 text-purple-700' : v.device_type === 'Tablet' ? 'bg-orange-50 text-orange-700' : 'bg-slate-100 text-slate-600'}`}>
+                       <span className="material-symbols-outlined text-[12px]">{v.device_type === 'Mobile' ? 'smartphone' : v.device_type === 'Tablet' ? 'tablet' : 'desktop_windows'}</span>
+                       {v.device_type}
+                     </span>
+                   </td>
+                   <td className="px-4 py-2.5 text-xs">{v.city && v.country ? `${v.city}, ${v.country}` : (v.city || v.country || '—')}</td>
+                   <td className="px-4 py-2.5 text-xs whitespace-nowrap">{formatAdminDateTime(v.viewed_at)}</td>
+                 </tr>
+               ))}
+               {(!overallStats.latestViews || overallStats.latestViews.length === 0) && (
+                  <tr>
+                     <td colSpan="5" className="px-4 py-4 text-center text-xs text-on-surface-variant">No recent views available.</td>
+                  </tr>
+               )}
+             </tbody>
+           </table>
+        </div>
+      </div>
+
+      {/* Reached Cities Card */}
+      <div className="bg-surface-container-low p-4 md:p-6 flex flex-col rounded-sm">
+        <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] md:text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">location_city</span>
+              Total Cities Reached: {overallStats.topCities?.length || 0}
+            </span>
+            {selectedCityFilter && (
+                <button onClick={() => setSelectedCityFilter('')} className="text-secondary text-xs uppercase font-bold tracking-widest flex items-center hover:underline">
+                    Clear Filter <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+            )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {overallStats.topCities?.length > 0 ? overallStats.topCities.map((c, i) => (
+             <button 
+                key={i} 
+                onClick={() => setSelectedCityFilter(c.city)}
+                className={`text-xs font-bold px-2.5 py-1 rounded-sm border shadow-sm transition ${selectedCityFilter === c.city ? 'bg-primary text-white border-primary' : 'bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200'}`}
+             >
+                {c.city} ({c.count})
+             </button>
+          )) : (
+            <span className="text-sm text-on-surface-variant font-medium">No city data available yet.</span>
+          )}
         </div>
       </div>
 

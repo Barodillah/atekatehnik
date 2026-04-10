@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>News &amp; Updates | Ateka Tehnik Engineering</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#dbe1ff",
+                        "background": "#f8f9fa",
+                        "tertiary-container": "#481002",
+                        "on-secondary-container": "#713b00",
+                        "on-secondary-fixed": "#2f1500",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-tertiary-fixed": "#3b0900",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#00184a",
+                        "surface-container": "#edeeef",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-background": "#191c1d",
+                        "inverse-primary": "#b3c5ff",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#7389ca",
+                        "surface": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "outline": "#757681",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "surface-tint": "#465c99",
+                        "tertiary-fixed": "#ffdbd1",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e1e3e4",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-fixed-variant": "#2d4480",
+                        "outline-variant": "#c5c6d1",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "secondary-container": "#ffa454",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-fixed-variant": "#76321f",
+                        "on-tertiary-container": "#ca745c",
+                        "on-surface": "#191c1d",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "secondary": "#904d00",
+                        "on-error": "#ffffff",
+                        "primary-container": "#001f5b",
+                        "error": "#ba1a1a",
+                        "tertiary": "#240400",
+                        "error-container": "#ffdad6",
+                        "primary": "#000c2e",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#ffdcc3",
+                        "on-surface-variant": "#444650"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body class="bg-background font-body text-on-background">
+    <main class="max-w-7xl mx-auto px-8 py-12">
+        <!-- Filter Bar -->
+        <section
+            class="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-outline-variant/20">
+            <h1 class="font-headline text-4xl font-extrabold tracking-tight text-primary-container">
+                News &amp; Updates
+            </h1>
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold">Filter
+                    By:</span>
+                <button
+                    class="px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label text-sm font-semibold hover:bg-secondary-container transition-colors">Newest</button>
+                <button
+                    class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label text-sm font-semibold hover:bg-surface-variant transition-colors">Oldest</button>
+                <button
+                    class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label text-sm font-semibold hover:bg-surface-variant transition-colors">Most
+                    Viewed</button>
+                <div class="relative">
+                    <button
+                        class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label text-sm font-semibold hover:bg-surface-variant transition-colors">
+                        By Category
+                        <span class="material-symbols-outlined text-sm" data-icon="expand_more">expand_more</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Featured Article -->
+        <section class="mb-16">
+            <div
+                class="group relative overflow-hidden bg-surface-container-lowest shadow-[0_32px_32px_rgba(25,28,29,0.04)] rounded-sm flex flex-col lg:flex-row border-l-4 border-secondary">
+                <div class="lg:w-2/3 h-[400px] overflow-hidden">
+                    <img alt="Featured News"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        data-alt="Modern industrial rice milling facility with stainless steel machinery and bright clinical lighting in an expansive factory setting"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8EhKV0nkhpX2E2YxnAzyF10MSGGDsA18Kry21xfhpSiyvMa8VVAugT-PYlqix2uixsJgl807eZbiCQWhC8928smfhiqN9nMwapNg30CQRM3aQntTQMSFEcGpdLcJPo2qIrk9u3uRbO-B4hXW1SV11Y2TQUMm7oFKkqO4Zc-PN9sTDiytmyqWfQGspJFe72FfkjJ3xOTPD6BXCt8Fktdjd_A-jJQtYMiCPE8B_wvggcb0_j_t9E6R7sU4ECB_CKRjtDC3lWrUS1II" />
+                </div>
+                <div class="lg:w-1/3 p-10 flex flex-col justify-center bg-surface-container-lowest">
+                    <span
+                        class="inline-block px-3 py-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-label font-black tracking-[0.2em] uppercase mb-4 w-fit">
+                        Industry
+                    </span>
+                    <h2 class="font-headline text-3xl font-extrabold text-primary-container leading-tight mb-4">
+                        Modernizing Indonesia's Rice Milling Infrastructure
+                    </h2>
+                    <p class="text-on-surface-variant text-base mb-8 leading-relaxed">
+                        A deep dive into how Ateka Tehnik is implementing smart automation to triple production
+                        efficiency for local agricultural hubs.
+                    </p>
+                    <div class="flex items-center gap-6 mt-auto text-on-surface-variant/60 font-label text-sm">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span>
+                            <span>12.4k</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-lg" data-icon="thumb_up">thumb_up</span>
+                            <span>842</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-lg" data-icon="mode_comment">mode_comment</span>
+                            <span>45</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- News Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- News Card 1 -->
+            <article class="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300">
+                <div class="aspect-video w-full mb-6 overflow-hidden bg-surface-container">
+                    <img alt="News Thumbnail"
+                        class="w-full h-full object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-500"
+                        data-alt="Detailed close-up of high-precision steel industrial gears and machinery parts with cold metallic blue lighting"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5RYHXCcqJrs7wFKfuPqMLqquvS75hxJx3ch2p3PAIeckKph2mJVNOTadPnZmlaoYdOEikwEnI-ukPhXORBJu7d0XAjlrNqQL-0gJnrVcEHLU716Rm4KCbVaYW2NXe6fzVYs3Lc3yQvL2RHjp3g3_Oal75KKoOR7z9hTpKBsjSrdSpRtUUtQnFBnRuIOlIMdAYiegm1odXPJCE_vyMznJvQPzBdGz0QNhdhhtyIH1ThI_7CJMgBXNPbRQJnmuY_BbaBo9r1kSnXGw" />
+                </div>
+                <div class="px-2">
+                    <span
+                        class="text-[10px] font-label font-bold tracking-widest text-secondary uppercase mb-3 block">Tech</span>
+                    <h3 class="font-headline text-xl font-bold text-primary-container mb-3 line-clamp-2 leading-snug">
+                        AI Integration in New Generation AT-500 Millers
+                    </h3>
+                    <p class="text-on-surface-variant text-sm mb-6 line-clamp-2">
+                        Introducing real-time grain analysis and automated sorting powered by neural networks.
+                    </p>
+                    <div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+                        <div class="flex items-center gap-4 text-on-surface-variant/60">
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base"
+                                    data-icon="visibility">visibility</span>
+                                2.1k
+                            </div>
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base" data-icon="favorite"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                156
+                            </div>
+                        </div>
+                        <span class="text-xs font-label text-on-surface-variant/40">2 days ago</span>
+                    </div>
+                </div>
+            </article>
+            <!-- News Card 2 -->
+            <article class="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300">
+                <div class="aspect-video w-full mb-6 overflow-hidden bg-surface-container">
+                    <img alt="News Thumbnail"
+                        class="w-full h-full object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-500"
+                        data-alt="Professional business handshake in front of a skyscraper window at sunset, representing industrial partnership and growth"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuqItnrh10vx1_1PXZifGGmjJ8F2TpJZnv_qVKJfUkHQ2eXCERX5ucakQ7ZYK8CSwDNGRaDpyXHh9SLzukwogkqLG5AXe2rhN02pmhB94GMrqJFoBMeHZ7aFh6VDE1DgvnPMTM09dztgox8K3QMgnXfYdQFLLoZjfq3b4BAPIdRNeaYOaaTnuLXSXbwds4VGqTgJGC6OgF3z4hgesjyOInE8nfchSayzsT2ODt8C7qf-YukuR3oxOC-6kIklb5QhejYf6Ztwft2jc" />
+                </div>
+                <div class="px-2">
+                    <span
+                        class="text-[10px] font-label font-bold tracking-widest text-secondary uppercase mb-3 block">Business</span>
+                    <h3 class="font-headline text-xl font-bold text-primary-container mb-3 line-clamp-2 leading-snug">
+                        Quarterly Growth Exceeds 40% in Southeast Asian Markets
+                    </h3>
+                    <p class="text-on-surface-variant text-sm mb-6 line-clamp-2">
+                        Strategic expansions in Vietnam and Thailand solidify Ateka Tehnik's regional leadership.
+                    </p>
+                    <div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+                        <div class="flex items-center gap-4 text-on-surface-variant/60">
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base"
+                                    data-icon="visibility">visibility</span>
+                                5.8k
+                            </div>
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base" data-icon="favorite"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                420
+                            </div>
+                        </div>
+                        <span class="text-xs font-label text-on-surface-variant/40">1 week ago</span>
+                    </div>
+                </div>
+            </article>
+            <!-- News Card 3 -->
+            <article class="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300">
+                <div class="aspect-video w-full mb-6 overflow-hidden bg-surface-container">
+                    <img alt="News Thumbnail"
+                        class="w-full h-full object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-500"
+                        data-alt="Young rice saplings growing in a flooded field with a focused reflection on environmental sustainability and farming"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz_EtUegpvj6f-1fmlKxaY0i4HSQiXpOJPgyH7Gy-XniEbHO4q9A2vGLOj_ZECcoLCZtW07AFAm_7DY2JDxt49IPwRXYQnMAuTFkilRUQbHyTRJmayN34wbLsyR4EAIMEmWVpWs-PwN1W6I096LhkVnAGZDoJ02ygY-6NqfvZ2fe3rqR8PNidN7sdU7Mw0pbWJEn4uOdRAYuXdslhUIyG256NImq6ls7N-rZS_vI_DfzVIcd2kDi8DRTSO9y3O65TjholpE6mHdmk" />
+                </div>
+                <div class="px-2">
+                    <span
+                        class="text-[10px] font-label font-bold tracking-widest text-secondary uppercase mb-3 block">CSR</span>
+                    <h3 class="font-headline text-xl font-bold text-primary-container mb-3 line-clamp-2 leading-snug">
+                        Zero-Waste Initiatives in Local Agricultural Hubs
+                    </h3>
+                    <p class="text-on-surface-variant text-sm mb-6 line-clamp-2">
+                        Our new program helps farmers convert rice husk waste into sustainable biofuel and fertilizer.
+                    </p>
+                    <div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+                        <div class="flex items-center gap-4 text-on-surface-variant/60">
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base"
+                                    data-icon="visibility">visibility</span>
+                                1.4k
+                            </div>
+                            <div class="flex items-center gap-1 text-xs">
+                                <span class="material-symbols-outlined text-base" data-icon="favorite"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                92
+                            </div>
+                        </div>
+                        <span class="text-xs font-label text-on-surface-variant/40">Oct 24, 2024</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        <!-- Load More Section -->
+        <div class="flex justify-center mt-20">
+            <button
+                class="px-10 py-3 border border-primary-container text-primary-container font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary-container hover:text-on-primary transition-all duration-300 active:scale-95">
+                Load More Updates
+            </button>
+        </div>
+    </main>
+</body>
+
+</html>

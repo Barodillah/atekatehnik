@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { trackWaClick } from '../utils/trackWaClick';
@@ -7,9 +7,10 @@ import { trackWaClick } from '../utils/trackWaClick';
 const Products = () => {
     const { t, lang } = useLanguage();
     usePageTitle(lang === 'id' ? 'Produk Kami' : 'Our Products');
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [products, setProducts] = useState([]);
-    const [activeCategory, setActiveCategory] = useState('');
+    const [activeCategory, setActiveCategory] = useState(searchParams.get('kategori') || '');
     const [isLoading, setIsLoading] = useState(true);
 
     const categories = [
@@ -37,11 +38,22 @@ const Products = () => {
         }
     };
 
+    // Keep activeCategory synced with URL params when accessed via external links
+    useEffect(() => {
+        const urlKategori = searchParams.get('kategori') || '';
+        setActiveCategory(urlKategori);
+    }, [searchParams]);
+
     useEffect(() => {
         fetchProducts(activeCategory);
     }, [activeCategory]);
 
     const handleCategoryChange = (value) => {
+        if (value) {
+            setSearchParams({ kategori: value });
+        } else {
+            setSearchParams({});
+        }
         setActiveCategory(value);
     };
 
@@ -104,7 +116,7 @@ const Products = () => {
                                         <img
                                             alt={product.nama}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                            src={product.gambar}
+                                            src={product.gambar.split(',')[0].trim()}
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-surface-container-highest flex items-center justify-center">

@@ -7,6 +7,14 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { lang, toggleLang, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMobileMenus, setOpenMobileMenus] = useState({});
+
+  const toggleMobileMenu = (path) => {
+    setOpenMobileMenus(prev => ({
+      ...prev,
+      [path]: !prev[path]
+    }));
+  };
 
   // Search State
   const [searchOpen, setSearchOpen] = useState(false);
@@ -68,7 +76,7 @@ const Navbar = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
-    
+
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -89,7 +97,7 @@ const Navbar = () => {
 
   const isPathActive = (path) => {
     if (path === '/portfolio') {
-      return location.pathname.startsWith('/portfolio') || location.pathname.startsWith('/post');
+      return location.pathname.startsWith('/portfolio') || location.pathname.startsWith('/post') || location.pathname.startsWith('/news');
     }
     if (path === '/products') {
       return location.pathname.startsWith('/products') || location.pathname.startsWith('/product') || location.pathname.startsWith('/edukasi');
@@ -120,8 +128,25 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', label: t('nav.home') },
-    { path: '/products', label: t('nav.products') },
-    { path: '/portfolio', label: t('nav.portfolio') },
+    {
+      path: '/products',
+      label: t('nav.products'),
+      subItems: [
+        { path: '/products?kategori=Paket', label: t('products.catPaketLengkap') || (lang === 'id' ? 'Paket Lengkap RMU' : 'Complete RMU Package') },
+        { path: '/products?kategori=Unit Mesin Tunggal', label: t('products.catUnitMesin') || (lang === 'id' ? 'Unit Mesin Tunggal' : 'Single Machine Unit') },
+        { path: '/products?kategori=Peralatan Pendukung', label: t('products.catPeralatan') || (lang === 'id' ? 'Peralatan Pendukung' : 'Supporting Equipment') },
+        { path: '/products?kategori=Suku Cadang', label: t('products.catSukuCadang') || (lang === 'id' ? 'Suku Cadang' : 'Spare Parts') },
+        { path: '/products', label: t('products.catAll') || (lang === 'id' ? 'Semua Produk' : 'All Products') },
+      ]
+    },
+    {
+      path: '/portfolio',
+      label: t('nav.portfolio'),
+      subItems: [
+        { path: '/portfolio', label: lang === 'id' ? 'Pemasangan' : 'Installations' },
+        { path: '/news', label: lang === 'id' ? 'Berita & Update' : 'News & Updates' },
+      ]
+    },
     { path: '/about', label: t('nav.about') },
     { path: '/contact', label: t('nav.contact') },
   ];
@@ -138,9 +163,31 @@ const Navbar = () => {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <Link key={item.path} className={getLinkClass(item.path)} to={item.path}>
-                {item.label}
-              </Link>
+              item.subItems ? (
+                <div key={item.path} className="relative group">
+                  <Link className={`flex items-center gap-1 ${getLinkClass(item.path)}`} to={item.path}>
+                    {item.label}
+                    <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                  </Link>
+                  <div className="absolute left-0 top-[100%] pt-4 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    <div className="bg-white dark:bg-[#000c2e] shadow-xl border border-outline-variant/10 rounded-sm overflow-hidden flex flex-col transform origin-top scale-95 group-hover:scale-100 transition-transform duration-300">
+                      {item.subItems.map((sub, idx) => (
+                        <Link
+                          key={idx}
+                          to={sub.path}
+                          className="px-4 py-3 text-sm font-headline font-semibold text-[#001f5b] dark:text-white hover:bg-surface-container-low hover:text-[#904d00]"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link key={item.path} className={getLinkClass(item.path)} to={item.path}>
+                  {item.label}
+                </Link>
+              )
             ))}
             <a className="font-headline font-bold tracking-tight text-[#001f5b] dark:text-slate-300 hover:text-[#904d00] transition-colors duration-300" href="https://katalog.inaproc.id/ateka-tehnik" target="_blank" rel="noopener noreferrer">
               {t('nav.elkkp')}
@@ -190,7 +237,7 @@ const Navbar = () => {
       {searchOpen && (
         <div className="fixed inset-0 z-[60] flex flex-col items-center pt-20 md:pt-32">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setSearchOpen(false)}
           />
@@ -208,7 +255,7 @@ const Navbar = () => {
               />
               <div className="flex items-center space-x-2">
                 {/* Enter to search Button */}
-                <button 
+                <button
                   type="submit"
                   className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-surface-container-low dark:bg-white/5 border border-outline-variant/30 rounded-full text-outline-variant hover:text-primary-container dark:hover:text-white transition-colors"
                   title="Tekan Enter untuk mencari"
@@ -217,14 +264,14 @@ const Navbar = () => {
                   <span className="material-symbols-outlined text-[14px]">keyboard_return</span>
                 </button>
                 {/* Mobile Search Icon Button */}
-                <button 
+                <button
                   type="submit"
                   className="md:hidden w-10 h-10 flex items-center justify-center text-outline-variant hover:text-primary-container dark:hover:text-white transition-colors rounded-full bg-surface-container-low dark:bg-white/10"
                 >
                   <span className="material-symbols-outlined text-sm">keyboard_return</span>
                 </button>
                 {/* Close Modal Button */}
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setSearchOpen(false);
@@ -236,7 +283,7 @@ const Navbar = () => {
                 </button>
               </div>
             </form>
-            
+
             {/* Search Results */}
             {searchQuery && (
               <div className="mt-4 bg-white dark:bg-[#000c2e] rounded-xl shadow-2xl border border-outline-variant/20 overflow-hidden max-h-[60vh] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-200">
@@ -249,8 +296,8 @@ const Navbar = () => {
                   <ul className="divide-y divide-outline-variant/10">
                     {searchResults.map(item => (
                       <li key={item.id}>
-                        <Link 
-                          to={item.link} 
+                        <Link
+                          to={item.link}
                           onClick={() => {
                             setSearchOpen(false);
                             setSearchQuery("");
@@ -301,14 +348,45 @@ const Navbar = () => {
           <div className="absolute top-16 left-0 right-0 bg-white dark:bg-[#000c2e] shadow-2xl border-t border-outline-variant/10 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <div className="py-4">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  className={getMobileLinkClass(item.path)}
-                  to={item.path}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
+                <div key={item.path}>
+                  {item.subItems ? (
+                    <button
+                      className={`flex w-full items-center justify-between transition-colors duration-200 ${isPathActive(item.path) ? "py-3 px-4 font-headline font-bold tracking-tight text-[#904d00] bg-[#904d00]/5 border-l-4 border-[#904d00]" : "py-3 px-4 font-headline font-bold tracking-tight text-[#001f5b] hover:text-[#904d00] hover:bg-surface-container-low"}`}
+                      onClick={() => toggleMobileMenu(item.path)}
+                    >
+                      {item.label}
+                      <span className={`material-symbols-outlined transition-transform duration-300 ${openMobileMenus[item.path] ? 'rotate-180' : ''}`}>
+                        expand_more
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      className={getMobileLinkClass(item.path)}
+                      to={item.path}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                  {item.subItems && (
+                    <div className={`overflow-hidden transition-all duration-300 ${openMobileMenus[item.path] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="pl-4 border-l-2 border-outline-variant/10 ml-4 py-1 flex flex-col gap-1 my-1 bg-surface-container-low/50">
+                        {item.subItems.map((sub, idx) => (
+                          <Link
+                            key={idx}
+                            className="block w-full py-2 px-4 font-headline text-sm font-semibold tracking-tight text-[#001f5b] hover:text-[#904d00]"
+                            to={sub.path}
+                            onClick={() => {
+                              setMenuOpen(false);
+                            }}
+                          >
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
               <a
                 className="block w-full py-3 px-4 font-headline font-bold tracking-tight text-[#001f5b] hover:text-[#904d00] hover:bg-surface-container-low transition-colors duration-200"

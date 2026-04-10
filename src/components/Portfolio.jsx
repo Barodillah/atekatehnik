@@ -11,13 +11,16 @@ const Portfolio = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch(`/api/posts.php?lang=${lang}&limit=12`);
-        const data = await res.json();
-        if (data.success) {
-          const ind = data.posts.filter(p => p.category === 'Industrial Installations').slice(0, 3);
-          const oth = data.posts.filter(p => p.category !== 'Industrial Installations').slice(0, 4);
-          setIndustrialProjects(ind);
-          setOtherProjects(oth);
+        const [indRes, othRes] = await Promise.all([
+          fetch(`/api/posts.php?lang=${lang}&category=${encodeURIComponent('Industrial Installations')}&limit=3`),
+          fetch(`/api/posts.php?lang=${lang}&exclude_category=${encodeURIComponent('Industrial Installations')}&limit=4`)
+        ]);
+        const indData = await indRes.json();
+        const othData = await othRes.json();
+        
+        if (indData.success && othData.success) {
+          setIndustrialProjects(indData.posts);
+          setOtherProjects(othData.posts);
         }
       } catch (error) {
         console.error("Failed to fetch projects frontend", error);
@@ -134,7 +137,7 @@ const Portfolio = () => {
               </div>
 
               {industrialProjects.length > 0 ? (
-                renderPortfolio(industrialProjects)
+                renderPortfolio(industrialProjects.slice(0, 3))
               ) : (
                 <div className="py-10 bg-surface-container-lowest rounded-sm border border-outline-variant/20 flex justify-center text-on-surface-variant">
                   {lang === 'id' ? 'Belum ada portofolio Industrial Installations.' : 'No Industrial Installations portfolio yet.'}

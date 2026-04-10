@@ -10,11 +10,12 @@ const ProductForm = () => {
 
   const [formData, setFormData] = useState({
     nama: '',
-    gambar: '',
     kategori: 'Paket',
     shopeeLink: '',
     description: '',
   });
+
+  const [gambars, setGambars] = useState(['']);
 
   const [spesifikasi, setSpesifikasi] = useState(['']);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,11 +90,13 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
           if (data.success && data.product) {
             setFormData({
               nama: data.product.nama,
-              gambar: data.product.gambar || '',
               kategori: data.product.kategori || 'Paket',
               shopeeLink: data.product.shopee_link || '',
               description: data.product.description || '',
             });
+            if (data.product.gambar) {
+              setGambars(data.product.gambar.split(',').map(s => s.trim()));
+            }
             if (data.product.spesifikasi && data.product.spesifikasi.length > 0) {
               setSpesifikasi(data.product.spesifikasi);
             }
@@ -130,15 +133,34 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
     setSpesifikasi(newSpecs);
   };
 
+  const handleGambarChange = (index, value) => {
+    const newGambars = [...gambars];
+    newGambars[index] = value;
+    setGambars(newGambars);
+  };
+
+  const addGambar = () => {
+    setGambars([...gambars, '']);
+  };
+
+  const removeGambar = (index) => {
+    const newGambars = [...gambars];
+    newGambars.splice(index, 1);
+    if (newGambars.length === 0) newGambars.push('');
+    setGambars(newGambars);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError('');
 
     const finalSpecs = spesifikasi.filter(s => s.trim() !== '');
+    const finalGambars = gambars.filter(g => g.trim() !== '').join(',');
     
     const finalData = {
       ...formData,
+      gambar: finalGambars,
       spesifikasi: finalSpecs
     };
 
@@ -162,7 +184,7 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto space-y-6 md:space-y-8 w-full font-body">
+    <div className="p-4 sm:p-6 md:p-8 w-full mx-auto space-y-6 md:space-y-8 font-body">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button 
@@ -230,18 +252,34 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
                   </select>
                 </div>
                 <div className="relative">
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
-                    URL Gambar Referensi
-                    <span className="material-symbols-outlined text-[14px] text-orange-400">image</span>
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      URL Gambar/Video <span className="material-symbols-outlined text-[14px] text-orange-400">perm_media</span>
+                    </div>
+                    <button type="button" onClick={addGambar} className="text-[10px] text-secondary hover:underline flex items-center gap-1 font-bold">
+                      <span className="material-symbols-outlined text-[12px]">add</span> Tambah Media
+                    </button>
                   </label>
-                  <input 
-                    name="gambar"
-                    value={formData.gambar}
-                    onChange={handleInputChange}
-                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
-                    placeholder="https://atekateknik.com/wp-content/uploads/..." 
-                    type="url" 
-                  />
+                  <div className="space-y-2">
+                    {gambars.map((gbr, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input 
+                          value={gbr}
+                          onChange={(e) => handleGambarChange(index, e.target.value)}
+                          className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-2 px-3 outline-none text-sm" 
+                          placeholder="https://... (.jpg / .mp4)" 
+                          type="url" 
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => removeGambar(index)}
+                          className="w-8 h-8 text-slate-400 hover:text-error hover:bg-error-container/20 transition-all rounded-sm flex items-center justify-center shrink-0"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
