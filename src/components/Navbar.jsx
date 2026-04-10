@@ -306,7 +306,7 @@ const Navbar = () => {
                         >
                           <div className="flex items-center gap-4">
                             {item.image && (
-                              <img src={item.image} alt="" className="w-10 h-10 rounded-sm object-cover shrink-0 bg-surface-container" />
+                              <img src={item.image.split(',')[0].trim()} alt="" className="w-10 h-10 rounded-sm object-cover shrink-0 bg-surface-container" />
                             )}
                             <div className="flex flex-col">
                               <span className="font-headline font-bold text-primary-container dark:text-white group-hover:text-secondary transition-colors">
