@@ -272,7 +272,7 @@ const DashboardHome = () => {
                 <img
                   alt={featured.nama}
                   className="w-full h-full object-cover mix-blend-overlay opacity-60"
-                  src={featured.gambar}
+                  src={featured.gambar.split(',')[0].trim()}
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/60 to-transparent border border-primary/20"></div>
               </div>

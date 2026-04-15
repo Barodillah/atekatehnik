@@ -13,7 +13,7 @@ const DryerAdvantages = () => {
     ];
 
     return (
-        <section className="py-24 bg-surface-container-low border-y border-outline-variant/10 relative overflow-hidden">
+        <section className="py-10 bg-surface-container-low border-y border-outline-variant/10 relative overflow-hidden">
             {/* Optional subtle background gradient */}
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -29,7 +29,7 @@ const DryerAdvantages = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     {innovations.map((item, index) => (
-                        <div 
+                        <div
                             key={index}
                             className="bg-white p-8 rounded-2xl text-center shadow-sm border border-outline-variant/10 hover:shadow-xl hover:border-secondary/40 hover:-translate-y-2 transition-all duration-300 group flex flex-col items-center gap-4"
                         >

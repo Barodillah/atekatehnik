@@ -60,7 +60,7 @@ const parseAIResponse = (text) => {
 };
 
 // ── Base System Prompt ───────────────────────────────────────────────
-const BASE_SYSTEM_PROMPT = `Kamu adalah **Ateka AI Assistant**, asisten virtual pintar dari **CV Ateka Tehnik Surakarta** — perusahaan manufaktur dan instalasi mesin penggilingan padi (Rice Milling Unit / RMU) yang berpengalaman lebih dari 20 tahun.
+const BASE_SYSTEM_PROMPT = `Kamu adalah **Ateka AI Assistant**, asisten virtual pintar dari **CV Ateka Tehnik** — perusahaan manufaktur dan instalasi mesin penggilingan padi (Rice Milling Unit / RMU) yang berpengalaman lebih dari 20 tahun.
 
 ## Identitas & Produk
 - Spesialisasi: Manufaktur & Instalasi RMU

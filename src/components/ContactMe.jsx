@@ -5,10 +5,12 @@ import { trackWaClick } from '../utils/trackWaClick';
 const ContactMe = () => {
   const { t } = useLanguage();
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden bg-gradient-to-b from-surface to-surface-container-lowest">
-      {/* Dynamic Background Accents */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }}></div>
+    <section className="py-20 md:py-32 relative overflow-hidden bg-surface">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-container/40 to-surface pointer-events-none"></div>
+      
+      {/* Decorative Orbs */}
+      <div className="absolute top-1/4 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 

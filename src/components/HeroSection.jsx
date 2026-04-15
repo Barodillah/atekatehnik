@@ -9,10 +9,11 @@ const HeroSection = () => {
   const [currentImage, setCurrentImage] = useState(0);
 
   const images = [
-    "https://atekatehnik.com/wp-content/uploads/gambar_hero_ai.jpeg",
-    "https://atekatehnik.com/wp-content/uploads/gambar_hero_3.png",
-    // "https://atekatehnik.com/wp-content/uploads/gambar_hero_2.png",
-    "https://atekatehnik.com/wp-content/uploads/gambar_hero_1.jpg"
+    "https://atekatehnik.com/wp-content/uploads/herobarukecil_1.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/herobarukecil_2.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/hero_size_kecil.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/hero_baru_kecil_lagi_4.jpg",
+    "https://atekatehnik.com/wp-content/uploads/hero_baru_kecil_lagi_3.jpeg"
   ];
 
   useEffect(() => {

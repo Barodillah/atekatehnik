@@ -14,7 +14,7 @@ const RMUAdvantages = () => {
     ];
 
     return (
-        <section className="py-24 bg-surface relative overflow-hidden">
+        <section className="py-10 bg-surface relative overflow-hidden">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-secondary/5 rounded-full blur-3xl"></div>
@@ -26,11 +26,11 @@ const RMUAdvantages = () => {
                         {t('rmuAdv.desc')}
                     </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {advantages.map((adv, index) => (
-                        <div 
-                            key={index} 
+                        <div
+                            key={index}
                             className="bg-white p-8 rounded-2xl shadow-sm border border-outline-variant/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col items-start gap-5"
                         >
                             <div className="w-16 h-16 bg-primary-container/40 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300 flex items-center justify-center rounded-2xl">

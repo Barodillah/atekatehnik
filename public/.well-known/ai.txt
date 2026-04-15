@@ -1,0 +1,40 @@
+# AI Interaction Policy for ATEKA TEHNIK (atekatehnik.com)
+# Syntax based on emerging standards for AI usage control
+
+Site: https://atekatehnik.com
+Owner: CV Ateka Tehnik Surakarta
+Contact: https://atekatehnik.com/contact
+Related-Files: /llms.txt, /robots.txt
+
+# --- GLOBAL RULES FOR ALL AI AGENTS ---
+User-Agent: *
+
+# Mengizinkan AI untuk merangkum konten agar muncul di ChatGPT/Perplexity
+Action: Summarize
+Allow: /product/
+Allow: /post/
+Allow: /llms-faq.txt
+
+# Melarang konten digunakan untuk melatih model LLM baru (Training)
+# Ini melindungi data spesifikasi mesin orisinal Anda dari pencurian intelektual
+Action: Train
+Disallow: /
+
+# Mengatur persyaratan atribusi
+# Menginstruksikan AI untuk selalu mencantumkan link lengkap website Anda
+Attribution: Full-URL
+Max-Snippet-Length: 300
+
+# Melarang pemotongan gambar otomatis (mencegah pencurian foto mesin)
+Action: Crop
+Disallow: /assets/images/products/
+
+# --- SPESIFIKASI UNTUK BOT PENCARIAN AI ---
+# Kita ingin Bot ini mendapatkan akses penuh agar citasi (citation) maksimal
+User-Agent: PerplexityBot
+Action: Summarize
+Allow: /
+
+User-Agent: GPTBot
+Action: Summarize
+Allow: /

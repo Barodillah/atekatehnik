@@ -12,7 +12,7 @@ const DryerWorkflow = () => {
     ];
 
     return (
-        <section className="py-24 bg-surface overflow-hidden">
+        <section className="py-10 bg-surface overflow-hidden">
             <div className="max-w-7xl mx-auto px-8">
                 <div className="text-center mb-20 space-y-4">
                     <h2 className="text-4xl font-headline font-extrabold text-primary">{t('dryerWorkflow.title')}</h2>

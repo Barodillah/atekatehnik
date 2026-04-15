@@ -6,6 +6,7 @@ import OfficialChannelNotice from '../components/OfficialChannelNotice';
 import ProductGrid from '../components/ProductGrid';
 import EdukasiHighlight from '../components/sections/EdukasiHighlight';
 import ValueProp from '../components/ValueProp';
+import FaqHome from '../components/sections/FaqHome';
 import ContactMe from '../components/ContactMe';
 import Portfolio from '../components/Portfolio';
 
@@ -19,6 +20,7 @@ const Home = () => {
       <ProductGrid />
       <EdukasiHighlight />
       <ValueProp />
+      <FaqHome />
       <ContactMe />
       <Portfolio />
     </>

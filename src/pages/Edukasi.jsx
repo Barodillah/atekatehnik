@@ -48,7 +48,7 @@ const Edukasi = () => {
             <DryerWorkflow />
 
             {/* Bottom Call-To-Action (3 actions) */}
-            <section className="py-24 bg-surface border-t border-outline-variant/10">
+            <section className="py-10 bg-surface border-t border-outline-variant/10">
                 <div className="max-w-4xl mx-auto px-8 text-center space-y-10">
                     <div className="space-y-4">
                         <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t('edukasi.ctaTitle')}</h2>

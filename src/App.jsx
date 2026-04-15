@@ -21,6 +21,7 @@ import SearchResults from './pages/SearchResults';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Edukasi from './pages/Edukasi';
+import Faq from './pages/Faq';
 import { NotFound } from './pages/ErrorPage';
 
 // Admin Dashboard Components & Pages
@@ -71,6 +72,7 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/edukasi" element={<Edukasi />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

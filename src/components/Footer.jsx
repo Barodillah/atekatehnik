@@ -24,8 +24,8 @@ const Footer = () => {
           <ul className="space-y-2">
             <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/privacy-policy">{t('footer.privacy')}</Link></li>
             <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/terms-of-service">{t('footer.terms')}</Link></li>
-            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/contact">{t('footer.serviceCenters')}</Link></li>
-            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/contact">{t('footer.globalExport')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/faq">{t('footer.faq')}</Link></li>
+            <li><Link className="text-slate-400 hover:text-[#ffa454] text-sm hover:translate-x-1 transition-transform duration-200 inline-block" to="/edukasi">{t('footer.globalExport')}</Link></li>
           </ul>
         </div>
         <div className="space-y-4">
