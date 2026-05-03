@@ -56,7 +56,7 @@ const ProductGrid = () => {
                 <img 
                   alt={item.nama} 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                  src={item.gambar}
+                  src={item.gambar.split(',')[0].trim()}
                 />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-outline">

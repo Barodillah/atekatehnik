@@ -67,22 +67,22 @@ const Portfolio = () => {
             </div>
             <div className="p-3 sm:p-5 flex flex-col flex-grow justify-center">
                 <div className="flex justify-between items-center mb-2 gap-2">
-                   <span className="text-[10px] sm:text-xs text-on-surface-variant font-medium whitespace-nowrap">
-                      {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                   </span>
-                   <span className="bg-secondary-fixed text-on-secondary-fixed text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
-                     {project.category}
-                   </span>
+                    <span className="text-[10px] sm:text-xs text-on-surface-variant font-medium whitespace-nowrap">
+                        {new Date(project.publish_date || project.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span className="bg-secondary-fixed text-on-secondary-fixed text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-tighter truncate max-w-[60%]">
+                        {project.category}
+                    </span>
                 </div>
                 <h3 className="font-headline font-bold text-sm sm:text-base text-primary mb-1 sm:mb-2 line-clamp-2 group-hover:text-secondary transition-colors leading-tight">
-                  {project.title}
+                    {project.title}
                 </h3>
                 <p className="text-[11px] sm:text-xs text-on-surface-variant font-medium line-clamp-2 mb-3">
-                  {project.subtitle}
+                    {project.subtitle}
                 </p>
                 <div className="mt-auto flex items-center gap-1.5 text-[11px] sm:text-xs text-secondary font-bold group-hover:gap-2 transition-all">
-                  {lang === 'id' ? 'Lihat Selengkapnya' : 'Read More'}
-                  <span className="material-symbols-outlined text-[14px] sm:text-base">arrow_forward</span>
+                    {lang === 'id' ? 'Lihat Selengkapnya' : 'Read More'}
+                    <span className="material-symbols-outlined text-[14px] sm:text-base">arrow_forward</span>
                 </div>
             </div>
         </Link>
@@ -135,11 +135,11 @@ const Portfolio = () => {
                         <div className="w-full md:w-3/5 relative">
                             <div className="aspect-video overflow-hidden rounded-sm shadow-2xl">
                                 <img alt="Featured Project" className="w-full h-full object-cover"
-                                    src="https://atekatehnik.com/wp-content/uploads/RMU_2-3ton_Pati.jpeg" />
+                                    src="https://atekatehnik.com/wp-content/uploads/PALEMBANG_3.png" />
                             </div>
                             <div className="absolute -bottom-6 -right-6 bg-secondary p-8 rounded-sm hidden md:block">
-                                <span className="block text-white font-headline text-4xl font-black">2024</span>
-                                <span className="block text-white/80 font-label text-xs tracking-widest uppercase">Pati, Jawa Tengah</span>
+                                <span className="block text-white font-headline text-4xl font-black">2025</span>
+                                <span className="block text-white/80 font-label text-xs tracking-widest uppercase">Palembang, Sumatera Selatan</span>
                             </div>
                         </div>
                         <div className="w-full md:w-2/5">
@@ -148,7 +148,7 @@ const Portfolio = () => {
                             <p className="text-on-surface-variant leading-relaxed mb-8">{t('portfolioPage.featuredDesc')}</p>
                             <div className="grid grid-cols-2 gap-6 mb-8">
                                 <div>
-                                    <span className="block text-2xl font-headline font-extrabold text-primary">2–3 Ton/Hr</span>
+                                    <span className="block text-2xl font-headline font-extrabold text-primary">{t('portfolioPage.featuredCapacityValue')}</span>
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statCapacity')}</span>
                                 </div>
                                 <div>
@@ -156,7 +156,7 @@ const Portfolio = () => {
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statPurity')}</span>
                                 </div>
                             </div>
-                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post/pemasangan-rmu-23-tonjam-di-pati-jawa-tengah">
+                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post/pemasangan-rmu-23-tonjam-di-palembang-sumatera-selatan">
                                 {t('portfolioPage.viewSpecs')} <span className="material-symbols-outlined">arrow_forward</span>
                             </Link>
                         </div>
