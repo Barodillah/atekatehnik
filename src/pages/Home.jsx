@@ -9,6 +9,7 @@ import ValueProp from '../components/ValueProp';
 import FaqHome from '../components/sections/FaqHome';
 import ContactMe from '../components/ContactMe';
 import Portfolio from '../components/Portfolio';
+import GalleryCTA from '../components/sections/GalleryCTA';
 
 const Home = () => {
   usePageTitle(null); // Uses default title
@@ -23,6 +24,7 @@ const Home = () => {
       <FaqHome />
       <ContactMe />
       <Portfolio />
+      <GalleryCTA />
     </>
   );
 };

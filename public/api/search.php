@@ -55,7 +55,7 @@ function extractSnippet(string $text, string $keyword, int $contextLen = 60): st
 
 // ── Search Products ──────────────────────────────────────────────
 $pStmt = $db->prepare("
-    SELECT id, nama, gambar, kategori, shopee_link, slug, description
+    SELECT id, nama, gambar, kategori, shopee_link, inaproc_link, slug, description
     FROM products
     WHERE nama LIKE :q1 OR kategori LIKE :q2 OR description LIKE :q3
     ORDER BY created_at DESC

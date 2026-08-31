@@ -262,6 +262,18 @@ const ProductDetail = () => {
                                         {t('products.buyOnShopee') || (lang === 'id' ? 'Beli di Shopee' : 'Buy on Shopee')}
                                     </a>
                                 )}
+
+                                {product.inaproc_link && (
+                                    <a
+                                        href={product.inaproc_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-[#D22B50] text-white px-8 py-4 rounded-sm font-headline font-extrabold text-lg hover:bg-[#b02241] transition-all flex items-center gap-3 shadow-xl"
+                                    >
+                                        <span className="material-symbols-outlined">storefront</span>
+                                        {lang === 'id' ? 'Kunjungi INAPROC' : 'Visit INAPROC'}
+                                    </a>
+                                )}
                             </div>
                             <div className="mt-10 grid grid-cols-3 gap-6 pt-10 border-t border-outline-variant/20">
                                 <div>

@@ -15,6 +15,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Portfolio from './pages/Portfolio';
 import News from './pages/News';
+import Gallery from './pages/Gallery';
 import Post from './pages/Post';
 import OfficialChannels from './pages/OfficialChannels';
 import SearchResults from './pages/SearchResults';
@@ -32,6 +33,8 @@ import AdminProducts from './pages/dashboard/Products';
 import AdminProductForm from './pages/dashboard/ProductForm';
 import AdminPosts from './pages/dashboard/Posts';
 import AdminPostForm from './pages/dashboard/PostForm';
+import AdminGallery from './pages/dashboard/AdminGallery';
+import AdminGalleryForm from './pages/dashboard/AdminGalleryForm';
 import AdminComments from './pages/dashboard/Comments';
 import AdminAnalytics from './pages/dashboard/Analytics';
 import ActivityLogs from './pages/dashboard/ActivityLogs';
@@ -65,6 +68,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/news" element={<News />} />
           <Route path="/post/:slug" element={<Post />} />
           <Route path="/official-channels" element={<OfficialChannels />} />
@@ -88,6 +92,9 @@ function App() {
             <Route path="posts" element={<AdminPosts />} />
             <Route path="posts/new" element={<AdminPostForm />} />
             <Route path="posts/edit/:id" element={<AdminPostForm />} />
+            <Route path="gallery" element={<AdminGallery />} />
+            <Route path="gallery/new" element={<AdminGalleryForm />} />
+            <Route path="gallery/edit/:id" element={<AdminGalleryForm />} />
             <Route path="comments" element={<AdminComments />} />
             <Route path="chat-history" element={<ChatHistory />} />
             <Route path="analytics" element={<AdminAnalytics />} />

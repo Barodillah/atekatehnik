@@ -420,7 +420,7 @@ function generateFull(PDO $db): string
     $md[] = '';
 
     $products = $db->query("
-        SELECT p.id, p.nama, p.slug, p.description, p.kategori, p.shopee_link, p.created_at
+        SELECT p.id, p.nama, p.slug, p.description, p.kategori, p.shopee_link, p.inaproc_link, p.created_at
         FROM products p
         ORDER BY p.kategori ASC, p.created_at ASC
     ")->fetchAll();
@@ -460,6 +460,9 @@ function generateFull(PDO $db): string
 
         if (!empty($p['shopee_link'])) {
             $md[] = "- **Shopee:** [{$p['shopee_link']}]({$p['shopee_link']})";
+        }
+        if (!empty($p['inaproc_link'])) {
+            $md[] = "- **INAPROC:** [{$p['inaproc_link']}]({$p['inaproc_link']})";
         }
 
         $md[] = '';
@@ -820,7 +823,7 @@ function generateProducts(PDO $db): string
     $md[] = '';
     
     $products = $db->query("
-        SELECT p.id, p.nama, p.slug, p.description, p.kategori, p.shopee_link, p.created_at
+        SELECT p.id, p.nama, p.slug, p.description, p.kategori, p.shopee_link, p.inaproc_link, p.created_at
         FROM products p
         ORDER BY p.kategori ASC, p.created_at ASC
     ")->fetchAll();
@@ -857,6 +860,9 @@ function generateProducts(PDO $db): string
 
         if (!empty($p['shopee_link'])) {
             $md[] = "- **Shopee:** [{$p['shopee_link']}]({$p['shopee_link']})";
+        }
+        if (!empty($p['inaproc_link'])) {
+            $md[] = "- **INAPROC:** [{$p['inaproc_link']}]({$p['inaproc_link']})";
         }
         $md[] = '';
 

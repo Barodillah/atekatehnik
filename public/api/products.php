@@ -74,7 +74,7 @@ switch ($method) {
             $search   = trim($_GET['search'] ?? '');
             $kategori = trim($_GET['kategori'] ?? '');
             $page     = max(1, (int)($_GET['page'] ?? 1));
-            $limit    = min(50, max(1, (int)($_GET['limit'] ?? 12)));
+            $limit    = min(1000, max(1, (int)($_GET['limit'] ?? 12)));
             $offset   = ($page - 1) * $limit;
 
             $conditions = [];
@@ -138,6 +138,7 @@ switch ($method) {
         $gambar     = trim($input['gambar'] ?? '');
         $kategori   = trim($input['kategori'] ?? '');
         $shopeeLink = trim($input['shopeeLink'] ?? '');
+        $inaprocLink = trim($input['inaprocLink'] ?? '');
         $spesifikasi = $input['spesifikasi'] ?? [];
 
         if (empty($nama) || empty($kategori)) {
@@ -148,8 +149,8 @@ switch ($method) {
         try {
             $slug = generateSlug($db, $nama);
             $stmt = $db->prepare("
-                INSERT INTO products (nama, slug, description, gambar, kategori, shopee_link)
-                VALUES (:nama, :slug, :description, :gambar, :kategori, :shopee)
+                INSERT INTO products (nama, slug, description, gambar, kategori, shopee_link, inaproc_link)
+                VALUES (:nama, :slug, :description, :gambar, :kategori, :shopee, :inaproc)
             ");
             $stmt->execute([
                 ':nama'        => $nama,
@@ -158,6 +159,7 @@ switch ($method) {
                 ':gambar'      => $gambar,
                 ':kategori'    => $kategori,
                 ':shopee'      => $shopeeLink,
+                ':inaproc'     => $inaprocLink,
             ]);
             $productId = (int)$db->lastInsertId();
 
@@ -200,6 +202,7 @@ switch ($method) {
         $gambar     = trim($input['gambar'] ?? '');
         $kategori   = trim($input['kategori'] ?? '');
         $shopeeLink = trim($input['shopeeLink'] ?? '');
+        $inaprocLink = trim($input['inaprocLink'] ?? '');
         $spesifikasi = $input['spesifikasi'] ?? [];
 
         if (empty($nama) || empty($kategori)) {
@@ -210,7 +213,7 @@ switch ($method) {
         try {
             $slug = generateSlug($db, $nama, $id);
             $stmt = $db->prepare("
-                UPDATE products SET nama = :nama, slug = :slug, description = :description, gambar = :gambar, kategori = :kategori, shopee_link = :shopee
+                UPDATE products SET nama = :nama, slug = :slug, description = :description, gambar = :gambar, kategori = :kategori, shopee_link = :shopee, inaproc_link = :inaproc
                 WHERE id = :id
             ");
             $stmt->execute([
@@ -220,6 +223,7 @@ switch ($method) {
                 ':gambar'      => $gambar,
                 ':kategori'    => $kategori,
                 ':shopee'      => $shopeeLink,
+                ':inaproc'     => $inaprocLink,
                 ':id'          => $id,
             ]);
 

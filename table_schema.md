@@ -198,8 +198,9 @@
 | 4 | `gambar` | `varchar(500)` | NO | - | - | - |
 | 5 | `kategori` | `varchar(100)` | NO | - | - | - |
 | 6 | `shopee_link` | `varchar(255)` | YES | - | NULL | - |
-| 7 | `description` | `text` | YES | - | NULL | - |
-| 8 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+| 7 | `inaproc_link` | `varchar(255)` | YES | - | NULL | - |
+| 8 | `description` | `text` | YES | - | NULL | - |
+| 9 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
 
 ## `product_specs`
 
@@ -226,3 +227,15 @@
 | 11 | `city` | `varchar(100)` | YES | - | '' | - |
 | 12 | `referrer` | `varchar(500)` | YES | - | '' | - |
 | 13 | `clicked_at` | `timestamp` | YES | - | current_timestamp() | - |
+
+## `galleries`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `type` | `enum('image','video')` | NO | - | 'image' | - |
+| 3 | `src` | `varchar(255)` | NO | - | - | - |
+| 4 | `title` | `varchar(255)` | NO | - | - | - |
+| 5 | `height_class` | `varchar(50)` | YES | - | 'aspect-square' | - |
+| 6 | `sort_order` | `int(11)` | YES | - | 0 | - |
+| 7 | `created_at` | `datetime` | NO | - | current_timestamp() | - |

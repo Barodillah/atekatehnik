@@ -210,6 +210,10 @@ const DashboardLayout = () => {
             <span className="material-symbols-outlined">edit_note</span>
             <span>Blog Posts</span>
           </Link>
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/gallery')} to="/admin/gallery">
+            <span className="material-symbols-outlined">collections</span>
+            <span>Gallery</span>
+          </Link>
           <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/comments')} to="/admin/comments">
             <span className="material-symbols-outlined">forum</span>
             <span>Comments</span>

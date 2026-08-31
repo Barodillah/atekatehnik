@@ -138,6 +138,11 @@ const Products = () => {
                     <span className="material-symbols-outlined text-[14px]">shopping_bag</span> Shopee
                   </a>
                 )}
+                {product.inaproc_link && (
+                  <a href={product.inaproc_link} target="_blank" rel="noreferrer" className="text-xs text-red-600 font-bold flex items-center gap-1 hover:underline mt-1">
+                    <span className="material-symbols-outlined text-[14px]">storefront</span> INAPROC
+                  </a>
+                )}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
                   <button 
                     onClick={() => navigate(`/admin/products/edit/${product.id}`)}

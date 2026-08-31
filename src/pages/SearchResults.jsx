@@ -76,7 +76,7 @@ const SearchResults = () => {
                 <div className="aspect-[4/3] overflow-hidden relative bg-surface-container-highest">
                   {item.image ? (
                     <img 
-                      src={item.image} 
+                      src={typeof item.image === 'string' ? item.image.split(',')[0].trim() : (Array.isArray(item.image) ? item.image[0] : item.image)} 
                       alt={item.title} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />

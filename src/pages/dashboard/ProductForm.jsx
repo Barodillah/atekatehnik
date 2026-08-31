@@ -12,6 +12,7 @@ const ProductForm = () => {
     nama: '',
     kategori: 'Paket',
     shopeeLink: '',
+    inaprocLink: '',
     description: '',
   });
 
@@ -47,12 +48,19 @@ const ProductForm = () => {
       if (length === 'sedang') lengthInstruction = "sekitar 4-6 kalimat menengah";
       if (length === 'panjang') lengthInstruction = "agak panjang dan sangat detail, maksimal 1 paragraf penuh";
 
-      const prompt = `Anda adalah asisten copywriter Ateka Tehnik (perusahaan bengkel pemesinan industri besar dan pembuatan pabrik penggilingan padi/RMU).
-Buatlah paragraf penjelasan deskripsi produk yang menarik, sales-oriented dan profesional berdasarkan spesifikasi berikut ini:
+      const prompt = `Anda adalah asisten copywriter dan data entry Ateka Tehnik (perusahaan bengkel pemesinan industri besar dan pembuatan pabrik penggilingan padi/RMU).
 Nama Mesin/Produk: ${formData.nama}
-Spesifikasi Teknis: ${specsText ? specsText : 'Belum ada data'}
+Spesifikasi Teknis Mentah: ${specsText ? specsText : 'Belum ada data'}
 
-Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perlu menggunakan bullet points atau list, buatlah mengalir seperti penawaran produk industrial. Kembalikan HANYA teks paragrafnya.`;
+Tugas Anda:
+1. Buat deskripsi produk: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, mengalir seperti penawaran produk industrial. WAJIB mengeja nama perusahaan sebagai "Ateka Tehnik" (menggunakan huruf 'h'), DILARANG KERAS menulisnya sebagai "Ateka Teknik".
+2. Perbaiki format spesifikasi teknis: Perbaiki penulisan spesifikasi mentah di atas (huruf besar/kecil yang tepat, spacing rapi) DAN WAJIB dipisah dengan ":" (contoh: "Kapasitas: 1 - 2 Ton/Jam"). Jangan mengarang spesifikasi baru jika tidak relevan, cukup perbaiki yang sudah ada dan buat rapi.
+
+PENTING: Kembalikan respon HANYA dalam format JSON valid tanpa awalan atau akhiran apapun (jangan gunakan markdown \`\`\`json):
+{
+  "description": "teks paragraf deskripsi",
+  "spesifikasi": ["Komponen 1: Nilai", "Komponen 2: Nilai"]
+}`;
 
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -70,7 +78,32 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
 
       const data = await res.json();
       if (data.choices && data.choices.length > 0) {
-        setFormData(prev => ({ ...prev, description: data.choices[0].message.content.trim() }));
+        const rawText = data.choices[0].message.content.trim();
+        let jsonText = rawText;
+        if (jsonText.startsWith('```')) {
+          const firstNewline = jsonText.indexOf('\n');
+          const lastBacktick = jsonText.lastIndexOf('```');
+          if (firstNewline !== -1 && lastBacktick !== -1) {
+            jsonText = jsonText.substring(firstNewline + 1, lastBacktick).trim();
+          }
+        }
+
+        try {
+          const parsed = JSON.parse(jsonText);
+          
+          if (parsed.description) {
+            setFormData(prev => ({ ...prev, description: parsed.description }));
+          }
+          if (parsed.spesifikasi && Array.isArray(parsed.spesifikasi)) {
+            if (parsed.spesifikasi.length > 0) {
+              setSpesifikasi(parsed.spesifikasi);
+            } else if (specsText === '') {
+              setSpesifikasi(['']);
+            }
+          }
+        } catch (e) {
+          throw new Error("Gagal melakukan parse format JSON dari AI. Silakan coba lagi.");
+        }
       } else {
         throw new Error(data.error?.message || "Gagal mengambil response dari AI.");
       }
@@ -92,6 +125,7 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
               nama: data.product.nama,
               kategori: data.product.kategori || 'Paket',
               shopeeLink: data.product.shopee_link || '',
+              inaprocLink: data.product.inaproc_link || '',
               description: data.product.description || '',
             });
             if (data.product.gambar) {
@@ -283,19 +317,35 @@ Instruksi: Tulis deskripsi ${lengthInstruction}. Maksimal 1 paragraf, tidak perl
                 </div>
               </div>
 
-              <div className="relative">
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
-                  Tautan E-Commerce (Shopee) <span className="text-outline-variant lowercase tracking-normal">(Opsional)</span>
-                  <span className="material-symbols-outlined text-[14px] text-orange-400">shopping_bag</span>
-                </label>
-                <input 
-                  name="shopeeLink"
-                  value={formData.shopeeLink}
-                  onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
-                  placeholder="https://shopee.co.id/..." 
-                  type="url" 
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
+                    Tautan Shopee <span className="text-outline-variant lowercase tracking-normal">(Opsional)</span>
+                    <span className="material-symbols-outlined text-[14px] text-orange-400">shopping_bag</span>
+                  </label>
+                  <input 
+                    name="shopeeLink"
+                    value={formData.shopeeLink}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
+                    placeholder="https://shopee.co.id/..." 
+                    type="url" 
+                  />
+                </div>
+                <div className="relative">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
+                    Tautan INAPROC <span className="text-outline-variant lowercase tracking-normal">(Opsional)</span>
+                    <span className="material-symbols-outlined text-[14px] text-red-500">storefront</span>
+                  </label>
+                  <input 
+                    name="inaprocLink"
+                    value={formData.inaprocLink}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
+                    placeholder="https://katalog.inaproc.id/..." 
+                    type="url" 
+                  />
+                </div>
               </div>
 
               <div className="relative">

@@ -145,6 +145,7 @@ const Navbar = () => {
       subItems: [
         { path: '/portfolio', label: lang === 'id' ? 'Pemasangan' : 'Installations' },
         { path: '/news', label: lang === 'id' ? 'Berita & Update' : 'News & Updates' },
+        { path: '/gallery', label: lang === 'id' ? 'Galeri' : 'Gallery' },
       ]
     },
     { path: '/about', label: t('nav.about') },
