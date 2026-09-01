@@ -250,12 +250,15 @@ const Products = () => {
                                                     ? 'bg-primary-container text-white'
                                                     : product.kategori === 'Peralatan Pendukung'
                                                         ? 'bg-[#2e7d32] text-white'
-                                                        : 'bg-primary text-white'
+                                                        : product.kategori === 'Suku Cadang'
+                                                            ? 'bg-[#e65100] text-white'
+                                                            : 'bg-primary text-white'
                                                 }`}>
                                                 {product.kategori === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap')
                                                     : product.kategori === 'Unit Mesin Tunggal' ? (t('products.catUnitMesin') || 'Unit Mesin Tunggal')
                                                         : product.kategori === 'Peralatan Pendukung' ? (t('products.catPeralatan') || 'Peralatan Pendukung')
-                                                            : product.kategori}
+                                                            : product.kategori === 'Suku Cadang' ? (t('products.catSukuCadang') || 'Suku Cadang')
+                                                                : product.kategori}
                                             </span>
                                         </div>
                                     </div>

@@ -72,7 +72,7 @@ const ProductGrid = () => {
           ) : (
           products.map((item) => (
             <div key={item.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden hover:shadow-[0_32px_32px_rgba(0,0,0,0.06)] transition-all duration-500 flex flex-col">
-              <div className="aspect-[4/3] overflow-hidden bg-surface-container shrink-0">
+              <div className="aspect-[4/3] overflow-hidden bg-surface-container shrink-0 relative">
                 {item.gambar ? (
                 <img 
                   alt={item.nama} 
@@ -84,6 +84,24 @@ const ProductGrid = () => {
                     <span className="material-symbols-outlined text-5xl">image</span>
                   </div>
                 )}
+                <div className="absolute top-4 left-4">
+                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm ${item.kategori === 'Paket'
+                    ? 'bg-secondary-fixed text-on-secondary-fixed'
+                    : item.kategori === 'Unit Mesin Tunggal'
+                      ? 'bg-primary-container text-white'
+                      : item.kategori === 'Peralatan Pendukung'
+                        ? 'bg-[#2e7d32] text-white'
+                        : item.kategori === 'Suku Cadang'
+                          ? 'bg-[#e65100] text-white'
+                          : 'bg-primary text-white'
+                  }`}>
+                    {item.kategori === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap')
+                      : item.kategori === 'Unit Mesin Tunggal' ? (t('products.catUnitMesin') || 'Unit Mesin Tunggal')
+                        : item.kategori === 'Peralatan Pendukung' ? (t('products.catPeralatan') || 'Peralatan Pendukung')
+                          : item.kategori === 'Suku Cadang' ? (t('products.catSukuCadang') || 'Suku Cadang')
+                            : item.kategori}
+                  </span>
+                </div>
               </div>
               <div className="p-6 space-y-4 flex-1 flex flex-col">
                 <h3 className="text-lg font-headline font-bold text-primary line-clamp-2">{item.nama}</h3>

@@ -158,7 +158,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20">
           {/* Logo */}
           <Link className="flex items-center gap-2 text-xl md:text-2xl font-black tracking-tighter text-[#001f5b] dark:text-white font-headline" to="/">
-            <img src="/logo-dark.png" alt="Ateka Tehnik Logo" className="h-8 md:h-10" />
+            <img src="/logo-dark.png" alt="Ateka Tehnik Logo" className="hidden md:block h-8 md:h-10" />
             ATEKA TEHNIK
           </Link>
 
@@ -217,8 +217,10 @@ const Navbar = () => {
               <span className="text-xs font-bold text-primary-container uppercase tracking-wider group-hover:text-secondary transition-colors">
                 {lang === 'id' ? 'ID' : 'EN'}
               </span>
-              <span className="material-symbols-outlined text-xs text-outline-variant group-hover:rotate-180 transition-transform duration-300">sync</span>
-              <span className={`fi ${lang === 'id' ? 'fi-gb' : 'fi-id'} rounded-sm opacity-40 group-hover:opacity-100 transition-opacity`} style={{ fontSize: '1rem' }}></span>
+              <span className="hidden md:flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-xs text-outline-variant group-hover:rotate-180 transition-transform duration-300">sync</span>
+                <span className={`fi ${lang === 'id' ? 'fi-gb' : 'fi-id'} rounded-sm opacity-40 group-hover:opacity-100 transition-opacity`} style={{ fontSize: '1rem' }}></span>
+              </span>
             </button>
 
             {/* Hamburger Button (Mobile) */}
