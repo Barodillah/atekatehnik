@@ -100,7 +100,7 @@ const translations = {
     "footer.faq": "Tanya Jawab (FAQ)",
     "footer.globalExport": "Panduan & Edukasi",
     "footer.contactOffice": "Kantor Pusat",
-    "footer.copyright": "© 2026 Ateka Tehnik Industrial Engineering. Hak Cipta Dilindungi.",
+    "footer.copyright": "© 2026 CV Ateka Tehnik - Hak Cipta Dilindungi.",
     "footer.premiumQuality": "Kualitas Premium",
 
     // About Page
@@ -119,7 +119,7 @@ const translations = {
     "about.statInstallations": "Instalasi",
     "about.statProvinces": "Provinsi Terlayani",
     "about.quote": "\"Presisi adalah standar dasar kami. Kemajuan adalah misi kami.\"",
-    "about.quoteAuthor": "— Direktur Pendiri",
+    "about.quoteAuthor": "Warsito - Direktur Pendiri",
     "about.coreTitle": "Prinsip Inti Kami",
     "about.precisionTitle": "Presisi Tak Tertandingi",
     "about.precisionDesc": "Kami menerapkan toleransi tingkat dirgantara dalam perakitan penggilingan kami untuk memastikan kerusakan butir minimum dan konsistensi hasil maksimum.",
@@ -526,7 +526,7 @@ const translations = {
     "footer.faq": "Frequently Asked Questions",
     "footer.globalExport": "Guide & Education",
     "footer.contactOffice": "Contact Office",
-    "footer.copyright": "© 2026 Ateka Tehnik Industrial Engineering. All Rights Reserved.",
+    "footer.copyright": "© 2026 CV Ateka Tehnik - All Rights Reserved.",
     "footer.premiumQuality": "Premium Quality",
 
     // About Page
@@ -545,7 +545,7 @@ const translations = {
     "about.statInstallations": "Installations",
     "about.statProvinces": "Provinces Served",
     "about.quote": "\"Precision is our baseline. Progress is our mission.\"",
-    "about.quoteAuthor": "— Founding Director",
+    "about.quoteAuthor": "Warsito - Founding Director",
     "about.coreTitle": "Our Core Directives",
     "about.precisionTitle": "Unrivaled Precision",
     "about.precisionDesc": "We employ aerospace-grade tolerances in our milling assemblies to ensure minimum grain breakage and maximum yield consistency.",

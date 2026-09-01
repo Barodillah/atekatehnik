@@ -78,9 +78,9 @@ const Contact = () => {
     };
 
     return (
-        <main className="pt-24">
+        <main>
             {/* Hero Section */}
-            <section className="relative py-24 px-8 overflow-hidden bg-[linear-gradient(135deg,#000c2e_0%,#001f5b_100%)]">
+            <section className="relative pt-32 pb-24 px-8 overflow-hidden bg-[linear-gradient(135deg,#000c2e_0%,#001f5b_100%)]">
                 <div className="max-w-7xl mx-auto relative z-10">
                     <h1 className="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tighter max-w-3xl mb-6">
                         {t('contactPage.heroTitle')}

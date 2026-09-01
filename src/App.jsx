@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatbotWidget from './components/ChatbotWidget';
 import ScrollToTop from './components/ScrollToTop';
+import StickyWhatsApp from './components/StickyWhatsApp';
 
 // Public Pages
 import Home from './pages/Home';
@@ -52,6 +53,7 @@ const PublicLayout = () => {
       </div>
       <Footer />
       <ChatbotWidget />
+      <StickyWhatsApp />
     </div>
   );
 };

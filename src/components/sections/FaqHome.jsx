@@ -46,7 +46,7 @@ const FaqHome = () => {
                     </p>
                 </div>
 
-                <div className="space-y-4 bg-white dark:bg-[#000c2e] p-6 md:p-8 rounded-3xl shadow-sm border border-outline-variant/10">
+                <div className="space-y-4 bg-white dark:bg-[#000c2e] p-6 md:p-8 rounded-sm shadow-sm border border-outline-variant/10">
                     {faqs.map((faq, index) => (
                         <div
                             key={index}
@@ -80,7 +80,7 @@ const FaqHome = () => {
                 <div className="mt-12 text-center">
                     <Link
                         to="/faq"
-                        className="inline-flex items-center gap-2 bg-[#001f5b] hover:bg-[#000c2e] text-white px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-[#001f5b]/20"
+                        className="inline-flex items-center gap-2 bg-[#001f5b] hover:bg-[#000c2e] text-white px-8 py-4 rounded-sm font-bold uppercase tracking-wider text-sm transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-[#001f5b]/20"
                     >
                         {t('faq.readMore')}
                         <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

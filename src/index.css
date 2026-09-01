@@ -20,14 +20,14 @@ body {
 
 @layer utilities {
   .animate-slide {
-    animation: slide 30s linear infinite;
+    animation: slide 90s linear infinite;
   }
   @keyframes slide {
     from {
       transform: translateX(0);
     }
     to {
-      transform: translateX(-50%);
+      transform: translateX(-100%);
     }
   }
 

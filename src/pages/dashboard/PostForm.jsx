@@ -118,7 +118,7 @@ const PostForm = () => {
     if (!id) return;
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/products.php?limit=50');
+        const res = await fetch('/api/products.php?limit=1000');
         const data = await res.json();
         if (data.success) setAllProducts(data.products || []);
       } catch {}
@@ -709,7 +709,7 @@ const PostForm = () => {
                         className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-outline-variant/10 last:border-none cursor-pointer"
                       >
                         {p.gambar && (
-                          <img src={p.gambar} alt={p.nama} className="w-8 h-8 object-cover rounded-sm bg-surface-container-low" />
+                          <img src={p.gambar.split(',')[0].trim()} alt={p.nama} className="w-8 h-8 object-cover rounded-sm bg-surface-container-low" />
                         )}
                         <div>
                           <span className="text-sm font-bold text-primary block">{p.nama}</span>

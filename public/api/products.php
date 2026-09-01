@@ -97,10 +97,24 @@ switch ($method) {
             $total = (int)$countStmt->fetchColumn();
 
             // Fetch products
+            $sortBy = strtolower(trim($_GET['sort_by'] ?? 'created_at'));
             $sortOrder = strtoupper(trim($_GET['sort'] ?? 'DESC'));
             if ($sortOrder !== 'ASC') $sortOrder = 'DESC';
             
-            $sql = "SELECT p.* FROM products p $where ORDER BY p.created_at $sortOrder LIMIT :limit OFFSET :offset";
+            if ($sortBy === 'views') {
+                $sql = "SELECT p.*, COALESCE(v.view_count, 0) as views 
+                        FROM products p 
+                        LEFT JOIN (
+                            SELECT page_slug, COUNT(*) as view_count 
+                            FROM page_views 
+                            WHERE page_type = 'product' 
+                            GROUP BY page_slug
+                        ) v ON p.slug = v.page_slug 
+                        $where 
+                        ORDER BY views $sortOrder, p.created_at DESC LIMIT :limit OFFSET :offset";
+            } else {
+                $sql = "SELECT p.* FROM products p $where ORDER BY p.created_at $sortOrder LIMIT :limit OFFSET :offset";
+            }
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v) {
                 $stmt->bindValue($k, $v);

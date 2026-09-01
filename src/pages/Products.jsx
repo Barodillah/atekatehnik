@@ -190,7 +190,7 @@ const Products = () => {
                                     setIsSearchActive(true);
                                     handleCategoryChange(''); // Automatically switch to "Semua Produk" when searching
                                 }}
-                                className="shrink-0 px-6 py-3 rounded-sm font-headline font-bold flex items-center gap-2 transition-colors cursor-pointer bg-surface-container-highest text-primary-container hover:bg-secondary-fixed shadow-sm"
+                                className="shrink-0 px-6 py-3 rounded-sm font-headline font-bold flex items-center gap-2 transition-colors cursor-pointer bg-surface-container-highest text-primary-container hover:bg-secondary-fixed shadow-sm snap-start"
                             >
                                 <span className="material-symbols-outlined text-xl">search</span>
                             </button>

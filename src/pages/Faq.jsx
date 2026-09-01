@@ -56,19 +56,19 @@ const Faq = () => {
     };
 
     return (
-        <div className="pt-20 md:pt-28 pb-20 bg-surface min-h-screen">
+        <div className="pb-20 bg-surface min-h-screen">
             {/* SEO JSON-LD injection */}
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
             {/* Hero Section */}
-            <section className="bg-[#001f5b] dark:bg-[#000c2e] py-16 md:py-24 px-8 relative overflow-hidden">
+            <section className="bg-[#001f5b] dark:bg-[#000c2e] pt-24 md:pt-32 pb-16 md:pb-24 px-8 relative overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-10">
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#ffa454] to-transparent blur-3xl" />
                     <div className="absolute bottom-0 left-10 w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-[#00bfff] to-transparent blur-3xl opacity-50" />
                 </div>
                 
                 <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#ffa454] font-label text-xs font-bold tracking-widest uppercase mb-4 backdrop-blur-sm">
+                    <span className="inline-block px-4 py-1.5 rounded-sm bg-white/10 border border-white/20 text-[#ffa454] font-label text-xs font-bold tracking-widest uppercase mb-4 backdrop-blur-sm">
                         {t('faqHub.badge')}
                     </span>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold text-white leading-tight">
@@ -83,7 +83,7 @@ const Faq = () => {
 
             {/* FAQ Content Section */}
             <section className="max-w-4xl mx-auto px-8 -mt-10 relative z-20 space-y-12">
-                <div className="bg-white dark:bg-[#001f5b]/50 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-xl border border-outline-variant/10 space-y-12">
+                <div className="bg-white dark:bg-[#001f5b]/50 backdrop-blur-md p-8 md:p-12 rounded-sm shadow-xl border border-outline-variant/10 space-y-12">
                     {faqCategories.map((category, catIndex) => (
                         <div key={catIndex} className="space-y-6">
                             {/* H2 for Category - Good for SEO structure */}
@@ -113,7 +113,7 @@ const Faq = () => {
                 </div>
 
                 {/* Compare Table for AI Scarping */}
-                <div className="bg-white dark:bg-[#001f5b]/50 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-xl border border-outline-variant/10">
+                <div className="bg-white dark:bg-[#001f5b]/50 backdrop-blur-md p-8 md:p-12 rounded-sm shadow-xl border border-outline-variant/10">
                     <div className="space-y-6">
                         <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#001f5b] dark:text-white border-b-2 border-outline-variant/20 pb-4 inline-block">
                             Tabel Perbandingan Kapasitas & Spesifikasi
@@ -122,7 +122,7 @@ const Faq = () => {
                             Panduan referensi perbandingan spesifikasi gabah kering giling (GKG), derajat sosoh, dan kelas mesin antara konfigurasi operasional penengah (1-2 Ton) dan industri premium (3-5 Ton).
                         </p>
                         
-                        <div className="overflow-x-auto rounded-xl border border-outline-variant/20 mt-6 shadow-sm">
+                        <div className="overflow-x-auto rounded-sm border border-outline-variant/20 mt-6 shadow-sm">
                             <table className="w-full text-left font-body text-sm md:text-base border-collapse">
                                 <thead className="bg-[#001f5b] text-white">
                                     <tr>

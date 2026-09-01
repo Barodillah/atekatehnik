@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatedCounter } from '../components/sections/QuickStats';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 
 const About = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     usePageTitle(t('nav.about') === 'Tentang' ? 'Tentang Kami' : 'About Us');
     return (
         <main className="pt-20">
@@ -39,25 +40,37 @@ const About = () => {
                             <p>{t('about.storyP1')}<span className="font-bold text-primary">{t('about.storyP1Bold')}</span>{t('about.storyP1End')}</p>
                             <p>{t('about.storyP2Start')}<span className="font-bold text-secondary">{t('about.storyP2Bold')}</span>{t('about.storyP2End')}</p>
                         </div>
-                        <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-8">
+                        <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
-                                <div className="text-4xl font-headline font-black text-secondary">20+</div>
-                                <div className="text-sm font-label uppercase tracking-widest text-outline">{t('about.statYears')}</div>
+                                <div className="text-3xl md:text-4xl font-headline font-black text-secondary mb-1">
+                                    <AnimatedCounter end={20} suffix="+" />
+                                </div>
+                                <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{t('about.statYears')}</div>
                             </div>
                             <div>
-                                <div className="text-4xl font-headline font-black text-secondary">1.5k+</div>
-                                <div className="text-sm font-label uppercase tracking-widest text-outline">{t('about.statInstallations')}</div>
+                                <div className="text-3xl md:text-4xl font-headline font-black text-secondary mb-1">
+                                    <AnimatedCounter end={500} suffix="+" />
+                                </div>
+                                <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{lang === 'id' ? 'Pelanggan' : 'Customers'}</div>
                             </div>
                             <div>
-                                <div className="text-4xl font-headline font-black text-secondary">34</div>
-                                <div className="text-sm font-label uppercase tracking-widest text-outline">{t('about.statProvinces')}</div>
+                                <div className="text-3xl md:text-4xl font-headline font-black text-secondary mb-1 flex items-center">
+                                    <AnimatedCounter end={1.8} suffix="k+" isFloat={true} />
+                                </div>
+                                <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{lang === 'id' ? 'Proyek & Produk Terjual' : 'Projects & Products Sold'}</div>
+                            </div>
+                            <div>
+                                <div className="text-3xl md:text-4xl font-headline font-black text-secondary mb-1">
+                                    <AnimatedCounter end={34} />
+                                </div>
+                                <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{t('about.statProvinces')}</div>
                             </div>
                         </div>
                     </div>
                     <div className="lg:col-span-5 relative">
                         <div className="aspect-square bg-surface-container-highest rounded-sm overflow-hidden shadow-2xl">
-                            <img alt="Technical drawing" className="w-full h-full object-cover mix-blend-multiply opacity-80"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPH2jPkT4gekvHv3YtMMw1xeeTa0MDqF-t24McHKBH8BC2vs7afCyGhI-_DSo5mG8e2qibMumqADAK9NsjfrPDx5KZ8GJhfu8yrpUD22TAv3GXsxR9vg_JF9YXHmGuGvYq-x7DOJU4dRw4-WhvB7-ljoo8lgWsquh-tmgbGoDDUjcgLQAt_-8SKh-6shUZofS9otYZr_Ew4otRy5D0kbMNrwZLxP3qctojaG0Cjx-nHwevrZ6eIsfW-N0pVG6H9Qu33tGDKsXr_3g" />
+                            <img alt="Ateka Tehnik Logo" className="w-full h-full object-contain p-8"
+                                src="/logo-bg.png" />
                         </div>
                         <div className="absolute -bottom-8 -left-8 bg-primary-container p-8 text-white shadow-xl max-w-xs hidden md:block">
                             <p className="font-headline font-bold text-lg mb-2 italic">{t('about.quote')}</p>
@@ -150,26 +163,26 @@ const About = () => {
                     </div>
                     <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-90 transition-opacity duration-500">
                         <div className="flex flex-col items-center gap-3 group">
-                            <img 
-                                src="https://atekatehnik.com/wp-content/uploads/ISO9001.png" 
-                                alt="SNI ISO 9001" 
-                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            <img
+                                src="https://atekatehnik.com/wp-content/uploads/ISO9001.png"
+                                alt="SNI ISO 9001"
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
                             />
                             <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">SNI ISO 9001</span>
                         </div>
                         <div className="flex flex-col items-center gap-3 group">
-                            <img 
-                                src="https://atekatehnik.com/wp-content/uploads/inaproc.png" 
-                                alt="E-Katalog INAPROC" 
-                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            <img
+                                src="https://atekatehnik.com/wp-content/uploads/inaproc.png"
+                                alt="E-Katalog INAPROC"
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
                             />
                             <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">E-Katalog INAPROC</span>
                         </div>
                         <div className="flex flex-col items-center gap-3 group">
-                            <img 
-                                src="https://atekatehnik.com/wp-content/uploads/mentri_industri.png" 
-                                alt="TKDN Compliant" 
-                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform" 
+                            <img
+                                src="https://atekatehnik.com/wp-content/uploads/mentri_industri.png"
+                                alt="TKDN Compliant"
+                                className="h-12 sm:h-16 md:h-20 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
                             />
                             <span className="font-headline font-semibold text-primary text-sm md:text-base tracking-wide">TKDN Compliant</span>
                         </div>

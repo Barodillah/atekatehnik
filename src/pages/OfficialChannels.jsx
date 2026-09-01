@@ -17,7 +17,7 @@ const OfficialChannels = () => {
         
         {/* Header Section */}
         <div className="text-center mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-bold text-xs tracking-widest uppercase mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-primary/10 text-primary font-bold text-xs tracking-widest uppercase mb-2">
             <span className="material-symbols-outlined text-sm">verified</span>
             {t('channels.badge')}
           </div>
@@ -32,12 +32,12 @@ const OfficialChannels = () => {
         <div className="grid lg:grid-cols-2 gap-10">
           
           {/* Official Section */}
-          <div className="bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 shadow-xl shadow-emerald-900/5 rounded-3xl p-6 md:p-10 relative overflow-hidden">
+          <div className="bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 shadow-xl shadow-emerald-900/5 rounded-sm p-6 md:p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"></div>
             
             <div className="relative z-10 space-y-8">
               <div className="flex items-center gap-4 border-b border-emerald-100 pb-6">
-                <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner">
+                <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-sm flex items-center justify-center shadow-inner">
                   <span className="material-symbols-outlined text-3xl">verified_user</span>
                 </div>
                 <div>
@@ -52,7 +52,7 @@ const OfficialChannels = () => {
                   <span className="material-symbols-outlined">location_on</span>
                   {t('channels.officialMapLabel')}
                 </h3>
-                <div className="w-full h-64 rounded-2xl overflow-hidden shadow-md border-2 border-emerald-100">
+                <div className="w-full h-64 rounded-sm overflow-hidden shadow-md border-2 border-emerald-100">
                   <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.5504399209117!2d110.9740423!3d-7.514775699999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a1bcc306b1955%3A0xdde6bfbc97d7a0e8!2sCV.%20ATEKA%20TEHNIK!5e0!3m2!1sid!2sid!4v1774947093135!5m2!1sid!2sid" 
                     className="w-full h-full border-0" 
@@ -73,25 +73,25 @@ const OfficialChannels = () => {
                   {t('channels.socialLabel')}
                 </h3>
                 <div className="flex flex-col gap-3">
-                  <a href="https://www.instagram.com/toko.ateka.tehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                  <a href="https://www.instagram.com/toko.ateka.tehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="IG" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">@toko.ateka.tehnik</span>
                   </a>
-                  <a href="https://www.facebook.com/warsito.atktehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                  <a href="https://www.facebook.com/warsito.atktehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">Ateka Tehnik</span>
                   </a>
-                  <a href="https://www.tiktok.com/@toko.ateka.tehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                  <a href="https://www.tiktok.com/@toko.ateka.tehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">@toko.ateka.tehnik</span>
                   </a>
-                  <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                  <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <div className="w-8 h-8 bg-[#ee4d2d] rounded-full flex items-center justify-center text-white">
                       <svg className="w-5 h-5" viewBox="0 0 192 192" fill="none"><path fill="currentColor" d="m29.004 157.064 5.987-.399-5.987.399ZM22 52v-6a6 6 0 0 0-5.987 6.4L22 52Zm140.996 105.064-5.987-.399 5.987.399ZM170 52l5.987.4A6 6 0 0 0 170 46v6ZM34.991 156.665 27.987 51.601l-11.974.798 7.005 105.064 11.973-.798Zm133.991.798 7.005-105.064-11.974-.798-7.004 105.064 11.973.798Zm-11.973-.798a10 10 0 0 1-9.978 9.335v12c11.582 0 21.181-8.98 21.951-20.537l-11.973-.798Zm-133.991.798C23.788 169.02 33.387 178 44.968 178v-12a10 10 0 0 1-9.977-9.335l-11.973.798ZM74 48c0-12.15 9.85-22 22-22V14c-18.778 0-34 15.222-34 34h12Zm22-22c12.15 0 22 9.85 22 22h12c0-18.778-15.222-34-34-34v12ZM22 58h148V46H22v12Zm22.969 120H147.03v-12H44.969v12Z"/></svg>
                     </div>
                     <span className="font-bold text-gray-700 group-hover:text-emerald-700">Toko Ateka Tehnik</span>
                   </a>
-                  <a href="https://youtube.com/@atekatehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
+                  <a href="https://youtube.com/@atekatehnik" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all group">
                     <svg className="w-8 h-8 text-[#FF0000]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd" />
                     </svg>
@@ -106,11 +106,11 @@ const OfficialChannels = () => {
                   <span className="material-symbols-outlined">shopping_cart</span>
                   Pemesanan Institusional (INAPROC)
                 </h3>
-                <div className="p-4 bg-white rounded-xl border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all">
+                <div className="p-4 bg-white rounded-sm border border-emerald-100 hover:shadow-md hover:border-emerald-300 transition-all">
                   <p className="text-sm text-gray-600 mb-4">
                     Pemesanan untuk pemerintahan / dinas dapat dilakukan secara transparan melalui E-Katalog LKPP karena kami adalah vendor resmi.
                   </p>
-                  <a href="https://katalog.inaproc.id/ateka-tehnik" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#D22B50] text-white font-bold text-sm rounded-lg hover:bg-[#D22B50]/90 transition-colors w-full sm:w-auto justify-center">
+                  <a href="https://katalog.inaproc.id/ateka-tehnik" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#D22B50] text-white font-bold text-sm rounded-sm hover:bg-[#D22B50]/90 transition-colors w-full sm:w-auto justify-center">
                     Kunjungi E-Katalog
                     <span className="material-symbols-outlined text-sm">open_in_new</span>
                   </a>
@@ -121,12 +121,12 @@ const OfficialChannels = () => {
           </div>
 
           {/* Unofficial Section */}
-          <div className="bg-gradient-to-b from-red-50 to-white border border-red-200 shadow-xl shadow-red-900/5 rounded-3xl p-6 md:p-10 relative overflow-hidden">
+          <div className="bg-gradient-to-b from-red-50 to-white border border-red-200 shadow-xl shadow-red-900/5 rounded-sm p-6 md:p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"></div>
             
             <div className="relative z-10 space-y-8">
               <div className="flex items-center gap-4 border-b border-red-100 pb-6">
-                <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center shadow-inner">
+                <div className="w-14 h-14 bg-red-100 text-red-600 rounded-sm flex items-center justify-center shadow-inner">
                   <span className="material-symbols-outlined text-3xl text-red-600">gpp_bad</span>
                 </div>
                 <div>
@@ -141,7 +141,7 @@ const OfficialChannels = () => {
                   <span className="material-symbols-outlined">location_on</span>
                   {t('channels.fakeMapLabel')}
                 </h3>
-                <div className="w-full h-64 rounded-2xl overflow-hidden shadow-md border-2 border-red-200 grayscale-[40%]">
+                <div className="w-full h-64 rounded-sm overflow-hidden shadow-md border-2 border-red-200 grayscale-[40%]">
                   <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.511742840282!2d106.54883767499815!3d-6.196007860700971!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ff98558bc3b7%3A0x162e53f9f4a950c9!2sAteka%20tehnik!5e0!3m2!1sid!2sid!4v1774947175889!5m2!1sid!2sid" 
                     className="w-full h-full border-0 pointer-events-none" 
@@ -151,7 +151,7 @@ const OfficialChannels = () => {
                   ></iframe>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <span className="text-xs font-semibold px-2 py-1 bg-red-100 text-red-700 rounded-md w-fit">{t('channels.ignoreLocation')}</span>
+                  <span className="text-xs font-semibold px-2 py-1 bg-red-100 text-red-700 rounded-sm w-fit">{t('channels.ignoreLocation')}</span>
                   <a href="https://maps.app.goo.gl/zJWx3yYU546QiFqTA" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-bold text-red-500 hover:text-red-800 transition-colors">
                     {t('channels.viewRef')} <span className="material-symbols-outlined text-sm">open_in_new</span>
                   </a>
@@ -164,7 +164,7 @@ const OfficialChannels = () => {
                   <span className="material-symbols-outlined">language</span>
                   {t('channels.fakeWebLabel')}
                 </h3>
-                <div className="p-4 bg-white rounded-xl border-2 border-dashed border-red-300 flex items-center justify-between">
+                <div className="p-4 bg-white rounded-sm border-2 border-dashed border-red-300 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-red-400">warning</span>
                     <div>
@@ -172,7 +172,7 @@ const OfficialChannels = () => {
                       <p className="text-xs text-red-600 font-medium tracking-wide">{t('channels.fakeWebNote')}</p>
                     </div>
                   </div>
-                  <a href="https://atekateknik.com/" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-lg transition-colors border border-red-100">
+                  <a href="https://atekateknik.com/" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-sm transition-colors border border-red-100">
                     {t('channels.fakeWebVisit')}
                   </a>
                 </div>

@@ -94,24 +94,25 @@ const ProductDetail = () => {
 
         const fetchRelated = async () => {
             try {
-                // First, fetch same-category products
-                const res = await fetch(`/api/products.php?kategori=${encodeURIComponent(product.kategori)}&limit=4`);
+                // First, fetch same-category products with lowest views
+                const res = await fetch(`/api/products.php?kategori=${encodeURIComponent(product.kategori)}&limit=15&sort_by=views&sort=ASC`);
                 const data = await res.json();
                 let items = [];
                 if (data.success && data.products) {
-                    items = data.products.filter(p => p.slug !== product.slug).slice(0, 3);
+                    let candidates = data.products.filter(p => p.slug !== product.slug);
+                    candidates.sort(() => 0.5 - Math.random());
+                    items = candidates.slice(0, 3);
                 }
 
-                // If fewer than 3, backfill from other categories
+                // If fewer than 3, backfill from other categories with lowest views
                 if (items.length < 3) {
-                    const allRes = await fetch(`/api/products.php?limit=20`);
+                    const allRes = await fetch(`/api/products.php?limit=25&sort_by=views&sort=ASC`);
                     const allData = await allRes.json();
                     if (allData.success && allData.products) {
                         const existingSlugs = new Set([product.slug, ...items.map(p => p.slug)]);
-                        const extras = allData.products
-                            .filter(p => !existingSlugs.has(p.slug))
-                            .slice(0, 3 - items.length);
-                        items = [...items, ...extras];
+                        let extras = allData.products.filter(p => !existingSlugs.has(p.slug));
+                        extras.sort(() => 0.5 - Math.random());
+                        items = [...items, ...extras.slice(0, 3 - items.length)];
                     }
                 }
 
@@ -291,15 +292,15 @@ const ProductDetail = () => {
                             </div>
                         </div>
                         <div className="order-1 lg:order-2 relative">
-                            <button
-                                onClick={() => setShowShareModal(true)}
-                                className="absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 bg-surface-container-lowest hover:bg-primary text-on-surface-variant hover:text-white p-3 md:p-4 rounded-full shadow-sm md:shadow-xl hover:shadow-[0_10px_20px_-5px_rgba(0,31,91,0.3)] transition-all duration-300 z-30 group border border-outline-variant/20 hover:border-primary"
-                                title={lang === 'id' ? 'Bagikan produk ini' : 'Share this product'}
-                            >
+                                <button
+                                    onClick={() => setShowShareModal(true)}
+                                    className="absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 bg-surface-container-lowest hover:bg-primary text-on-surface-variant hover:text-white p-3 md:p-4 rounded-sm shadow-sm md:shadow-xl hover:shadow-[0_10px_20px_-5px_rgba(0,31,91,0.3)] transition-all duration-300 z-30 group border border-outline-variant/20 hover:border-primary"
+                                    title={lang === 'id' ? 'Bagikan produk ini' : 'Share this product'}
+                                >
                                 <span className="material-symbols-outlined text-[20px] md:text-[24px] block group-hover:scale-110 transition-transform">share</span>
                             </button>
-                            <div className="absolute inset-0 bg-primary/5 rounded-3xl -rotate-2 scale-105 hidden lg:block"></div>
-                            <div className="relative bg-surface-container-lowest p-2 md:p-4 rounded-lg shadow-xl md:shadow-2xl cursor-pointer group" onClick={() => { setIsModalOpen(true); setCurrentMediaIndex(0); }}>
+                            <div className="absolute inset-0 bg-primary/5 rounded-sm -rotate-2 scale-105 hidden lg:block"></div>
+                            <div className="relative bg-surface-container-lowest p-2 md:p-4 rounded-sm shadow-xl md:shadow-2xl cursor-pointer group" onClick={() => { setIsModalOpen(true); setCurrentMediaIndex(0); }}>
                                 {mediaItems.length > 0 ? (
                                     <>
                                         {isVideo(mediaItems[0]) ? (
@@ -314,7 +315,7 @@ const ProductDetail = () => {
                                             />
                                         )}
                                         {mediaItems.length > 1 && (
-                                            <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md z-10 flex items-center gap-1 shadow-lg">
+                                            <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-sm text-xs font-bold backdrop-blur-md z-10 flex items-center gap-1 shadow-lg">
                                                 <span className="material-symbols-outlined text-[14px]">photo_library</span>
                                                 {mediaItems.length}
                                             </div>
@@ -369,7 +370,7 @@ const ProductDetail = () => {
                                 <h2 className="font-headline text-4xl font-extrabold text-primary mb-4">{t('productGrid.specLabel') || (lang === 'id' ? 'Spesifikasi Teknis' : 'Technical Specifications')}</h2>
                                 <div className="h-1 w-20 bg-secondary"></div>
                             </div>
-                            <div className="bg-surface-container-lowest shadow-sm rounded-lg border border-outline-variant/10 overflow-hidden">
+                            <div className="bg-surface-container-lowest shadow-sm rounded-sm border border-outline-variant/10 overflow-hidden">
                                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline-variant/20">
                                     {(() => {
                                         const parsedSpecs = product.spesifikasi.map(spec => {
@@ -439,7 +440,7 @@ const ProductDetail = () => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {relatedProducts.map(relProduct => (
-                                    <Link to={`/product/${relProduct.slug}`} key={relProduct.slug || relProduct.id} className="group block bg-white border border-outline-variant/20 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,31,91,0.15)] transition-all duration-300 transform hover:-translate-y-1 relative">
+                                    <Link to={`/product/${relProduct.slug}`} key={relProduct.slug || relProduct.id} className="group block bg-white border border-outline-variant/20 overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,31,91,0.15)] transition-all duration-300 transform hover:-translate-y-1 relative">
                                         <div className="aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
                                             {relProduct.gambar ? (
                                                 <img src={relProduct.gambar.split(',')[0].trim()} alt={relProduct.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -449,7 +450,7 @@ const ProductDetail = () => {
                                                 </div>
                                             )}
                                             <div className="absolute top-4 left-4 z-10">
-                                                <span className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-md text-white ${relProduct.kategori === 'Paket' ? 'bg-gradient-to-r from-[#904d00] to-[#b86200]'
+                                                <span className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest shadow-md text-white ${relProduct.kategori === 'Paket' ? 'bg-gradient-to-r from-[#904d00] to-[#b86200]'
                                                     : relProduct.kategori === 'Unit Mesin Tunggal' ? 'bg-gradient-to-r from-[#1a237e] to-[#3949ab]'
                                                         : relProduct.kategori === 'Peralatan Pendukung' ? 'bg-gradient-to-r from-[#1b5e20] to-[#2e7d32]'
                                                             : 'bg-gradient-to-r from-[#001f5b] to-[#003399]'
@@ -464,7 +465,7 @@ const ProductDetail = () => {
                                         </div>
                                         <div className="p-6 relative z-20 bg-white">
                                             <h3 className="text-xl font-bold text-[#001f5b] mb-2 line-clamp-2 leading-tight">{relProduct.nama}</h3>
-                                            <p className="text-[#4a5568] text-sm line-clamp-2 mb-6 leading-relaxed bg-white">{relProduct.description}</p>
+                                            <div className="text-[#4a5568] text-sm line-clamp-2 mb-6 leading-relaxed bg-white" dangerouslySetInnerHTML={{ __html: parseMarkdown(relProduct.description || '') }} />
                                             <span className="text-secondary font-bold text-xs uppercase tracking-widest flex items-center gap-2 group-hover:text-[#001f5b] transition-colors relative z-30 inline-block bg-white pr-2 pb-2">
                                                 {lang === 'id' ? 'Lihat Detail' : 'View Details'} <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform relative top-0.5 inline-block">arrow_forward</span>
                                             </span>
@@ -540,7 +541,7 @@ const ProductDetail = () => {
             {/* Share Modal */}
             {showShareModal && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-surface p-8 rounded-md max-w-sm w-full shadow-2xl relative mx-4 animate-in zoom-in duration-300">
+                    <div className="bg-surface p-8 rounded-sm max-w-sm w-full shadow-2xl relative mx-4 animate-in zoom-in duration-300">
                         <button onClick={() => setShowShareModal(false)} className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface">
                             <span className="material-symbols-outlined">close</span>
                         </button>

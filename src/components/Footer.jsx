@@ -7,7 +7,10 @@ const Footer = () => {
     <footer className="bg-[#001f5b] dark:bg-[#000c2e] w-full pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-1 space-y-6">
-          <div className="text-xl font-bold text-white font-headline">ATEKA TEHNIK</div>
+          <div className="flex items-center gap-2 text-xl font-bold text-white font-headline">
+            <img src="/logo-white.png" alt="Ateka Tehnik Logo" className="h-8 md:h-10" />
+            ATEKA TEHNIK
+          </div>
           <p className="text-slate-400 text-sm leading-relaxed">{t('footer.desc')}</p>
         </div>
         <div className="space-y-4">

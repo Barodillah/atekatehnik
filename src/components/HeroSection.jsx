@@ -45,7 +45,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
           {/* Left: Text Content */}
           <div className="max-w-3xl space-y-8">
-            <div className="inline-flex items-center gap-2 bg-secondary-fixed text-on-secondary-fixed px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-md border border-secondary-fixed/20 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 bg-secondary-fixed text-on-secondary-fixed px-4 py-2 rounded-sm text-xs font-bold tracking-widest uppercase shadow-md border border-secondary-fixed/20 backdrop-blur-md">
               <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
               {t('hero.badge')}
             </div>
@@ -68,7 +68,7 @@ const HeroSection = () => {
 
             {/* Mobile: stat inline below CTAs */}
             <div className="lg:hidden pt-4">
-              <div className="inline-flex items-center gap-4 bg-primary/90 backdrop-blur-xl px-6 py-4 rounded-xl shadow-lg border border-white/10">
+              <div className="inline-flex items-center gap-4 bg-primary/90 backdrop-blur-xl px-6 py-4 rounded-sm shadow-lg border border-white/10">
                 <div className="text-4xl font-black font-headline text-white">20+</div>
                 <div className="text-[11px] uppercase tracking-widest text-white/80 font-bold max-w-[100px] leading-tight">
                   {t('hero.stat')}
@@ -79,7 +79,7 @@ const HeroSection = () => {
 
           {/* Right: Highlight Stat Card (desktop only) */}
           <div className="hidden lg:flex flex-col items-center justify-center shrink-0">
-            <div className="bg-primary/90 backdrop-blur-xl px-10 py-10 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,31,91,0.5)] border border-white/10 text-center relative overflow-hidden group hover:scale-105 transition-transform duration-500">
+            <div className="bg-primary/90 backdrop-blur-xl px-10 py-10 rounded-sm shadow-[0_25px_60px_-15px_rgba(0,31,91,0.5)] border border-white/10 text-center relative overflow-hidden group hover:scale-105 transition-transform duration-500">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
               <div className="relative z-10">
                 <div className="text-7xl font-black font-headline text-white leading-none mb-2">20+</div>

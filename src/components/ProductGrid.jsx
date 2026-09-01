@@ -143,7 +143,7 @@ const ProductGrid = () => {
                 </div>
               </details>
             </div>
-            <a href="https://katalog.inaproc.id/ateka-tehnik" target="_blank" rel="noreferrer" className="shrink-0 bg-[#D22B50] text-white px-8 py-3 font-headline font-bold uppercase tracking-widest text-sm hover:bg-[#D22B50]/90 transition-colors">
+            <a href="https://katalog.inaproc.id/ateka-tehnik" target="_blank" rel="noreferrer" className="shrink-0 bg-[#D22B50] text-white px-8 py-3 font-headline font-bold uppercase tracking-widest text-sm rounded-sm hover:bg-[#D22B50]/90 transition-colors">
               Kunjungi INAPROC
             </a>
           </div>

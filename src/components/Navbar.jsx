@@ -157,7 +157,8 @@ const Navbar = () => {
       <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#000c2e]/80 backdrop-blur-md shadow-[0_32px_32px_rgba(25,28,29,0.04)]">
         <div className="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20">
           {/* Logo */}
-          <Link className="text-xl md:text-2xl font-black tracking-tighter text-[#001f5b] dark:text-white font-headline" to="/">
+          <Link className="flex items-center gap-2 text-xl md:text-2xl font-black tracking-tighter text-[#001f5b] dark:text-white font-headline" to="/">
+            <img src="/logo-dark.png" alt="Ateka Tehnik Logo" className="h-8 md:h-10" />
             ATEKA TEHNIK
           </Link>
 
@@ -209,7 +210,7 @@ const Navbar = () => {
             {/* Language Toggle */}
             <button
               onClick={toggleLang}
-              className="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 px-3 py-1.5 rounded-full transition-all duration-200 group hover:shadow-sm"
+              className="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 px-3 py-1.5 rounded-sm transition-all duration-200 group hover:shadow-sm"
               title={lang === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
             >
               <span className={`fi ${lang === 'id' ? 'fi-id' : 'fi-gb'} rounded-sm`} style={{ fontSize: '1rem' }}></span>
@@ -244,7 +245,7 @@ const Navbar = () => {
           />
           {/* Search Box */}
           <div className="relative w-full max-w-3xl px-4 z-10 animate-in fade-in zoom-in-95 duration-200">
-            <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-white dark:bg-[#000c2e] rounded-xl shadow-2xl p-2 border border-outline-variant/20">
+            <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-white dark:bg-[#000c2e] rounded-sm shadow-2xl p-2 border border-outline-variant/20">
               <span className="material-symbols-outlined text-outline-variant ml-4 text-2xl">search</span>
               <input
                 ref={searchInputRef}
@@ -258,7 +259,7 @@ const Navbar = () => {
                 {/* Enter to search Button */}
                 <button
                   type="submit"
-                  className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-surface-container-low dark:bg-white/5 border border-outline-variant/30 rounded-full text-outline-variant hover:text-primary-container dark:hover:text-white transition-colors"
+                  className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-surface-container-low dark:bg-white/5 border border-outline-variant/30 rounded-sm text-outline-variant hover:text-primary-container dark:hover:text-white transition-colors"
                   title="Tekan Enter untuk mencari"
                 >
                   <span className="text-xs font-bold uppercase tracking-widest">Enter</span>
@@ -287,7 +288,7 @@ const Navbar = () => {
 
             {/* Search Results */}
             {searchQuery && (
-              <div className="mt-4 bg-white dark:bg-[#000c2e] rounded-xl shadow-2xl border border-outline-variant/20 overflow-hidden max-h-[60vh] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-200">
+              <div className="mt-4 bg-white dark:bg-[#000c2e] rounded-sm shadow-2xl border border-outline-variant/20 overflow-hidden max-h-[60vh] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-200">
                 {isSearching ? (
                   <div className="p-8 flex flex-col items-center text-outline-variant">
                     <span className="material-symbols-outlined animate-spin text-2xl mb-2">progress_activity</span>

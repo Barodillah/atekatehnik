@@ -354,10 +354,10 @@ const Post = () => {
                             <Link
                                 key={prod.product_slug}
                                 to={`/product/${prod.product_slug}`}
-                                className="group bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 flex flex-col relative overflow-hidden h-full"
+                                className="group bg-surface-container-lowest border border-outline-variant/30 rounded-sm p-4 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 flex flex-col relative overflow-hidden h-full"
                             >
                                 <div className="flex gap-4">
-                                    <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-surface rounded-lg overflow-hidden relative border border-outline-variant/10">
+                                    <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-surface rounded-sm overflow-hidden relative border border-outline-variant/10">
                                         {prod.gambar ? (
                                             <img src={prod.gambar.split(',')[0].trim()} alt={prod.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         ) : (
@@ -542,7 +542,7 @@ const Post = () => {
             {/* Comment Confirmation Modal */}
             {showCommentModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-surface p-8 rounded-md max-w-md w-full shadow-2xl relative mx-4">
+                    <div className="bg-surface p-8 rounded-sm max-w-md w-full shadow-2xl relative mx-4">
                         <button onClick={() => setShowCommentModal(false)} className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface">
                             <span className="material-symbols-outlined">close</span>
                         </button>
@@ -611,7 +611,7 @@ const Post = () => {
             {/* Share Modal */}
             {showShareModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-surface p-8 rounded-md max-w-sm w-full shadow-2xl relative mx-4">
+                    <div className="bg-surface p-8 rounded-sm max-w-sm w-full shadow-2xl relative mx-4">
                         <button onClick={() => setShowShareModal(false)} className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface">
                             <span className="material-symbols-outlined">close</span>
                         </button>
