@@ -1,5 +1,6 @@
-import React from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import ReactGA from 'react-ga4';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
@@ -58,7 +59,17 @@ const PublicLayout = () => {
   );
 };
 
+// Initialize Google Analytics
+ReactGA.initialize("G-VPFES0SYFN");
+
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Send pageview with a custom path whenever location changes
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location.pathname]);
+
   return (
     <LanguageProvider>
       <Routes>

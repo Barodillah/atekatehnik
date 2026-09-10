@@ -59,7 +59,7 @@ const QuickStats = () => {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
                         <div className="flex flex-col items-center justify-start p-2 md:p-4">
                             <div className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-secondary mb-1 md:mb-2">
-                                <AnimatedCounter end={20} suffix="+" />
+                                <AnimatedCounter end={new Date().getFullYear() - 2004} suffix="+" />
                             </div>
                             <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{t('about.statYears')}</div>
                         </div>

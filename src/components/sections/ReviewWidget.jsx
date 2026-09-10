@@ -6,7 +6,7 @@ const ReviewWidget = () => {
   useEffect(() => {
     if (containerRef.current && !containerRef.current.querySelector('script')) {
       const script = document.createElement('script');
-      script.src = 'https://cdn.trustindex.io/loader.js?1eb1de880f5143708a567b2e380';
+      script.src = 'https://widgets.sociablekit.com/google-reviews/widget.js';
       script.defer = true;
       script.async = true;
       containerRef.current.appendChild(script);
@@ -16,10 +16,11 @@ const ReviewWidget = () => {
   return (
     <section className="bg-surface py-12 px-4 md:px-8">
       <div className="max-w-7xl mx-auto w-full relative" ref={containerRef}>
-        {/* Trustindex widget will load here */}
+        <div className="sk-ww-google-reviews" data-embed-id="25712675"></div>
       </div>
     </section>
   );
 };
 
 export default ReviewWidget;
+

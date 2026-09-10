@@ -22,10 +22,12 @@ body {
   .animate-slide {
     animation: slide 90s linear infinite;
   }
+
   @keyframes slide {
     from {
       transform: translateX(0);
     }
+
     to {
       transform: translateX(-100%);
     }
@@ -35,6 +37,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -45,3 +48,30 @@ body {
   }
 }
 
+/* Global Custom Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ffdcc480 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffdcc480; /* 50% opacity of #ffdcc4 */
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffdcc4cc; /* 80% opacity of #ffdcc4 */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
