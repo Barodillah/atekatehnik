@@ -180,7 +180,7 @@ foreach ($postIdMap as $post) {
         'badge'    => $post['category'],
         'desc'     => $post['subtitle'] ?: '',
         'snippet'  => $snippet,
-        'link'     => '/post/' . $post['slug'],
+        'link'     => ($post['category'] === 'Industrial Installations' ? '/portfolio/' : '/news/') . $post['slug'],
         'language' => $post['language'],
     ];
 }
