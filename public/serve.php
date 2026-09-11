@@ -24,38 +24,85 @@ $baseUri = parse_url($requestUri, PHP_URL_PATH);
 $baseUri = rtrim($baseUri, '/');
 if (empty($baseUri)) $baseUri = '/';
 
+$pageSchemaType = 'WebPage'; // Default fallback
+
 switch ($baseUri) {
+    case '/':
+        $title = "ATEKA TEHNIK | Supplier Penggilingan Padi Terbaik di Indonesia";
+        $pageSchemaType = 'WebSite';
+        break;
     case '/products':
         $title = "Produk | ATEKA TEHNIK";
+        $pageSchemaType = 'CollectionPage';
         break;
     case '/about':
         $title = "Tentang Kami | ATEKA TEHNIK";
+        $pageSchemaType = 'AboutPage';
         break;
     case '/contact':
         $title = "Hubungi Kami | ATEKA TEHNIK";
+        $pageSchemaType = 'ContactPage';
         break;
     case '/portfolio':
         $title = "Portofolio | ATEKA TEHNIK";
+        $pageSchemaType = 'CollectionPage';
+        break;
+    case '/gallery':
+        $title = "Galeri | ATEKA TEHNIK";
+        $pageSchemaType = 'ImageGallery';
+        break;
+    case '/news':
+        $title = "Berita Terbaru | ATEKA TEHNIK";
+        $pageSchemaType = 'CollectionPage';
         break;
     case '/edukasi':
         $title = "Edukasi Pasca Panen | ATEKA TEHNIK";
+        $pageSchemaType = 'CollectionPage';
         break;
     case '/search':
         $title = "Hasil Pencarian | ATEKA TEHNIK";
+        $pageSchemaType = 'SearchResultsPage';
         break;
     case '/official-channels':
         $title = "Official Channels | ATEKA TEHNIK";
+        $pageSchemaType = 'WebPage';
         break;
     case '/privacy-policy':
         $title = "Kebijakan Privasi | ATEKA TEHNIK";
+        $pageSchemaType = 'WebPage';
         break;
     case '/terms-of-service':
         $title = "Syarat Ketentuan | ATEKA TEHNIK";
+        $pageSchemaType = 'WebPage';
+        break;
+    case '/faq':
+        $title = "FAQ & Bantuan | ATEKA TEHNIK";
+        $pageSchemaType = 'FAQPage';
         break;
 }
 
-$isPost = preg_match('/^\/post\/([^\/?]+)/', $requestUri, $postMatches);
+$isPost = preg_match('/^\/(?:post|portfolio|news)\/([^\/?]+)/', $requestUri, $postMatches);
 $isProduct = preg_match('/^\/product\/([^\/?]+)/', $requestUri, $productMatches);
+
+$jsonLdGraph = [
+    [
+        '@type' => 'Organization',
+        '@id' => 'https://atekatehnik.com/#organization',
+        'name' => 'CV Ateka Tehnik',
+        'url' => 'https://atekatehnik.com',
+        'logo' => [
+            '@type' => 'ImageObject',
+            '@id' => 'https://atekatehnik.com/#logo',
+            'url' => 'https://atekatehnik.com/favicon.png',
+            'caption' => 'CV Ateka Tehnik'
+        ],
+        'description' => 'Spesialis Supplier Penggilingan Padi Terbaik di Indonesia.',
+        'sameAs' => [
+            'https://www.instagram.com/toko.ateka.tehnik',
+            'https://www.tiktok.com/@toko.ateka.tehnik'
+        ]
+    ]
+]; // Base JSON-LD structured data graph
 
 if ($isPost || $isProduct) {
     $slug = $isPost ? $postMatches[1] : $productMatches[1];
@@ -68,7 +115,7 @@ if ($isPost || $isProduct) {
 
         try {
             if ($isPost) {
-                $stmt = $db->prepare("SELECT title, subtitle, cover_image FROM posts WHERE slug = :slug");
+                $stmt = $db->prepare("SELECT title, subtitle, cover_image, category, publish_date FROM posts WHERE slug = :slug");
                 $stmt->execute([':slug' => $slug]);
                 $item = $stmt->fetch();
 
@@ -95,19 +142,121 @@ if ($isPost || $isProduct) {
                     $description = substr($description, 0, 157) . "...";
                 }
 
+                // Process image(s)
+                $imageUrls = [];
                 if (!empty($imageRaw)) {
-                    // If multiple images are comma-separated, take the first one
                     $imageParts = explode(',', $imageRaw);
-                    $firstImage = trim($imageParts[0]);
-
-                    // If it's a relative path, make it absolute using hostname
-                    // Otherwise keep it as is
-                    if (strpos($firstImage, 'http') === 0) {
-                        $image = $firstImage;
-                    } else {
-                        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'atekatehnik.com';
-                        $image = "https://" . $host . (strpos($firstImage, '/') === 0 ? '' : '/') . $firstImage;
+                    foreach ($imageParts as $imgPart) {
+                        $imgTrimmed = trim($imgPart);
+                        if (empty($imgTrimmed)) continue;
+                        if (strpos($imgTrimmed, 'http') === 0) {
+                            $imageUrls[] = $imgTrimmed;
+                        } else {
+                            $hostForImg = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'atekatehnik.com';
+                            $imageUrls[] = "https://" . $hostForImg . (strpos($imgTrimmed, '/') === 0 ? '' : '/') . $imgTrimmed;
+                        }
                     }
+                    // Use first image for OG tags
+                    $image = $imageUrls[0] ?? $image;
+                }
+
+                // Build JSON-LD Structured Data
+                if ($isPost && !empty($item)) {
+                    $schemaType = ($item['category'] === 'Industrial Installations') ? 'Article' : 'NewsArticle';
+                    $publishDate = !empty($item['publish_date']) ? date('c', strtotime($item['publish_date'])) : date('c');
+
+                    $postLd = [
+                        '@type' => $schemaType,
+                        '@id' => 'https://atekatehnik.com' . $requestUri . '#article',
+                        'headline' => $item['title'],
+                        'image' => !empty($imageUrls) ? $imageUrls : ['https://atekatehnik.com/preview.jpg'],
+                        'datePublished' => $publishDate,
+                        'dateModified' => $publishDate,
+                        'author' => [
+                            '@id' => 'https://atekatehnik.com/#organization'
+                        ],
+                        'publisher' => [
+                            '@id' => 'https://atekatehnik.com/#organization'
+                        ],
+                        'description' => $description
+                    ];
+                    $jsonLdGraph[] = $postLd;
+                } elseif ($isProduct && !empty($item)) {
+                    $productDesc = trim(strip_tags($item['description'] ?? ''));
+                    if (strlen($productDesc) > 300) {
+                        $productDesc = substr($productDesc, 0, 297) . "...";
+                    }
+
+                    $productLd = [
+                        '@type' => 'Product',
+                        '@id' => 'https://atekatehnik.com' . $requestUri . '#product',
+                        'name' => $item['nama'],
+                        'image' => !empty($imageUrls) ? $imageUrls : ['https://atekatehnik.com/preview.jpg'],
+                        'description' => !empty($productDesc) ? $productDesc : 'Mesin penggilingan padi berkualitas tinggi dari CV Ateka Tehnik.',
+                        'brand' => [
+                            '@type' => 'Brand',
+                            'name' => 'CV Ateka Tehnik'
+                        ],
+                        'aggregateRating' => [
+                            '@type' => 'AggregateRating',
+                            'ratingValue' => '5',
+                            'reviewCount' => '1'
+                        ],
+                        'review' => [
+                            [
+                                '@type' => 'Review',
+                                'reviewRating' => [
+                                    '@type' => 'Rating',
+                                    'ratingValue' => '5',
+                                    'bestRating' => '5'
+                                ],
+                                'author' => [
+                                    '@type' => 'Person',
+                                    'name' => 'Pelanggan Ateka Tehnik'
+                                ]
+                            ]
+                        ],
+                        'offers' => [
+                            '@type' => 'Offer',
+                            'priceCurrency' => 'IDR',
+                            'price' => '0',
+                            'availability' => 'https://schema.org/InStock',
+                            'description' => 'Harga Bersaing — Hubungi kami untuk penawaran terbaik',
+                            'hasMerchantReturnPolicy' => [
+                                '@type' => 'MerchantReturnPolicy',
+                                'applicableCountry' => 'ID',
+                                'returnPolicyCategory' => 'https://schema.org/MerchantReturnNotPermitted'
+                            ],
+                            'shippingDetails' => [
+                                '@type' => 'OfferShippingDetails',
+                                'shippingRate' => [
+                                    '@type' => 'MonetaryAmount',
+                                    'value' => 0,
+                                    'currency' => 'IDR'
+                                ],
+                                'shippingDestination' => [
+                                    '@type' => 'DefinedRegion',
+                                    'addressCountry' => 'ID'
+                                ],
+                                'deliveryTime' => [
+                                    '@type' => 'ShippingDeliveryTime',
+                                    'handlingTime' => [
+                                        '@type' => 'QuantitativeValue',
+                                        'minValue' => 0,
+                                        'maxValue' => 7,
+                                        'unitCode' => 'd'
+                                    ],
+                                    'transitTime' => [
+                                        '@type' => 'QuantitativeValue',
+                                        'minValue' => 1,
+                                        'maxValue' => 14,
+                                        'unitCode' => 'd'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ];
+                    $jsonLdGraph[] = $productLd;
                 }
             }
 
@@ -115,6 +264,18 @@ if ($isPost || $isProduct) {
             // Ignore DB errors and fallback to default tags silently
         }
     }
+} else {
+    // Inject schema for static pages
+    $jsonLdGraph[] = [
+        '@type' => $pageSchemaType,
+        '@id' => 'https://atekatehnik.com' . $requestUri . '#webpage',
+        'url' => 'https://atekatehnik.com' . $requestUri,
+        'name' => $title,
+        'description' => $description,
+        'publisher' => [
+            '@id' => 'https://atekatehnik.com/#organization'
+        ]
+    ];
 }
 
 // Ensure proper Host
@@ -136,4 +297,13 @@ $html = preg_replace('/<meta[^>]*name="twitter:title"[^>]*>/i', '<meta name="twi
 $html = preg_replace('/<meta[^>]*name="twitter:description"[^>]*>/i', '<meta name="twitter:description" content="' . htmlspecialchars($description) . '" />', $html);
 $html = preg_replace('/<meta[^>]*name="twitter:image"[^>]*>/i', '<meta name="twitter:image" content="' . htmlspecialchars($image) . '" />', $html);
 
+// Inject JSON-LD Structured Data (Schema Markup)
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@graph' => $jsonLdGraph
+];
+$jsonLdScript = '<script type="application/ld+json">' . json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . '</script>';
+$html = str_replace('</head>', $jsonLdScript . "\n</head>", $html);
+
 echo $html;
+

@@ -13,7 +13,7 @@ const Portfolio = () => {
     const newsProjects = projects.filter(p => p.category !== 'Industrial Installations');
 
     const ProjectCard = ({ project }) => (
-        <Link to={`/post/${project.slug}`} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
+        <Link to={`/portfolio/${project.slug}`} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
             <div className="aspect-[4/3] overflow-hidden bg-surface-container">
                 {project.cover_image ? (
                     <img
@@ -51,7 +51,7 @@ const Portfolio = () => {
     );
 
     const NewsCard = ({ project }) => (
-        <Link to={`/post/${project.slug}`} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300 text-left">
+        <Link to={`/news/${project.slug}`} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300 text-left">
             <div className="w-[120px] sm:w-[180px] shrink-0 bg-surface-container overflow-hidden relative min-h-[120px] sm:min-h-[140px]">
                 {project.cover_image ? (
                     <img
@@ -156,7 +156,7 @@ const Portfolio = () => {
                                     <span className="block text-xs font-label text-on-surface-variant uppercase tracking-wider">{t('portfolioPage.statPurity')}</span>
                                 </div>
                             </div>
-                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/post/pemasangan-rmu-23-tonjam-di-palembang-sumatera-selatan">
+                            <Link className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all" to="/portfolio/pemasangan-rmu-23-tonjam-di-palembang-sumatera-selatan">
                                 {t('portfolioPage.viewSpecs')} <span className="material-symbols-outlined">arrow_forward</span>
                             </Link>
                         </div>

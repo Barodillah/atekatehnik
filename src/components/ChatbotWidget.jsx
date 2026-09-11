@@ -209,9 +209,9 @@ Konten/Topik Terlihat: ${headings || 'Halaman Landing/General'}`;
       refList += '\n### ARTIKEL/POST:\n';
       if (postData.success) {
         postData.data?.posts?.forEach(p => {
-          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "/post/${p.slug}"\n`;
+          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "${p.category === 'Industrial Installations' ? '/portfolio' : '/news'}/${p.slug}"\n`;
         }) || postData.posts?.forEach(p => {
-          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "/post/${p.slug}"\n`;
+          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "${p.category === 'Industrial Installations' ? '/portfolio' : '/news'}/${p.slug}"\n`;
         });
       }
 

@@ -491,7 +491,7 @@ const ProductDetail = () => {
                             </div>
                             <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
                                 {relatedPosts.map((rPost) => (
-                                    <Link to={`/post/${rPost.slug}`} key={rPost.slug || rPost.id} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300">
+                                    <Link to={rPost.category === 'Industrial Installations' ? `/portfolio/${rPost.slug}` : `/news/${rPost.slug}`} key={rPost.slug || rPost.id} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300">
                                         <div className="w-[120px] sm:w-[180px] shrink-0 bg-surface-container overflow-hidden relative min-h-[120px] sm:min-h-[140px]">
                                             {rPost.cover_image ? (
                                                 <img

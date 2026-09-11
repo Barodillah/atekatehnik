@@ -34,7 +34,7 @@ const Portfolio = () => {
   const renderPortfolio = (projectList) => (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {projectList.map((project) => (
-        <Link to={`/post/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
+        <Link to={`/portfolio/${project.slug}`} key={project.id} className="group bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-xl hover:border-secondary transition-all duration-500 flex flex-col text-left">
           <div className="aspect-[4/3] overflow-hidden bg-surface-container relative">
             {project.cover_image ? (
               <img
@@ -76,7 +76,7 @@ const Portfolio = () => {
   const renderNews = (projectList) => (
     <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
       {projectList.map((project) => (
-        <Link to={`/post/${project.slug}`} key={project.id} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300">
+        <Link to={`/news/${project.slug}`} key={project.id} className="group flex bg-surface-container-lowest rounded-sm overflow-hidden border border-outline-variant/20 hover:shadow-md hover:border-secondary transition-all duration-300">
           <div className="w-[120px] sm:w-[180px] shrink-0 bg-surface-container overflow-hidden relative min-h-[120px] sm:min-h-[140px]">
             {project.cover_image ? (
               <img

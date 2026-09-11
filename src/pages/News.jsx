@@ -146,7 +146,7 @@ const News = () => {
                 {/* Featured Article */}
                 {featuredPost && (
                     <section className="mb-16">
-                        <Link to={`/post/${featuredPost.slug}`} className="group block overflow-hidden bg-surface-container-lowest shadow-[0_32px_32px_rgba(25,28,29,0.04)] rounded-sm flex flex-col lg:flex-row border-l-4 border-secondary hover:shadow-[0_32px_32px_rgba(25,28,29,0.1)] transition-all duration-300">
+                        <Link to={`/news/${featuredPost.slug}`} className="group block overflow-hidden bg-surface-container-lowest shadow-[0_32px_32px_rgba(25,28,29,0.04)] rounded-sm flex flex-col lg:flex-row border-l-4 border-secondary hover:shadow-[0_32px_32px_rgba(25,28,29,0.1)] transition-all duration-300">
                             <div className="lg:w-2/3 h-[300px] lg:h-auto relative overflow-hidden bg-surface-container shrink-0">
                                 {featuredPost.cover_image ? (
                                     <img 
@@ -193,7 +193,7 @@ const News = () => {
                 {gridPosts.length > 0 && (
                     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
                         {gridPosts.map((post) => (
-                            <Link to={`/post/${post.slug}`} key={post.id} className="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300 group border border-outline-variant/10 rounded-sm overflow-hidden">
+                            <Link to={`/news/${post.slug}`} key={post.id} className="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300 group border border-outline-variant/10 rounded-sm overflow-hidden">
                                 <div className="aspect-video w-full mb-6 overflow-hidden bg-surface-container">
                                     {post.cover_image ? (
                                         <img 

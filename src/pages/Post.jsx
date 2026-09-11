@@ -510,7 +510,7 @@ const Post = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {relatedInstallations.map(project => (
-                            <Link to={`/post/${project.slug}`} key={project.id} className="group block bg-surface-container-low border border-outline-variant/30 rounded-sm overflow-hidden hover:shadow-xl transition-all">
+                            <Link to={project.category === 'Industrial Installations' ? `/portfolio/${project.slug}` : `/news/${project.slug}`} key={project.id} className="group block bg-surface-container-low border border-outline-variant/30 rounded-sm overflow-hidden hover:shadow-xl transition-all">
                                 <div className="aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
                                     <img src={project.cover_image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000'} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 font-bold text-[10px] tracking-widest uppercase text-primary">

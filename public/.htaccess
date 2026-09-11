@@ -17,7 +17,7 @@
   RewriteRule ^llms-full\.txt$ api/llms.php?mode=full [L,QSA]
   RewriteRule ^llms-products\.txt$ api/llms.php?mode=products [L,QSA]
   RewriteRule ^llms-portfolio\.txt$ api/llms.php?mode=portfolio [L,QSA]
-  RewriteRule ^llms-edukasi\.txt$ api/llms.php?mode=edukasi [L,QSA]
+  RewriteRule ^llms-news\.txt$ api/llms.php?mode=news [L,QSA]
   RewriteRule ^llms-about\.txt$ api/llms.php?mode=about [L,QSA]
   RewriteRule ^llms-faq\.txt$ api/llms.php?mode=faq [L,QSA]
   RewriteRule ^llms-contact\.txt$ api/llms.php?mode=contact [L,QSA]

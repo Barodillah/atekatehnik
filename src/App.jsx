@@ -83,6 +83,9 @@ function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/news" element={<News />} />
+          <Route path="/portfolio/:slug" element={<Post />} />
+          <Route path="/news/:slug" element={<Post />} />
+          {/* Fallback for legacy links and admin comments */}
           <Route path="/post/:slug" element={<Post />} />
           <Route path="/official-channels" element={<OfficialChannels />} />
           <Route path="/search" element={<SearchResults />} />

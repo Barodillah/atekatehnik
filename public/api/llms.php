@@ -31,7 +31,7 @@ define('MAX_DESCRIPTION_LENGTH', 120);
 
 // ── Determine Mode ───────────────────────────────────────────────────
 $mode = $_GET['mode'] ?? 'summary';
-$validModes = ['summary', 'full', 'robots', 'sitemap', 'products', 'portfolio', 'edukasi', 'about', 'faq', 'contact', 'official-channels', 'guide'];
+$validModes = ['summary', 'full', 'robots', 'sitemap', 'products', 'portfolio', 'news', 'about', 'faq', 'contact', 'official-channels', 'guide'];
 if (!in_array($mode, $validModes)) {
     $mode = 'summary';
 }
@@ -80,8 +80,8 @@ try {
         $markdown = generateProducts($db);
     } elseif ($mode === 'portfolio') {
         $markdown = generatePortfolio($db);
-    } elseif ($mode === 'edukasi') {
-        $markdown = generateEdukasi($db);
+    } elseif ($mode === 'news') {
+        $markdown = generateNews($db);
     } elseif ($mode === 'about') {
         $markdown = generateAbout();
     } elseif ($mode === 'faq') {
@@ -123,7 +123,14 @@ function generateRobots(): string
     $txt = [];
     $txt[] = 'User-agent: *';
     $txt[] = 'Allow: /';
-    $txt[] = 'Disallow: /api/';
+    $txt[] = '';
+    $txt[] = '# Allow public API endpoints';
+    $txt[] = 'Allow: /api/posts.php*';
+    $txt[] = 'Allow: /api/products.php*';
+    $txt[] = 'Allow: /api/search.php*';
+    $txt[] = 'Allow: /api/gallery.php*';
+    $txt[] = '';
+    $txt[] = '# Block admin endpoints';
     $txt[] = 'Disallow: /admin/';
     $txt[] = '';
     $txt[] = '# Allow LLMs to access these endpoints';
@@ -147,7 +154,7 @@ function generateSitemap(PDO $db): string
     // Static Routes
     $staticRoutes = [
         '/',
-        '/edukasi',
+        '/news',
         '/faq',
         '/contact',
         '/privacy-policy',
@@ -174,11 +181,12 @@ function generateSitemap(PDO $db): string
     }
 
     // Posts
-    $posts = $db->query("SELECT slug, publish_date FROM posts WHERE language = 'id' ORDER BY publish_date DESC")->fetchAll();
+    $posts = $db->query("SELECT slug, category, publish_date FROM posts WHERE language = 'id' ORDER BY publish_date DESC")->fetchAll();
     foreach ($posts as $p) {
         $date = !empty($p['publish_date']) ? date('Y-m-d', strtotime($p['publish_date'])) : date('Y-m-d');
+        $prefix = ($p['category'] === 'Industrial Installations') ? '/portfolio/' : '/news/';
         $xml[] = '  <url>';
-        $xml[] = '    <loc>' . SITE_URL . '/post/' . $p['slug'] . '</loc>';
+        $xml[] = '    <loc>' . SITE_URL . $prefix . $p['slug'] . '</loc>';
         $xml[] = '    <lastmod>' . $date . '</lastmod>';
         $xml[] = '    <priority>0.7</priority>';
         $xml[] = '  </url>';
@@ -235,7 +243,7 @@ function generateSummary(PDO $db): string
     $md[] = '- [Katalog Produk](' . SITE_URL . '/llms-products.txt): Spesifikasi teknis mendalam seluruh mesin.';
     $md[] = '- [Panduan FAQ](' . SITE_URL . '/llms-faq.txt): Jawaban teknis operasional dan troubleshooting.';
     $md[] = '- [Panduan Pemasangan & Portfolio](' . SITE_URL . '/llms-portfolio.txt): Studi kasus spesifikasi ruang dan mesin.';
-    $md[] = '- [Edukasi & Berita](' . SITE_URL . '/llms-edukasi.txt): Tips pasca panen dan berita instalasi.';
+    $md[] = '- [Edukasi & Berita](' . SITE_URL . '/llms-news.txt): Tips pasca panen dan berita instalasi.';
     $md[] = '- [Panduan Dasar Mesin](' . SITE_URL . '/llms-guide.txt): Panduan operasional RMU & Bed Dryer.';
     $md[] = '- [Tentang CV Ateka Tehnik](' . SITE_URL . '/llms-about.txt): Profil, legalitas, dan sejarah perusahaan.';
     $md[] = '- [Informasi Kontak](' . SITE_URL . '/llms-contact.txt): Nomor WhatsApp dan lokasi operasional.';
@@ -322,7 +330,7 @@ function generateSummary(PDO $db): string
 
     if (!empty($guides)) {
         foreach ($guides as $g) {
-            $url = SITE_URL . '/post/' . $g['slug'];
+            $url = SITE_URL . '/portfolio/' . $g['slug'];
             $subtitle = truncateDescription($g['subtitle']);
             $location = $g['location'] ? " (📍 {$g['location']})" : '';
             $md[] = "- [{$g['title']}]({$url}){$location}: {$subtitle}";
@@ -349,7 +357,7 @@ function generateSummary(PDO $db): string
 
     if (!empty($tips)) {
         foreach ($tips as $t) {
-            $url = SITE_URL . '/post/' . $t['slug'];
+            $url = SITE_URL . '/news/' . $t['slug'];
             $subtitle = truncateDescription($t['subtitle']);
             $md[] = "- [{$t['title']}]({$url}): {$subtitle}";
         }
@@ -549,7 +557,7 @@ function generateFull(PDO $db): string
         );
 
         foreach ($guides as $g) {
-            $url = SITE_URL . '/post/' . $g['slug'];
+            $url = SITE_URL . '/portfolio/' . $g['slug'];
             $md[] = "### {$g['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
@@ -636,7 +644,7 @@ function generateFull(PDO $db): string
 
     if (!empty($articles)) {
         foreach ($articles as $a) {
-            $url = SITE_URL . '/post/' . $a['slug'];
+            $url = SITE_URL . '/news/' . $a['slug'];
             $md[] = "### {$a['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
@@ -695,7 +703,7 @@ function generateFull(PDO $db): string
     $md[] = '- [Katalog Produk](' . SITE_URL . '/llms-products.txt): Spesifikasi teknis mendalam seluruh mesin.';
     $md[] = '- [Panduan FAQ](' . SITE_URL . '/llms-faq.txt): Jawaban teknis operasional dan troubleshooting.';
     $md[] = '- [Panduan Pemasangan & Portfolio](' . SITE_URL . '/llms-portfolio.txt): Studi kasus spesifikasi ruang dan mesin.';
-    $md[] = '- [Edukasi & Berita](' . SITE_URL . '/llms-edukasi.txt): Tips pasca panen dan berita instalasi.';
+    $md[] = '- [Edukasi & Berita](' . SITE_URL . '/llms-news.txt): Tips pasca panen dan berita instalasi.';
     $md[] = '- [Panduan Dasar Mesin](' . SITE_URL . '/llms-guide.txt): Panduan operasional RMU & Bed Dryer.';
     $md[] = '- [Tentang CV Ateka Tehnik](' . SITE_URL . '/llms-about.txt): Profil, legalitas, dan sejarah perusahaan.';
     $md[] = '- [Informasi Kontak](' . SITE_URL . '/llms-contact.txt): Nomor WhatsApp dan lokasi operasional.';
@@ -927,7 +935,7 @@ function generatePortfolio(PDO $db): string
         $guideDeliverables = fetchRelatedData($db, 'post_deliverables', 'post_id', $guideIds, 'item');
 
         foreach ($guides as $g) {
-            $url = SITE_URL . '/post/' . $g['slug'];
+            $url = SITE_URL . '/portfolio/' . $g['slug'];
             $md[] = "### {$g['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
@@ -987,9 +995,9 @@ function generatePortfolio(PDO $db): string
 }
 
 /**
- * Generate edukasi/news version (/llms-edukasi.txt)
+ * Generate edukasi/news version (/llms-news.txt)
  */
-function generateEdukasi(PDO $db): string
+function generateNews(PDO $db): string
 {
     $md = [];
     $md[] = '# Tips, Edukasi & Berita Terbaru — ' . SITE_NAME;
@@ -1004,7 +1012,7 @@ function generateEdukasi(PDO $db): string
 
     if (!empty($articles)) {
         foreach ($articles as $a) {
-            $url = SITE_URL . '/post/' . $a['slug'];
+            $url = SITE_URL . '/news/' . $a['slug'];
             $md[] = "### {$a['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
