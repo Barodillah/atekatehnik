@@ -112,10 +112,11 @@ if ($isPost || $isProduct) {
     if (file_exists($dbFile)) {
         require_once $dbFile;
         $db = getDB();
+        $ssrContentHtml = '';
 
         try {
             if ($isPost) {
-                $stmt = $db->prepare("SELECT title, subtitle, cover_image, category, publish_date FROM posts WHERE slug = :slug");
+                $stmt = $db->prepare("SELECT title, subtitle, content, cover_image, category, publish_date FROM posts WHERE slug = :slug");
                 $stmt->execute([':slug' => $slug]);
                 $item = $stmt->fetch();
 
@@ -123,6 +124,7 @@ if ($isPost || $isProduct) {
                     $title = $item['title'] . " | ATEKA TEHNIK";
                     $descriptionRaw = $item['subtitle'];
                     $imageRaw = $item['cover_image'];
+                    $ssrContentHtml = "<h1>" . htmlspecialchars($item['title']) . "</h1>" . $item['content']; // HTML content
                 }
             } else {
                 $stmt = $db->prepare("SELECT nama, description, gambar FROM products WHERE slug = :slug");
@@ -133,6 +135,7 @@ if ($isPost || $isProduct) {
                     $title = "Jual " . $item['nama'] . " | ATEKA TEHNIK";
                     $descriptionRaw = $item['description'];
                     $imageRaw = $item['gambar'];
+                    $ssrContentHtml = "<h1>" . htmlspecialchars($item['nama']) . "</h1><div>" . $item['description'] . "</div>";
                 }
             }
 
@@ -297,6 +300,11 @@ $html = preg_replace('/<meta[^>]*name="twitter:title"[^>]*>/i', '<meta name="twi
 $html = preg_replace('/<meta[^>]*name="twitter:description"[^>]*>/i', '<meta name="twitter:description" content="' . htmlspecialchars($description) . '" />', $html);
 $html = preg_replace('/<meta[^>]*name="twitter:image"[^>]*>/i', '<meta name="twitter:image" content="' . htmlspecialchars($image) . '" />', $html);
 
+// Inject Canonical Meta
+$html = preg_replace('/<link[^>]*rel="canonical"[^>]*>/i', '', $html); // Clean up if any
+$canonicalTag = '<link rel="canonical" href="' . htmlspecialchars($url) . '" />';
+$html = str_replace('</head>', $canonicalTag . "\n</head>", $html);
+
 // Inject JSON-LD Structured Data (Schema Markup)
 $jsonLd = [
     '@context' => 'https://schema.org',
@@ -304,6 +312,11 @@ $jsonLd = [
 ];
 $jsonLdScript = '<script type="application/ld+json">' . json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . '</script>';
 $html = str_replace('</head>', $jsonLdScript . "\n</head>", $html);
+
+// Inject SSR HTML Content
+if (!empty($ssrContentHtml)) {
+    $html = preg_replace('/<noscript>.*?<\/noscript>/is', "<noscript>\n" . $ssrContentHtml . "\n</noscript>", $html);
+}
 
 echo $html;
 

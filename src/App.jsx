@@ -68,6 +68,16 @@ function App() {
   useEffect(() => {
     // Send pageview with a custom path whenever location changes
     ReactGA.send({ hitType: "pageview", page: location.pathname });
+
+    // Manage dynamic canonical tag
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    // Set canonical dynamically based on the current location
+    canonicalLink.setAttribute('href', `https://atekatehnik.com${location.pathname}`);
   }, [location.pathname]);
 
   return (

@@ -24,7 +24,7 @@ define('SITE_URL', 'https://atekatehnik.com');
 define('SITE_NAME', 'ATEKA TEHNIK');
 define('WHATSAPP_NUMBER', '62881080634612');
 define('CACHE_TTL', 86400); // 24 hours in seconds
-define('CACHE_DIR', sys_get_temp_dir() . '/atekatehnik_llms_cache');
+define('CACHE_DIR', sys_get_temp_dir() . '/atekatehnik_llms_cache_v2');
 define('SUMMARY_PRODUCT_LIMIT', 10);
 define('SUMMARY_POST_LIMIT', 5);
 define('MAX_DESCRIPTION_LENGTH', 120);
@@ -154,6 +154,12 @@ function generateSitemap(PDO $db): string
     // Static Routes
     $staticRoutes = [
         '/',
+        '/products',
+        '/portfolio',
+        '/about',
+        '/gallery',
+        '/official-channels',
+        '/edukasi',
         '/news',
         '/faq',
         '/contact',
