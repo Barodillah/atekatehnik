@@ -3,7 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 
 const Faq = () => {
-    usePageTitle('FAQ Hub');
+    usePageTitle('Tanya Jawab Terkait RMU / Mesin Pasca Panen');
     const { t } = useLanguage();
 
     const faqCategories = [
@@ -66,7 +66,7 @@ const Faq = () => {
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#ffa454] to-transparent blur-3xl" />
                     <div className="absolute bottom-0 left-10 w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-[#00bfff] to-transparent blur-3xl opacity-50" />
                 </div>
-                
+
                 <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
                     <span className="inline-block px-4 py-1.5 rounded-sm bg-white/10 border border-white/20 text-[#ffa454] font-label text-xs font-bold tracking-widest uppercase mb-4 backdrop-blur-sm">
                         {t('faqHub.badge')}
@@ -121,7 +121,7 @@ const Faq = () => {
                         <p className="text-slate-700 dark:text-slate-300 font-body leading-relaxed max-w-3xl">
                             Panduan referensi perbandingan spesifikasi gabah kering giling (GKG), derajat sosoh, dan kelas mesin antara konfigurasi operasional penengah (1-2 Ton) dan industri premium (3-5 Ton).
                         </p>
-                        
+
                         <div className="overflow-x-auto rounded-sm border border-outline-variant/20 mt-6 shadow-sm">
                             <table className="w-full text-left font-body text-sm md:text-base border-collapse">
                                 <thead className="bg-[#001f5b] text-white">

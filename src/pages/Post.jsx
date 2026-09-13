@@ -4,6 +4,21 @@ import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { parseMarkdown } from '../utils/markdownParser';
 
+// Media Helper Functions
+const isYouTube = (url) => {
+    return url?.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+};
+
+const getYouTubeId = (url) => {
+    const match = isYouTube(url);
+    return match ? match[1] : null;
+};
+
+const isVideoFile = (url) => {
+    return url?.match(/\.(mp4|webm|ogg)$/i);
+};
+
+
 const Post = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -391,24 +406,45 @@ const Post = () => {
                 <section className="px-8 md:px-20 py-24 bg-surface-container-low">
                     <h2 className="text-3xl font-bold text-primary mb-12 tracking-tight font-headline">{t('postPage.mediaGallery')}</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                        {post.phases.map((phase, index) => (
-                            <div key={index}
-                                className={`relative group overflow-hidden cursor-pointer aspect-square ${index === 0 ? 'col-span-2 row-span-2' : ''}`}
-                                onClick={() => setPreviewIndex(index)}
-                            >
-                                <img alt={phase.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                    src={phase.image_url || 'https://via.placeholder.com/800'} />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                                    <div className="bg-white/15 backdrop-blur-sm p-3 md:p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
-                                        <span className="material-symbols-outlined text-white text-2xl md:text-3xl block">zoom_in</span>
+                        {post.phases.map((phase, index) => {
+                            const ytid = getYouTubeId(phase.image_url);
+                            const isDirectVideo = isVideoFile(phase.image_url);
+                            const isVideo = ytid || isDirectVideo;
+                            return (
+                                <div key={index}
+                                    className={`relative group overflow-hidden cursor-pointer aspect-square ${index === 0 ? 'col-span-2 row-span-2' : ''}`}
+                                    onClick={() => setPreviewIndex(index)}
+                                >
+                                    {ytid ? (
+                                        <img alt={phase.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                            src={`https://img.youtube.com/vi/${ytid}/hqdefault.jpg`} />
+                                    ) : isDirectVideo ? (
+                                        <video
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+                                            src={`${phase.image_url}#t=0.1`}
+                                            preload="metadata"
+                                            muted
+                                            playsInline
+                                        />
+                                    ) : (
+                                        <img alt={phase.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                            src={phase.image_url || 'https://via.placeholder.com/800'} />
+                                    )}
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                                        <div className="bg-white/15 backdrop-blur-sm p-3 md:p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
+                                            <span className="material-symbols-outlined text-white text-2xl md:text-3xl block">
+                                                {isVideo ? 'play_circle' : 'zoom_in'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                                        <h4 className="text-white font-bold text-sm md:text-base font-headline line-clamp-2">{phase.title}</h4>
                                     </div>
                                 </div>
-                                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                                    <h4 className="text-white font-bold text-sm md:text-base font-headline line-clamp-2">{phase.title}</h4>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </section>
             )}
@@ -508,20 +544,20 @@ const Post = () => {
                                 className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                         </Link>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
                         {relatedInstallations.map(project => (
-                            <Link to={project.category === 'Industrial Installations' ? `/portfolio/${project.slug}` : `/news/${project.slug}`} key={project.id} className="group block bg-surface-container-low border border-outline-variant/30 rounded-sm overflow-hidden hover:shadow-xl transition-all">
-                                <div className="aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
-                                    <img src={project.cover_image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000'} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 font-bold text-[10px] tracking-widest uppercase text-primary">
+                            <Link to={project.category === 'Industrial Installations' ? `/portfolio/${project.slug}` : `/news/${project.slug}`} key={project.id} className="group flex flex-row md:flex-col bg-surface-container-low border border-outline-variant/30 rounded-sm overflow-hidden hover:shadow-xl transition-all">
+                                <div className="w-[120px] sm:w-[150px] shrink-0 md:w-full aspect-square md:aspect-[4/3] relative overflow-hidden bg-surface-container-lowest">
+                                    <img src={project.cover_image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000'} alt={project.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-3 md:py-1 font-bold text-[8px] md:text-[10px] tracking-widest uppercase text-primary">
                                         {project.category === 'Industrial Installations' ? (project.location || 'Indonesia') : project.category}
                                     </div>
                                 </div>
-                                <div className="p-6">
-                                    <h3 className="text-xl font-bold text-primary mb-2 line-clamp-2">{project.title}</h3>
-                                    <p className="text-on-surface-variant text-sm line-clamp-2 mb-4">{project.subtitle}</p>
-                                    <span className="text-secondary font-bold text-xs uppercase tracking-widest flex items-center gap-2 group-hover:text-primary transition-colors">
-                                        {project.category === 'Industrial Installations' ? t('postPage.readCaseStudy') : (lang === 'id' ? 'Baca Selengkapnya' : 'Read More')} <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                <div className="p-3 md:p-6 flex flex-col justify-center md:justify-start flex-grow">
+                                    <h3 className="font-headline text-sm md:text-xl font-bold text-primary mb-1 md:mb-2 line-clamp-2 leading-snug">{project.title}</h3>
+                                    <p className="text-[11px] md:text-sm text-on-surface-variant line-clamp-2 mb-2 md:mb-4">{project.subtitle}</p>
+                                    <span className="mt-auto text-secondary font-bold text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-1 md:gap-2 group-hover:text-primary transition-colors">
+                                        {project.category === 'Industrial Installations' ? t('postPage.readCaseStudy') : (lang === 'id' ? 'Baca Selengkapnya' : 'Read More')} <span className="material-symbols-outlined text-[14px] md:text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                     </span>
                                 </div>
                             </Link>
@@ -713,13 +749,45 @@ const Post = () => {
                             </button>
                         )}
 
-                        {/* Image + Description */}
+                        {/* Image / Video + Description */}
                         <div className="flex flex-col items-center max-w-5xl w-full px-16 md:px-20" onClick={(e) => e.stopPropagation()}>
-                            <img
-                                src={currentPhase.image_url}
-                                alt={currentPhase.title}
-                                className="max-w-full max-h-[70vh] object-contain rounded-sm shadow-2xl"
-                            />
+                            {(() => {
+                                const ytid = getYouTubeId(currentPhase.image_url);
+                                const isDirectVideo = isVideoFile(currentPhase.image_url);
+
+                                if (ytid) {
+                                    return (
+                                        <div className="w-full aspect-video rounded-sm shadow-2xl overflow-hidden bg-black max-h-[70vh]">
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={`https://www.youtube.com/embed/${ytid}?autoplay=1`}
+                                                title={currentPhase.title}
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        </div>
+                                    );
+                                } else if (isDirectVideo) {
+                                    return (
+                                        <video
+                                            src={currentPhase.image_url}
+                                            controls
+                                            autoPlay
+                                            className="max-w-full max-h-[70vh] rounded-sm shadow-2xl bg-black"
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <img
+                                            src={currentPhase.image_url}
+                                            alt={currentPhase.title}
+                                            className="max-w-full max-h-[70vh] object-contain rounded-sm shadow-2xl bg-black/50"
+                                        />
+                                    );
+                                }
+                            })()}
                             <div className="mt-6 text-center max-w-2xl">
                                 <h3 className="text-white font-bold text-lg md:text-xl font-headline mb-2">{currentPhase.title}</h3>
                                 {currentPhase.description && (

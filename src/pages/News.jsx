@@ -193,51 +193,62 @@ const News = () => {
                 {gridPosts.length > 0 && (
                     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
                         {gridPosts.map((post) => (
-                            <Link to={`/news/${post.slug}`} key={post.id} className="flex flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300 group border border-outline-variant/10 rounded-sm overflow-hidden">
-                                <div className="aspect-video w-full mb-6 overflow-hidden bg-surface-container">
-                                    {post.cover_image ? (
-                                        <img 
-                                            alt={post.title}
-                                            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
-                                            src={post.cover_image} 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-outline">
-                                            <span className="material-symbols-outlined text-3xl">image</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="px-4 pb-6 flex flex-col flex-grow">
-                                    <span className="text-[10px] font-label font-bold tracking-widest text-secondary uppercase mb-3 block">
-                                        {post.category}
-                                    </span>
-                                    <h3 className="font-headline text-xl font-bold text-primary-container mb-3 line-clamp-2 leading-snug group-hover:text-secondary transition-colors">
-                                        {post.title}
-                                    </h3>
-                                    <p className="text-on-surface-variant text-sm mb-6 line-clamp-2 flex-grow">
-                                        {post.subtitle}
-                                    </p>
-                                    <div className="flex items-center justify-between pt-4 border-t border-outline-variant/10 mt-auto">
-                                        <div className="flex items-center gap-4 text-on-surface-variant/60">
-                                            <div className="flex items-center gap-1 text-xs" title="Views">
-                                                <span className="material-symbols-outlined text-base">visibility</span>
-                                                {post.view_count || 0}
+                                <Link to={`/news/${post.slug}`} key={post.id} className="flex flex-row md:flex-col bg-surface hover:bg-surface-container-low transition-colors duration-300 group border border-outline-variant/10 rounded-sm overflow-hidden">
+                                    <div className="w-[120px] sm:w-[150px] shrink-0 md:w-full aspect-square md:aspect-video relative md:mb-6 overflow-hidden bg-surface-container">
+                                        {post.cover_image ? (
+                                            <img 
+                                                alt={post.title}
+                                                className="absolute inset-0 w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                                                src={post.cover_image} 
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 w-full h-full flex items-center justify-center text-outline">
+                                                <span className="material-symbols-outlined text-3xl">image</span>
                                             </div>
-                                            <div className="flex items-center gap-1 text-xs" title="Likes">
-                                                <span className="material-symbols-outlined text-base">thumb_up</span>
-                                                {post.like_count || 0}
-                                            </div>
-                                            <div className="flex items-center gap-1 text-xs" title="Comments">
-                                                <span className="material-symbols-outlined text-base">mode_comment</span>
-                                                {post.comment_count || 0}
-                                            </div>
-                                        </div>
-                                        <span className="text-xs font-label text-on-surface-variant/70">
-                                            {new Date(post.publish_date || post.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </span>
+                                        )}
                                     </div>
-                                </div>
-                            </Link>
+                                    <div className="p-3 md:p-0 md:px-4 md:pb-6 flex flex-col flex-grow justify-center md:justify-start">
+                                        <div className="flex justify-between items-center md:items-start md:flex-col mb-1 md:mb-3 gap-1 md:gap-0">
+                                            <span className="order-2 md:order-1 text-[10px] font-label font-bold tracking-widest text-secondary uppercase md:mb-3 block">
+                                                {post.category}
+                                            </span>
+                                            <span className="order-1 md:order-2 md:hidden text-[10px] text-on-surface-variant font-medium whitespace-nowrap">
+                                                {new Date(post.publish_date || post.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        <h3 className="font-headline text-sm md:text-xl font-bold text-primary-container mb-1 md:mb-3 line-clamp-2 leading-snug group-hover:text-secondary transition-colors">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-[11px] md:text-sm text-on-surface-variant mb-2 md:mb-6 line-clamp-2 md:flex-grow">
+                                            {post.subtitle}
+                                        </p>
+                                        
+                                        <div className="md:hidden mt-auto flex items-center gap-1.5 text-[11px] text-secondary font-bold group-hover:gap-2 transition-all">
+                                            {lang === 'id' ? 'Lihat Selengkapnya' : 'Read More'}
+                                            <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                        </div>
+
+                                        <div className="hidden md:flex items-center justify-between pt-4 border-t border-outline-variant/10 mt-auto">
+                                            <div className="flex items-center gap-4 text-on-surface-variant/60">
+                                                <div className="flex items-center gap-1 text-xs" title="Views">
+                                                    <span className="material-symbols-outlined text-base">visibility</span>
+                                                    {post.view_count || 0}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-xs" title="Likes">
+                                                    <span className="material-symbols-outlined text-base">thumb_up</span>
+                                                    {post.like_count || 0}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-xs" title="Comments">
+                                                    <span className="material-symbols-outlined text-base">mode_comment</span>
+                                                    {post.comment_count || 0}
+                                                </div>
+                                            </div>
+                                            <span className="text-xs font-label text-on-surface-variant/70">
+                                                {new Date(post.publish_date || post.created_at).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
                         ))}
                     </section>
                 )}

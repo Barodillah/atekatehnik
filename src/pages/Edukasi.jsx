@@ -10,7 +10,7 @@ import DryerAdvantages from '../components/sections/DryerAdvantages';
 
 const Edukasi = () => {
     const { t } = useLanguage();
-    usePageTitle('Edukasi Pasca Panen');
+    usePageTitle('Edukasi Alat & Mesin Pasca Panen');
 
     return (
         <div className="bg-surface text-on-surface">

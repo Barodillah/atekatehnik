@@ -10,7 +10,6 @@ const Gallery = () => {
   const [galleries, setGalleries] = useState([]);
   const [displayedGalleries, setDisplayedGalleries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadCount, setLoadCount] = useState(15);
   
   const observerTarget = useRef(null);
 
@@ -47,12 +46,12 @@ const Gallery = () => {
   const loadMoreItems = useCallback(() => {
     if (galleries.length === 0) return;
     
-    setLoadCount(prevCount => {
+    setDisplayedGalleries(prev => {
+      const prevCount = prev.length;
       const nextCount = prevCount + 15;
       const newItems = [];
       
       for (let i = prevCount; i < nextCount; i++) {
-        // modulo for looping
         const originalItem = galleries[i % galleries.length];
         newItems.push({
           ...originalItem,
@@ -60,8 +59,7 @@ const Gallery = () => {
         });
       }
       
-      setDisplayedGalleries(prev => [...prev, ...newItems]);
-      return nextCount;
+      return [...prev, ...newItems];
     });
   }, [galleries]);
 

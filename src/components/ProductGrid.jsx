@@ -59,7 +59,7 @@ const ProductGrid = () => {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {isLoading ? (
             <div className="col-span-full flex flex-col items-center justify-center py-16">
               <span className="material-symbols-outlined text-primary animate-spin text-4xl">progress_activity</span>
@@ -84,8 +84,8 @@ const ProductGrid = () => {
                     <span className="material-symbols-outlined text-5xl">image</span>
                   </div>
                 )}
-                <div className="absolute top-4 left-4">
-                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-sm ${item.kategori === 'Paket'
+                <div className="absolute top-2 left-2 md:top-4 md:left-4">
+                  <span className={`px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm ${item.kategori === 'Paket'
                     ? 'bg-secondary-fixed text-on-secondary-fixed'
                     : item.kategori === 'Unit Mesin Tunggal'
                       ? 'bg-primary-container text-white'
@@ -103,20 +103,20 @@ const ProductGrid = () => {
                   </span>
                 </div>
               </div>
-              <div className="p-6 space-y-4 flex-1 flex flex-col">
-                <h3 className="text-lg font-headline font-bold text-primary line-clamp-2">{item.nama}</h3>
+              <div className="p-3 md:p-6 flex-1 flex flex-col">
+                <h3 className="text-sm md:text-lg font-headline font-bold text-primary line-clamp-2 mb-2 md:mb-4">{item.nama}</h3>
                 {item.description && (
                   <div 
-                    className="text-sm text-on-surface-variant font-body line-clamp-3 prose prose-sm max-w-none"
+                    className="text-[11px] md:text-sm text-on-surface-variant font-body line-clamp-3 prose prose-sm max-w-none mb-2 md:mb-4"
                     dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description) }}
                   />
                 )}
-                <div className="pt-4 border-t border-outline-variant/10 mt-auto">
+                <div className="pt-2 md:pt-4 border-t border-outline-variant/10 mt-auto">
                   <Link 
                     to={`/product/${item.slug || item.id}`}
-                    className="text-primary font-bold text-sm flex items-center gap-2 cursor-pointer hover:text-secondary transition-colors"
+                    className="text-primary font-bold text-[11px] md:text-sm flex items-center gap-1 md:gap-2 cursor-pointer hover:text-secondary transition-colors"
                   >
-                    {t('productGrid.detailSpec')} <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    {t('productGrid.detailSpec')} <span className="material-symbols-outlined text-[14px] md:text-sm">arrow_forward</span>
                   </Link>
                 </div>
               </div>
