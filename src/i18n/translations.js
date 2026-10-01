@@ -10,10 +10,10 @@ const translations = {
 
     // Hero Section
     "hero.badge": "Pemimpin Industri Sejak 2004",
-    "hero.title": "Supplier Penggilingan Padi: ",
-    "hero.titleHighlight": "Solusi Presisi",
-    "hero.titleSuffix": " untuk Hasil Beras Premium",
-    "hero.subtitle": "Lebih dari 20 tahun memimpin manufaktur dan instalasi Rice Milling Unit (RMU) berstandar nasional. Kami hadirkan teknologi efisien untuk ketahanan pangan Indonesia.",
+    "hero.title": "Manufaktur Mesin RMU Presisi: ",
+    "hero.titleHighlight": "Hasilkan Beras Premium",
+    "hero.titleSuffix": "",
+    "hero.subtitle": "Solusi Rice Milling Unit terintegrasi langsung dari pabrikasi berpengalaman 20+ tahun. Dirancang minim beras patah, hemat energi, dan didukung teknisi ahli purnajual di seluruh Indonesia.",
     "hero.cta1": "Konsultasi Rencana Usaha",
     "hero.cta2": "Lihat Katalog INAPROC",
     "hero.ctaWa": "Hubungi Langsung Kami",
@@ -436,10 +436,10 @@ const translations = {
 
     // Hero Section
     "hero.badge": "Industrial Leader Since 2004",
-    "hero.title": "Rice Mill Supplier: ",
-    "hero.titleHighlight": "Precision Solutions",
-    "hero.titleSuffix": " for Premium Rice Output",
-    "hero.subtitle": "Over 20 years leading the manufacture and installation of nationally standardized Rice Milling Units (RMU). We deliver efficient technology for Indonesia's food security.",
+    "hero.title": "Precision RMU Machine Manufacturing: ",
+    "hero.titleHighlight": "Produce Premium Rice",
+    "hero.titleSuffix": "",
+    "hero.subtitle": "Integrated Rice Milling Unit solutions direct from a fabricator with 20+ years of experience. Designed for minimal broken rice, energy efficiency, and supported by expert after-sales technicians throughout Indonesia.",
     "hero.cta1": "Business Plan Consultation",
     "hero.cta2": "View INAPROC Catalog",
     "hero.ctaWa": "Contact Us Directly",

@@ -15,8 +15,8 @@ requireMethod('GET');
 $db = getDB();
 
 $type = $_GET['type'] ?? 'post';
-if (!in_array($type, ['post', 'product'])) {
-    jsonError(400, 'type must be "post" or "product".');
+if (!in_array($type, ['post', 'product', 'gallery'])) {
+    jsonError(400, 'type must be "post", "product", or "gallery".');
 }
 
 $slug = trim($_GET['slug'] ?? '');

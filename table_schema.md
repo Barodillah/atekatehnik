@@ -81,7 +81,7 @@
 | # | Column | Type | Nullable | Key | Default | Extra |
 |---|--------|------|----------|-----|---------|-------|
 | 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
-| 2 | `page_type` | `enum('post','product')` | NO | MUL | - | - |
+| 2 | `page_type` | `enum('post','product','gallery')` | NO | MUL | - | - |
 | 3 | `page_slug` | `varchar(255)` | NO | - | - | - |
 | 4 | `ip_address` | `varchar(45)` | NO | MUL | - | - |
 | 5 | `user_agent` | `text` | YES | - | NULL | - |

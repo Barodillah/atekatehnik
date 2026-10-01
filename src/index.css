@@ -19,17 +19,17 @@ body {
 }
 
 @layer utilities {
-  .animate-slide {
-    animation: slide 90s linear infinite;
+  .animate-marquee {
+    animation: marquee 50s linear infinite;
   }
 
-  @keyframes slide {
+  @keyframes marquee {
     from {
       transform: translateX(0);
     }
 
     to {
-      transform: translateX(-100%);
+      transform: translateX(-50%);
     }
   }
 

@@ -85,6 +85,12 @@ const Analytics = () => {
           >
             Products
           </button>
+          <button
+            onClick={() => setViewType('gallery')}
+            className={`px-6 py-2.5 text-sm font-bold uppercase tracking-widest transition-all ${viewType === 'gallery' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:bg-slate-200'}`}
+          >
+            Gallery
+          </button>
         </div>
       </div>
 
@@ -229,7 +235,7 @@ const Analytics = () => {
                   <tr key={p.slug} className={`hover:bg-surface-container-low transition-colors cursor-pointer ${selectedSlug === p.slug ? 'bg-blue-50' : ''}`} onClick={() => fetchDetails(p.slug)}>
                     <td className="px-6 py-4 text-sm font-bold text-on-surface-variant">{i + 1}</td>
                     <td className="px-6 py-4">
-                      <a href={`/${viewType === 'post' ? 'post' : 'product'}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-700 hover:underline" onClick={(e) => e.stopPropagation()}>
+                      <a href={viewType === 'gallery' ? (p.slug === 'main' ? '/gallery' : `/gallery?view=${p.slug}`) : `/${viewType}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-700 hover:underline" onClick={(e) => e.stopPropagation()}>
                         {p.slug}
                       </a>
                     </td>

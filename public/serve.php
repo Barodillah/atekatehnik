@@ -83,6 +83,7 @@ switch ($baseUri) {
 
 $isPost = preg_match('/^\/(?:post|portfolio|news)\/([^\/?]+)/', $requestUri, $postMatches);
 $isProduct = preg_match('/^\/product\/([^\/?]+)/', $requestUri, $productMatches);
+$isGalleryShare = ($baseUri === '/gallery' && !empty($_GET['view']));
 
 $jsonLdGraph = [
     [
@@ -104,8 +105,8 @@ $jsonLdGraph = [
     ]
 ]; // Base JSON-LD structured data graph
 
-if ($isPost || $isProduct) {
-    $slug = $isPost ? $postMatches[1] : $productMatches[1];
+if ($isPost || $isProduct || $isGalleryShare) {
+    $slug = $isPost ? $postMatches[1] : ($isProduct ? $productMatches[1] : null);
 
     // Direct DB query for fast execution
     $dbFile = __DIR__ . '/api/db.php';
@@ -126,7 +127,7 @@ if ($isPost || $isProduct) {
                     $imageRaw = $item['cover_image'];
                     $ssrContentHtml = "<h1>" . htmlspecialchars($item['title']) . "</h1>" . $item['content']; // HTML content
                 }
-            } else {
+            } elseif ($isProduct) {
                 $stmt = $db->prepare("SELECT nama, description, gambar FROM products WHERE slug = :slug");
                 $stmt->execute([':slug' => $slug]);
                 $item = $stmt->fetch();
@@ -136,6 +137,63 @@ if ($isPost || $isProduct) {
                     $descriptionRaw = $item['description'];
                     $imageRaw = $item['gambar'];
                     $ssrContentHtml = "<h1>" . htmlspecialchars($item['nama']) . "</h1><div>" . $item['description'] . "</div>";
+                }
+            } elseif ($isGalleryShare) {
+                $viewParts = explode('-', $_GET['view']);
+                $galleryId = end($viewParts);
+                
+                $stmt = $db->prepare("SELECT title, src, type FROM galleries WHERE id = :id");
+                $stmt->execute([':id' => $galleryId]);
+                $item = $stmt->fetch();
+
+                if ($item) {
+                    $mediaType = ($item['type'] === 'video') ? 'Video' : 'Gambar';
+                    $title = $mediaType . " " . $item['title'] . " | ATEKA TEHNIK";
+                    $descriptionRaw = "Lihat dokumentasi instalasi dan produk kami: " . $item['title'];
+                    $imageRaw = $item['src'];
+
+                    // Auto-generate video thumbnail using FFmpeg if it's a video
+                    if ($item['type'] === 'video') {
+                        $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+                        
+                        $srcUrl = $item['src'];
+                        if (strpos($srcUrl, 'http') === 0) {
+                            // Extract just the path if it's a full URL (e.g. /uploads/video.mp4)
+                            $srcPath = parse_url($srcUrl, PHP_URL_PATH);
+                        } else {
+                            $srcPath = str_replace('\\', '/', $srcUrl);
+                            if (strpos($srcPath, '/') !== 0) {
+                                $srcPath = '/' . $srcPath;
+                            }
+                        }
+                        $videoPath = $docRoot . $srcPath;
+                        
+                        // Gunakan __DIR__ agar lebih pasti mengarah ke folder tempat serve.php berada
+                        $cacheDir = __DIR__ . '/cache/thumbnails';
+                        
+                        if (!is_dir($cacheDir)) {
+                            @mkdir($cacheDir, 0777, true);
+                        }
+                        
+                        $thumbName = md5($item['src']) . '.jpg';
+                        $thumbPath = $cacheDir . '/' . $thumbName;
+                        
+                        // If thumbnail doesn't exist, try to extract it
+                        if (!file_exists($thumbPath) && file_exists($videoPath)) {
+                            $cmd = "ffmpeg -i " . escapeshellarg($videoPath) . " -ss 00:00:01.000 -vframes 1 -vf scale=480:-1 -q:v 2 " . escapeshellarg($thumbPath) . " 2>&1";
+                            if (function_exists('exec')) {
+                                @exec($cmd);
+                            }
+                        }
+                        
+                        if (file_exists($thumbPath)) {
+                            $imageRaw = '/cache/thumbnails/' . $thumbName;
+                        } else {
+                            $imageRaw = 'https://atekatehnik.com/wp/uploads/asset_6abe7d3fc60301.88406795.png';
+                        }
+                    }
+
+                    $ssrContentHtml = "<h1>" . htmlspecialchars($item['title']) . "</h1><img src='" . htmlspecialchars($imageRaw) . "' alt='" . htmlspecialchars($item['title']) . "'/>";
                 }
             }
 
@@ -260,6 +318,22 @@ if ($isPost || $isProduct) {
                         ]
                     ];
                     $jsonLdGraph[] = $productLd;
+                } elseif ($isGalleryShare && !empty($item)) {
+                    $galleryLd = [
+                        '@type' => 'ImageObject',
+                        '@id' => 'https://atekatehnik.com' . $requestUri . '#image',
+                        'contentUrl' => !empty($imageUrls) ? $imageUrls[0] : $image,
+                        'name' => $item['title'],
+                        'description' => $description,
+                        'creator' => [
+                            '@id' => 'https://atekatehnik.com/#organization'
+                        ],
+                        'license' => 'https://atekatehnik.com/terms-of-service',
+                        'acquireLicensePage' => 'https://atekatehnik.com/contact',
+                        'creditText' => 'Hak Cipta © CV Ateka Tehnik',
+                        'copyrightNotice' => 'Semua gambar adalah milik eksklusif CV Ateka Tehnik dan dilindungi oleh undang-undang hak cipta.'
+                    ];
+                    $jsonLdGraph[] = $galleryLd;
                 }
             }
 

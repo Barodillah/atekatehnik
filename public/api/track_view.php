@@ -19,8 +19,8 @@ $input = getJsonInput();
 $pageType = trim($input['page_type'] ?? '');
 $slug = trim($input['slug'] ?? '');
 
-if (!in_array($pageType, ['post', 'product'])) {
-    jsonError(400, 'page_type must be "post" or "product".');
+if (!in_array($pageType, ['post', 'product', 'gallery'])) {
+    jsonError(400, 'page_type must be "post", "product", or "gallery".');
 }
 if (empty($slug)) {
     jsonError(400, 'slug is required.');
