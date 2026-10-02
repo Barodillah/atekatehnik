@@ -30,12 +30,9 @@ const Gallery = () => {
   const observerTarget = useRef(null);
   const modalVideoRef = useRef(null);
 
-  // Memaksa iOS untuk autoplay dengan mengatur property muted secara manual dan memanggil play()
+  // Play otomatis saat modal terbuka (iOS biasanya mengizinkan autoplay unmuted jika diawali dengan interaksi 'klik' user untuk membuka modal)
   useEffect(() => {
     if (selectedItem && selectedItem.type === 'video' && modalVideoRef.current) {
-      // Force play on iOS
-      modalVideoRef.current.defaultMuted = true;
-      modalVideoRef.current.muted = true;
       modalVideoRef.current.play().catch((err) => {
         console.warn('Autoplay prevented by browser:', err);
       });
@@ -535,8 +532,6 @@ const Gallery = () => {
                 src={selectedItem.src}
                 controls
                 autoPlay
-                muted
-                defaultMuted
                 loop
                 playsInline
                 webkit-playsinline="true"
