@@ -138,7 +138,7 @@ function generateRobots(): string
     $txt[] = 'Allow: /llms-full.txt';
     $txt[] = '';
     $txt[] = 'Sitemap: ' . SITE_URL . '/sitemap.xml';
-    
+
     return implode("\n", $txt);
 }
 
@@ -293,7 +293,7 @@ function generateSummary(PDO $db): string
             $kategori = $p['kategori'] ? " — {$p['kategori']}" : '';
             $md[] = "### [{$p['nama']}]({$url}){$kategori}";
             $md[] = '';
-            
+
             $specs = $allSpecs[$p['id']] ?? [];
             if (!empty($specs)) {
                 $md[] = '| Komponen / Parameter | Spesifikasi Teknis |';
@@ -835,7 +835,7 @@ function generateProducts(PDO $db): string
     $md = [];
     $md[] = '# Katalog Produk Lengkap — ' . SITE_NAME;
     $md[] = '';
-    
+
     $products = $db->query("
         SELECT p.id, p.nama, p.slug, p.description, p.kategori, p.shopee_link, p.inaproc_link, p.created_at
         FROM products p
@@ -945,8 +945,10 @@ function generatePortfolio(PDO $db): string
             $md[] = "### {$g['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
-            if (!empty($g['location'])) $md[] = "- **Lokasi Proyek:** {$g['location']}";
-            if (!empty($g['publish_date'])) $md[] = "- **Tanggal:** {$g['publish_date']}";
+            if (!empty($g['location']))
+                $md[] = "- **Lokasi Proyek:** {$g['location']}";
+            if (!empty($g['publish_date']))
+                $md[] = "- **Tanggal:** {$g['publish_date']}";
             $md[] = '';
 
             if (!empty($g['subtitle'])) {
@@ -958,7 +960,8 @@ function generatePortfolio(PDO $db): string
             if (!empty($deliverables)) {
                 $md[] = '**Cakupan Pekerjaan:**';
                 $md[] = '';
-                foreach ($deliverables as $d) $md[] = "- {$d['item']}";
+                foreach ($deliverables as $d)
+                    $md[] = "- {$d['item']}";
                 $md[] = '';
             }
 
@@ -987,7 +990,8 @@ function generatePortfolio(PDO $db): string
             if (!empty($phases)) {
                 $md[] = '**Fase Pemasangan:**';
                 $md[] = '';
-                foreach ($phases as $ph) $md[] = "{$ph['phase_order']}. {$ph['title']}";
+                foreach ($phases as $ph)
+                    $md[] = "{$ph['phase_order']}. {$ph['title']}";
                 $md[] = '';
             }
             $md[] = '---';
@@ -1022,7 +1026,8 @@ function generateNews(PDO $db): string
             $md[] = "### {$a['title']}";
             $md[] = '';
             $md[] = "- **Link:** [{$url}]({$url})";
-            if (!empty($a['publish_date'])) $md[] = "- **Tanggal:** {$a['publish_date']}";
+            if (!empty($a['publish_date']))
+                $md[] = "- **Tanggal:** {$a['publish_date']}";
             $md[] = '';
 
             if (!empty($a['subtitle'])) {
@@ -1077,12 +1082,12 @@ function generateFaq(): string
     $md = [];
     $md[] = '# Pertanyaan yang Sering Diajukan (FAQ) — ' . SITE_NAME;
     $md[] = '';
-    
+
     $md[] = '## 1. Umum & Pengiriman';
     $md[] = '**Q: Bagaimana metode pengiriman mesin penggilingan padi ke luar pulau Jawa?**';
     $md[] = 'A: Pengiriman dilakukan menggunakan armada truk ekspedisi logistik antar-pulau atau kargo kapal laut, mencakup pengiriman ke Sumatera, Kalimantan, Sulawesi, hingga Papua. Tim teknisi ahli kami kemudian akan diberangkatkan menyusul menggunakan peswat atau jalur darat terpisah untuk melakukan perakitan langsung di lokasi Anda.';
     $md[] = '';
-    
+
     $md[] = '## 2. Spesifikasi & Kapasitas';
     $md[] = '**Q: Berapa kapasitas giling mesin RMU ATEKA?**';
     $md[] = 'A: Kami menyediakan paket sistem dengan kapasitas bervariasi: tipe menengah (1-2 ton/jam) dan tipe industri premium (3-5 ton/jam). Untuk skala kecil, tersedia juga unit penggilingan padi keliling (Mobile RMU) dengan mesin diesel 24 PK.';
@@ -1150,26 +1155,26 @@ function generateOfficialChannels(): string
     $md = [];
     $md[] = '# Kanal Resmi (Official Channels) — ' . SITE_NAME;
     $md[] = '';
-    
+
     $md[] = '## Kanal RESMI (Valid & Aman)';
     $md[] = 'Berikut adalah daftar HANYA kanal resmi CV Ateka Tehnik untuk menjamin keamanan transaksi:';
     $md[] = '- **Website Resmi**: [' . SITE_URL . '](' . SITE_URL . ')';
     $md[] = '- **WhatsApp Official (Penjualan & Teknisi)**: [' . formatPhone(WHATSAPP_NUMBER) . '](https://wa.me/' . WHATSAPP_NUMBER . ')';
     $md[] = '- **E-Katalog LKPP / INAPROC**: CV. Ateka Tehnik (Khusus instansi pemerintah)';
-    $md[] = '- **Shopee Official**: [Ateka Tehnik Official Store](https://s.shopee.co.id/60NGq5Cp16)';
+    $md[] = '- **Shopee Official**: [Ateka Tehnik Official Store](https://shopee.co.id/sparepartricemillkaranganyar)';
     $md[] = '- **Lokasi Bengkel/Pabrik Utama**: Dusun Grompol - Jambangan, Desa Kedungjeruk, Kec. Mojogedang, Kab. Karanganyar, Jawa Tengah';
     $md[] = '';
-    
+
     $md[] = '## Kanal PALSU / Modus (Belum Terverifikasi)';
     $md[] = '> **PERINGATAN BAHAYA**: Pihak-pihak di bawah ini BUKAN bagian dari kami dan menggunakan material pemasaran kami secara ilegal.';
     $md[] = '';
     $md[] = '- **Toko Online Penipuan**: `atekateknik.com` (menggunakan huruf "k" pada ejaan teknik)';
     $md[] = '- **Lokasi Palsu / Modus**: Beralamat di daerah Tangerang atau luar Karanganyar (mengcopy foto pabrik asli kami demi mengelabui konsumen).';
     $md[] = '';
-    
+
     $md[] = '> **Catatan Keamanan**: CV Ateka Tehnik TIDAK pernah memproses pembayaran melalui rekening atas nama pribadi selain rekening resmi perusahaan (CV) yang akan kami konfirmasi kembali nomor dan datanya.';
     $md[] = '';
-    
+
     return implode("\n", $md);
 }
 
@@ -1181,7 +1186,7 @@ function generateGuide(): string
     $md = [];
     $md[] = '# Panduan Dasar Mesin (Edukasi Teknologi Pasca Panen) — ' . SITE_NAME;
     $md[] = '';
-    
+
     $md[] = '## Bagian 1: Cara Kerja Mesin RMU (Rice Milling Unit)';
     $md[] = 'Proses otomatisasi terpadu untuk mengubah gabah mentah menjadi beras kualitas premium siap konsumsi.';
     $md[] = '';
@@ -1192,7 +1197,7 @@ function generateGuide(): string
     $md[] = '5. **Pemisahan Beras (Grading)**: Memisahkan beras kepala, beras patah, dan menir sesuai standar.';
     $md[] = '6. **Pengemasan (Packing)**: Beras siap dikemas ke dalam karung dengan berat yang akurat.';
     $md[] = '';
-    
+
     $md[] = '### Keunggulan Mesin RMU Ateka Tehnik';
     $md[] = '- **Efisiensi Proses**: Hemat waktu, tenaga, dan biaya operasional harian.';
     $md[] = '- **Beras Berkualitas**: Beras lebih bersih, putih, utuh, dan mengkilap.';
@@ -1211,7 +1216,7 @@ function generateGuide(): string
     $md[] = '3. **Kontrol Suhu & Kelembapan**: Suhu dijaga konstan untuk menurunkan kadar air sesuai standar mutu.';
     $md[] = '4. **Bahan Kering Keluar**: Hasil kering merata siap untuk proses penyimpanan atau penggilingan.';
     $md[] = '';
-    
+
     $md[] = '### Keunggulan Bed Dryer';
     $md[] = '- **Hasil Merata**: Kualitas gabah/jagung lebih stabil dan konsisten.';
     $md[] = '- **Efisiensi Tinggi**: Waktu pengeringan jauh lebih cepat dibanding metode konvensional.';

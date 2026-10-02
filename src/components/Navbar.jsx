@@ -149,7 +149,14 @@ const Navbar = () => {
       ]
     },
     { path: '/about', label: t('nav.about') },
-    { path: '/contact', label: t('nav.contact') },
+    {
+      path: '/contact',
+      label: t('nav.contact'),
+      subItems: [
+        { path: '/contact', label: lang === 'id' ? 'Hubungi Kami' : 'Contact Us' },
+        { path: '/official-channels', label: lang === 'id' ? 'Channel Resmi' : 'Official Channels' },
+      ]
+    },
   ];
 
   return (

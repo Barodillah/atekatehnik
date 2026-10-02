@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { trackWaClick } from '../utils/trackWaClick';
+import MarketplaceButton from '../components/MarketplaceButton';
 
 const Products = () => {
     const { t, lang } = useLanguage();
@@ -12,7 +13,7 @@ const Products = () => {
     const [products, setProducts] = useState([]);
     const [activeCategory, setActiveCategory] = useState(searchParams.get('kategori') || '');
     const [isLoading, setIsLoading] = useState(true);
-    
+
     // Live Search and Infinite Scroll States
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchActive, setIsSearchActive] = useState(false);
@@ -67,7 +68,7 @@ const Products = () => {
                 fetchProducts(activeCategory);
             }
         }, 300);
-        
+
         return () => clearTimeout(timeoutId);
     }, [activeCategory, searchQuery]);
 
@@ -82,7 +83,7 @@ const Products = () => {
 
     // Reset load count when category or search changes
     useEffect(() => {
-        setLoadCount(15);
+        setLoadCount(activeCategory === 'Suku Cadang' ? 18 : 15);
     }, [activeCategory, searchQuery]);
 
     // Compute displayed products
@@ -110,8 +111,8 @@ const Products = () => {
 
     // Infinite scroll trigger
     const loadMoreProducts = useCallback(() => {
-        setLoadCount(prev => prev + 15);
-    }, []);
+        setLoadCount(prev => prev + (activeCategory === 'Suku Cadang' ? 18 : 15));
+    }, [activeCategory]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -172,7 +173,7 @@ const Products = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-white border border-outline-variant/30 rounded-sm py-4 pl-12 pr-12 font-headline text-lg focus:outline-none focus:border-primary-container transition-colors shadow-sm"
                             />
-                            <button 
+                            <button
                                 onClick={() => {
                                     setIsSearchActive(false);
                                     setSearchQuery('');
@@ -227,109 +228,128 @@ const Products = () => {
                         <p className="text-lg font-bold">{t('products.noProducts') || 'Belum ada produk atau hasil pencarian tidak ditemukan.'}</p>
                     </div>
                 ) : (
-                    <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
-                            {displayedProducts.map((product) => (
-                                <div key={product.id} className="bg-surface-container-lowest group flex flex-col">
-                                    <div className="relative h-48 md:h-80 overflow-hidden">
-                                        {product.gambar ? (
-                                            <img
-                                                alt={product.nama}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                src={product.gambar.split(',')[0].trim()}
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full bg-surface-container-highest flex items-center justify-center">
-                                                <span className="material-symbols-outlined text-6xl text-outline">image</span>
-                                            </div>
-                                        )}
-                                        <div className="absolute top-2 left-2 md:top-4 md:left-4">
-                                            <span className={`px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm ${product.kategori === 'Paket'
-                                                ? 'bg-secondary-fixed text-on-secondary-fixed'
-                                                : product.kategori === 'Unit Mesin Tunggal'
-                                                    ? 'bg-primary-container text-white'
-                                                    : product.kategori === 'Peralatan Pendukung'
-                                                        ? 'bg-[#2e7d32] text-white'
-                                                        : product.kategori === 'Suku Cadang'
-                                                            ? 'bg-[#e65100] text-white'
-                                                            : 'bg-primary text-white'
-                                                }`}>
-                                                {product.kategori === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap')
-                                                    : product.kategori === 'Unit Mesin Tunggal' ? (t('products.catUnitMesin') || 'Unit Mesin Tunggal')
-                                                        : product.kategori === 'Peralatan Pendukung' ? (t('products.catPeralatan') || 'Peralatan Pendukung')
-                                                            : product.kategori === 'Suku Cadang' ? (t('products.catSukuCadang') || 'Suku Cadang')
-                                                                : product.kategori}
-                                            </span>
+                    <div className="flex flex-col gap-12 md:gap-20">
+                        {Object.entries(
+                            displayedProducts.reduce((acc, product) => {
+                                const cat = product.kategori || 'Lainnya';
+                                if (!acc[cat]) acc[cat] = [];
+                                acc[cat].push(product);
+                                return acc;
+                            }, {})
+                        ).map(([catName, productsInCategory]) => {
+                            const isSukuCadang = catName === 'Suku Cadang';
+                            return (
+                                <div key={catName} className="flex flex-col">
+                                    {activeCategory === '' && (
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <h2 className="font-headline text-2xl md:text-3xl font-extrabold text-primary">
+                                                {catName === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap')
+                                                : catName === 'Unit Mesin Tunggal' ? (t('products.catUnitMesin') || 'Unit Mesin Tunggal')
+                                                : catName === 'Peralatan Pendukung' ? (t('products.catPeralatan') || 'Peralatan Pendukung')
+                                                : catName === 'Suku Cadang' ? (t('products.catSukuCadang') || 'Suku Cadang')
+                                                : catName}
+                                            </h2>
+                                            <div className="flex-1 h-px bg-outline-variant/30"></div>
                                         </div>
-                                    </div>
-                                    <div className="p-4 md:p-8 flex-grow flex flex-col">
-                                        <Link to={`/product/${product.slug || product.id}`} className="hover:opacity-80 transition-opacity">
-                                            <h3 className="font-headline text-lg md:text-2xl font-extrabold text-primary-container mb-4 md:mb-6" title={product.nama}>
-                                                {product.nama.length > 50 ? `${product.nama.substring(0, 50)}...` : product.nama}
-                                            </h3>
-                                        </Link>
-                                        {product.spesifikasi && product.spesifikasi.length > 0 && (
-                                            <div className="hidden md:block space-y-2 md:space-y-4 mb-4 md:mb-8 flex-1">
-                                                {product.spesifikasi.slice(0, 2).map((spec, i) => (
-                                                    <div key={i} className="flex items-start md:items-center gap-1 md:gap-2 py-1 md:py-2 border-b border-outline-variant/20">
-                                                        <span className="material-symbols-outlined text-secondary text-sm mt-0.5 md:mt-0">check_circle</span>
-                                                        <span className="text-primary-container font-medium text-xs md:text-sm">{spec}</span>
+                                    )}
+                                    <div className={`grid gap-4 md:gap-6 ${isSukuCadang ? 'grid-cols-2 md:grid-cols-4 xl:grid-cols-6' : 'grid-cols-2 md:grid-cols-3'}`}>
+                                        {productsInCategory.map((product) => (
+                                            <div key={product.id} className="bg-surface-container-lowest group flex flex-col h-full border border-outline-variant/10">
+                                                <div className={`relative overflow-hidden ${isSukuCadang ? 'aspect-square' : 'h-48 md:h-80'}`}>
+                                                    {product.gambar ? (
+                                                        <img
+                                                            alt={product.nama}
+                                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                            src={product.gambar.split(',')[0].trim()}
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-surface-container-highest flex items-center justify-center">
+                                                            <span className="material-symbols-outlined text-6xl text-outline">image</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Badge */}
+                                                    <div className="absolute top-2 left-2 md:top-4 md:left-4">
+                                                        <span className={`px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm shadow-sm ${product.kategori === 'Paket'
+                                                            ? 'bg-secondary-fixed text-on-secondary-fixed'
+                                                            : product.kategori === 'Unit Mesin Tunggal'
+                                                                ? 'bg-primary-container text-white'
+                                                                : product.kategori === 'Peralatan Pendukung'
+                                                                    ? 'bg-[#2e7d32] text-white'
+                                                                    : product.kategori === 'Suku Cadang'
+                                                                        ? 'bg-[#e65100] text-white'
+                                                                        : 'bg-primary text-white'
+                                                            }`}>
+                                                            {product.kategori === 'Paket' ? (t('products.catPaketLengkap') || 'Paket Lengkap')
+                                                                : product.kategori === 'Unit Mesin Tunggal' ? (t('products.catUnitMesin') || 'Unit Mesin Tunggal')
+                                                                    : product.kategori === 'Peralatan Pendukung' ? (t('products.catPeralatan') || 'Peralatan Pendukung')
+                                                                        : product.kategori === 'Suku Cadang' ? (t('products.catSukuCadang') || 'Suku Cadang')
+                                                                            : product.kategori}
+                                                        </span>
                                                     </div>
-                                                ))}
-                                                {product.spesifikasi.length > 2 && (
-                                                    <div className="text-[10px] md:text-xs text-outline font-medium pt-1">
-                                                        +{product.spesifikasi.length - 2} {lang === 'id' ? 'spesifikasi lainnya' : 'other specifications'}
+                                                </div>
+                                                <div className={`flex-grow flex flex-col ${isSukuCadang ? 'p-3' : 'p-4 md:p-8'}`}>
+                                                    <Link to={`/product/${product.slug || product.id}`} className="hover:opacity-80 transition-opacity">
+                                                        <h3 className={`font-headline font-extrabold text-primary-container ${isSukuCadang ? 'text-sm md:text-base mb-3 leading-tight line-clamp-2' : 'text-lg md:text-2xl mb-4 md:mb-6'}`} title={product.nama}>
+                                                            {product.nama.length > 50 ? `${product.nama.substring(0, 50)}...` : product.nama}
+                                                        </h3>
+                                                    </Link>
+                                                    
+                                                    {!isSukuCadang && product.spesifikasi && product.spesifikasi.length > 0 && (
+                                                        <div className="hidden md:block space-y-2 md:space-y-4 mb-4 md:mb-8 flex-1">
+                                                            {product.spesifikasi.slice(0, 2).map((spec, i) => (
+                                                                <div key={i} className="flex items-start md:items-center gap-1 md:gap-2 py-1 md:py-2 border-b border-outline-variant/20">
+                                                                    <span className="material-symbols-outlined text-secondary text-sm mt-0.5 md:mt-0">check_circle</span>
+                                                                    <span className="text-primary-container font-medium text-xs md:text-sm">{spec}</span>
+                                                                </div>
+                                                            ))}
+                                                            {product.spesifikasi.length > 2 && (
+                                                                <div className="text-[10px] md:text-xs text-outline font-medium pt-1">
+                                                                    +{product.spesifikasi.length - 2} {lang === 'id' ? 'spesifikasi lainnya' : 'other specifications'}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    
+                                                    <div className="flex flex-col gap-1.5 md:gap-2 mt-auto">
+                                                        <Link
+                                                            to={`/product/${product.slug || product.id}`}
+                                                            className={`bg-surface-container-high text-primary-container font-headline font-bold tracking-tight hover:bg-surface-container-highest transition-colors text-center border border-outline-variant/20 ${isSukuCadang ? 'py-1.5 md:py-2 text-[10px] md:text-xs' : 'py-2 md:py-3 text-xs md:text-sm'}`}
+                                                        >
+                                                            {lang === 'id' ? 'Lihat Detail' : 'View Detail'}
+                                                        </Link>
+                                                        <MarketplaceButton product={product} size={isSukuCadang ? 'mini' : 'small'} />
+                                                        <a
+                                                            href={`https://wa.me/62881080634612?text=${encodeURIComponent(`Saya melihat dari website atekatehnik.com. Halo, saya tertarik dengan produk: ${product.nama}. Bisa info lebih lanjut?`)}`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            onClick={() => trackWaClick('products-list', product.nama)}
+                                                            className={`bg-[#25D366] text-white font-headline font-bold tracking-tight hover:bg-[#1da851] transition-colors text-center flex items-center justify-center group ${isSukuCadang ? 'py-1.5 md:py-2 text-[10px] md:text-xs gap-1' : 'py-2 md:py-3 text-xs md:text-sm gap-1 md:gap-2'}`}
+                                                        >
+                                                            <svg className={`fill-current group-hover:animate-bounce ${isSukuCadang ? 'w-2.5 h-2.5' : 'w-3 h-3 md:w-4 md:h-4'}`} viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><title>WhatsApp icon</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
+                                                            {t('products.inquire')}
+                                                        </a>
+                                                        {product.inaproc_link && (
+                                                            <a
+                                                                href={product.inaproc_link}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className={`bg-[#D22B50] text-white font-headline font-bold tracking-tight hover:bg-[#b02241] transition-colors text-center flex items-center justify-center group ${isSukuCadang ? 'py-1.5 md:py-2 text-[10px] md:text-xs gap-1' : 'py-2 md:py-3 text-xs md:text-sm gap-1 md:gap-2'}`}
+                                                            >
+                                                                <span className={`material-symbols-outlined group-hover:scale-110 transition-transform ${isSukuCadang ? 'text-[12px]' : 'text-sm'}`}>storefront</span>
+                                                                {lang === 'id' ? 'Kunjungi INAPROC' : 'Visit INAPROC'}
+                                                            </a>
+                                                        )}
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
-                                        )}
-                                        <div className="flex flex-col gap-3 mt-auto">
-                                            <Link
-                                                to={`/product/${product.slug || product.id}`}
-                                                className="bg-surface-container-high text-primary-container py-2 md:py-3 font-headline font-bold text-xs md:text-sm tracking-tight hover:bg-surface-container-highest transition-colors text-center border border-outline-variant/20"
-                                            >
-                                                {lang === 'id' ? 'Lihat Detail' : 'View Detail'}
-                                            </Link>
-                                            {product.shopee_link && (
-                                                <a
-                                                    href={product.shopee_link}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="bg-[#ee4d2d] text-white py-2 md:py-3 font-headline font-bold text-xs md:text-sm tracking-tight hover:bg-[#d73f21] transition-colors text-center flex items-center justify-center gap-1 md:gap-2 group"
-                                                >
-                                                    <span className="material-symbols-outlined text-[14px] md:text-sm group-hover:scale-110 transition-transform">shopping_bag</span>
-                                                    {t('products.buyOnShopee') || 'Beli di Shopee'}
-                                                </a>
-                                            )}
-                                            <a
-                                                href={`https://wa.me/62881080634612?text=${encodeURIComponent(`Saya melihat dari website atekatehnik.com. Halo, saya tertarik dengan produk: ${product.nama}. Bisa info lebih lanjut?`)}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                onClick={() => trackWaClick('products-list', product.nama)}
-                                                className="bg-[#25D366] text-white py-2 md:py-3 font-headline font-bold text-xs md:text-sm tracking-tight hover:bg-[#1da851] transition-colors text-center flex items-center justify-center gap-1 md:gap-2 group"
-                                            >
-                                                <svg className="w-3 h-3 md:w-4 md:h-4 fill-current group-hover:animate-bounce" viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><title>WhatsApp icon</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
-                                                {t('products.inquire')}
-                                            </a>
-                                            {product.inaproc_link && (
-                                                <a
-                                                    href={product.inaproc_link}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="bg-[#D22B50] text-white py-2 md:py-3 font-headline font-bold text-xs md:text-sm tracking-tight hover:bg-[#b02241] transition-colors text-center flex items-center justify-center gap-1 md:gap-2 group"
-                                                >
-                                                    <span className="material-symbols-outlined text-sm group-hover:scale-110 transition-transform">storefront</span>
-                                                    {lang === 'id' ? 'Kunjungi INAPROC' : 'Visit INAPROC'}
-                                                </a>
-                                            )}
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            );
+                        })}
                         {/* Observer Target */}
-                        <div ref={observerTarget} className="h-10 w-full mt-8"></div>
-                    </>
+                        <div ref={observerTarget} className="h-10 w-full mt-4"></div>
+                    </div>
                 )}
             </main>
 
@@ -342,7 +362,7 @@ const Products = () => {
                         <div className="relative z-10">
                             <h3 className="text-white font-headline text-3xl font-extrabold mb-4">{t('products.spareParts')}</h3>
                             <p className="text-on-primary-container mb-6 max-w-sm">{t('products.spareDesc')}</p>
-                            <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noreferrer" className="bg-secondary-container text-on-secondary-container px-8 py-3 font-headline font-bold uppercase tracking-widest text-xs inline-block">{t('products.visitOfficialStore')}</a>
+                            <Link to="/official-channels" className="bg-secondary-container text-on-secondary-container px-8 py-3 font-headline font-bold uppercase tracking-widest text-xs inline-block">{t('products.visitOfficialStore')}</Link>
                         </div>
                     </div>
                     <div className="md:col-span-2 bg-surface-container-high p-8 flex flex-col justify-center">

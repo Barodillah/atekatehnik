@@ -22,7 +22,8 @@ $image = "https://atekatehnik.com/preview.jpg";
 
 $baseUri = parse_url($requestUri, PHP_URL_PATH);
 $baseUri = rtrim($baseUri, '/');
-if (empty($baseUri)) $baseUri = '/';
+if (empty($baseUri))
+    $baseUri = '/';
 
 $pageSchemaType = 'WebPage'; // Default fallback
 
@@ -97,10 +98,14 @@ $jsonLdGraph = [
             'url' => 'https://atekatehnik.com/favicon.png',
             'caption' => 'CV Ateka Tehnik'
         ],
-        'description' => 'Spesialis Supplier Penggilingan Padi Terbaik di Indonesia.',
+        'description' => 'Spesialis Manufaktur Penggilingan Padi Terbaik di Indonesia.',
         'sameAs' => [
             'https://www.instagram.com/toko.ateka.tehnik',
-            'https://www.tiktok.com/@toko.ateka.tehnik'
+            'https://www.facebook.com/warsito.atktehnik',
+            'https://www.tiktok.com/@toko.ateka.tehnik',
+            'https://shopee.co.id/sparepartricemillkaranganyar',
+            'https://www.tokopedia.com/toko-ateka-tehnik',
+            'https://youtube.com/@atekatehnik'
         ]
     ]
 ]; // Base JSON-LD structured data graph
@@ -141,7 +146,7 @@ if ($isPost || $isProduct || $isGalleryShare) {
             } elseif ($isGalleryShare) {
                 $viewParts = explode('-', $_GET['view']);
                 $galleryId = end($viewParts);
-                
+
                 $stmt = $db->prepare("SELECT title, src, type FROM galleries WHERE id = :id");
                 $stmt->execute([':id' => $galleryId]);
                 $item = $stmt->fetch();
@@ -155,7 +160,7 @@ if ($isPost || $isProduct || $isGalleryShare) {
                     // Auto-generate video thumbnail using FFmpeg if it's a video
                     if ($item['type'] === 'video') {
                         $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
-                        
+
                         $srcUrl = $item['src'];
                         if (strpos($srcUrl, 'http') === 0) {
                             // Extract just the path if it's a full URL (e.g. /uploads/video.mp4)
@@ -167,17 +172,17 @@ if ($isPost || $isProduct || $isGalleryShare) {
                             }
                         }
                         $videoPath = $docRoot . $srcPath;
-                        
+
                         // Gunakan __DIR__ agar lebih pasti mengarah ke folder tempat serve.php berada
                         $cacheDir = __DIR__ . '/cache/thumbnails';
-                        
+
                         if (!is_dir($cacheDir)) {
                             @mkdir($cacheDir, 0777, true);
                         }
-                        
+
                         $thumbName = md5($item['src']) . '.jpg';
                         $thumbPath = $cacheDir . '/' . $thumbName;
-                        
+
                         // If thumbnail doesn't exist, try to extract it
                         if (!file_exists($thumbPath) && file_exists($videoPath)) {
                             $cmd = "ffmpeg -i " . escapeshellarg($videoPath) . " -ss 00:00:01.000 -vframes 1 -vf scale=480:-1 -q:v 2 " . escapeshellarg($thumbPath) . " 2>&1";
@@ -185,7 +190,7 @@ if ($isPost || $isProduct || $isGalleryShare) {
                                 @exec($cmd);
                             }
                         }
-                        
+
                         if (file_exists($thumbPath)) {
                             $imageRaw = '/cache/thumbnails/' . $thumbName;
                         } else {
@@ -209,7 +214,8 @@ if ($isPost || $isProduct || $isGalleryShare) {
                     $imageParts = explode(',', $imageRaw);
                     foreach ($imageParts as $imgPart) {
                         $imgTrimmed = trim($imgPart);
-                        if (empty($imgTrimmed)) continue;
+                        if (empty($imgTrimmed))
+                            continue;
                         if (strpos($imgTrimmed, 'http') === 0) {
                             $imageUrls[] = $imgTrimmed;
                         } else {

@@ -12,7 +12,17 @@ $method = $_SERVER['REQUEST_METHOD'];
 $db = getDB();
 
 if ($method === 'GET') {
-    $stmt = $db->query("SELECT * FROM galleries ORDER BY sort_order ASC, created_at DESC");
+    $stmt = $db->query("
+        SELECT g.*, COALESCE(v.view_count, 0) as views 
+        FROM galleries g
+        LEFT JOIN (
+            SELECT SUBSTRING_INDEX(page_slug, '-', -1) as gallery_id, COUNT(*) as view_count 
+            FROM page_views 
+            WHERE page_type = 'gallery' AND page_slug != 'main'
+            GROUP BY SUBSTRING_INDEX(page_slug, '-', -1)
+        ) v ON CAST(g.id AS char) = v.gallery_id
+        ORDER BY g.sort_order ASC, g.created_at DESC
+    ");
     jsonSuccess(['data' => $stmt->fetchAll()]);
 }
 

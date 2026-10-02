@@ -1,89 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
 
-const tikTokEmbeds = [
-  <blockquote key="1" className="tiktok-embed" cite="https://www.tiktok.com/@toko.ateka.tehnik/video/7605829231867710738" data-video-id="7605829231867710738" style={{ maxWidth: '605px', minWidth: '325px', width: '100%' }} ><section><a target="_blank" rel="noreferrer" title="@toko.ateka.tehnik" href="https://www.tiktok.com/@toko.ateka.tehnik?refer=embed">@toko.ateka.tehnik</a> uji coba pengeringan gabah 1 ton dengan bed dryer, pengeringan membutuhkan waktu sekitar 6 jam bos🤩🔥 info bed dryer chat admin❗️ <a title="penggilinganpadi" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/penggilinganpadi?refer=embed">#penggilinganpadi</a> <a title="gabahbalap🌾" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/gabahbalap%F0%9F%8C%BE?refer=embed">#gabahbalap🌾</a> <a title="beras" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/beras?refer=embed">#beras</a> <a target="_blank" rel="noreferrer" title="♬ suara asli  - La Tasya" href="https://www.tiktok.com/music/suara-asli-La-Tasya-7596018856641366805?refer=embed">♬ suara asli  - La Tasya</a></section></blockquote>,
-  <blockquote key="2" className="tiktok-embed" cite="https://www.tiktok.com/@toko.ateka.tehnik/video/7526174808329948434" data-video-id="7526174808329948434" style={{ maxWidth: '605px', minWidth: '325px', width: '100%' }} ><section><a target="_blank" rel="noreferrer" title="@toko.ateka.tehnik" href="https://www.tiktok.com/@toko.ateka.tehnik?refer=embed">@toko.ateka.tehnik</a> <a title="penggilinganpadi" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/penggilinganpadi?refer=embed">#penggilinganpadi</a> <a title="gabahbalap🌾" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/gabahbalap%F0%9F%8C%BE?refer=embed">#gabahbalap🌾</a> <a title="beras" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/beras?refer=embed">#beras</a> <a target="_blank" rel="noreferrer" title="♬ suara asli - carofvngky - HUDA CARO [𝑿𝑮]" href="https://www.tiktok.com/music/suara-asli-carofvngky-7367381357154093830?refer=embed">♬ suara asli - carofvngky - HUDA CARO [𝑿𝑮]</a></section></blockquote>,
-  <blockquote key="3" className="tiktok-embed" cite="https://www.tiktok.com/@toko.ateka.tehnik/video/7531677565254192402" data-video-id="7531677565254192402" style={{ maxWidth: '605px', minWidth: '325px', width: '100%' }} ><section><a target="_blank" rel="noreferrer" title="@toko.ateka.tehnik" href="https://www.tiktok.com/@toko.ateka.tehnik?refer=embed">@toko.ateka.tehnik</a> <a title="penggilinganpadi" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/penggilinganpadi?refer=embed">#penggilinganpadi</a> <a title="gabahbalap🌾" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/gabahbalap%F0%9F%8C%BE?refer=embed">#gabahbalap🌾</a> <a title="beras" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/beras?refer=embed">#beras</a> <a target="_blank" rel="noreferrer" title="♬ suara asli  - Bram ft 𝗔𝗣 (am prem di bio)" href="https://www.tiktok.com/music/suara-asli-Bram-ft-𝗔𝗣-am-prem-di-bio-7525763261527673656?refer=embed">♬ suara asli  - Bram ft 𝗔𝗣 (am prem di bio)</a></section></blockquote>,
-  <blockquote key="4" className="tiktok-embed" cite="https://www.tiktok.com/@toko.ateka.tehnik/video/7681536512642600200" data-video-id="7681536512642600200" style={{ maxWidth: '605px', minWidth: '325px', width: '100%' }} ><section><a target="_blank" rel="noreferrer" title="@toko.ateka.tehnik" href="https://www.tiktok.com/@toko.ateka.tehnik?refer=embed">@toko.ateka.tehnik</a> pecah kulit yanmar(hw) ready boss🤩🔥🫵🏼 siapa cepat dia dapat, yuk lgsg wa admin toko di bio😋🙏🏻 <a title="penggilinganpadi" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/penggilinganpadi?refer=embed">#penggilinganpadi</a> <a title="gabahbalap🌾" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/gabahbalap%F0%9F%8C%BE?refer=embed">#gabahbalap🌾</a> <a title="beras" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/beras?refer=embed">#beras</a> <a target="_blank" rel="noreferrer" title="♬ suara asli  - 𝐔𝐔𝐃.𝐃𝐂" href="https://www.tiktok.com/music/suara-asli-𝐔𝐔𝐃𝐃𝐂-7615224262387190535?refer=embed">♬ suara asli  - 𝐔𝐔𝐃.𝐃𝐂</a></section></blockquote>,
-  <blockquote key="5" className="tiktok-embed" cite="https://www.tiktok.com/@toko.ateka.tehnik/video/7676327435587144978" data-video-id="7676327435587144978" style={{ maxWidth: '605px', minWidth: '325px', width: '100%' }} ><section><a target="_blank" rel="noreferrer" title="@toko.ateka.tehnik" href="https://www.tiktok.com/@toko.ateka.tehnik?refer=embed">@toko.ateka.tehnik</a> upgrade rice milling unit disini dijamin aman dan terpercaya boss😋🤙🏻🔥 <a title="penggilinganpadi" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/penggilinganpadi?refer=embed">#penggilinganpadi</a> <a title="gabahbalap🌾" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/gabahbalap%F0%9F%8C%BE?refer=embed">#gabahbalap🌾</a> <a title="beras" target="_blank" rel="noreferrer" href="https://www.tiktok.com/tag/beras?refer=embed">#beras</a> <a target="_blank" rel="noreferrer" title="♬ original sound  - elpe YETE" href="https://www.tiktok.com/music/original-sound-elpe-YETE-7669464838673812232?refer=embed">♬ original sound  - elpe YETE</a></section></blockquote>
-];
-
-// Clone 3 items at each edge for infinite loop (3 = max items per view on desktop)
-const CLONE_COUNT = 3;
-const loopEmbeds = [
-  ...tikTokEmbeds.slice(-CLONE_COUNT),
-  ...tikTokEmbeds,
-  ...tikTokEmbeds.slice(0, CLONE_COUNT),
-];
-
 const OfficialChannelNotice = () => {
   const { t } = useLanguage();
-  const totalItems = tikTokEmbeds.length;
-  const totalSlides = loopEmbeds.length;
-  // Start at CLONE_COUNT so we begin at the first real item
-  const [currentIndex, setCurrentIndex] = useState(CLONE_COUNT);
-  const [isTransitioning, setIsTransitioning] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
-  const [itemsPerView, setItemsPerView] = useState(
-    typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 1
-  );
-
-  // Responsive: detect desktop vs mobile
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerView(window.innerWidth >= 768 ? 3 : 1);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Load TikTok Script
-  useEffect(() => {
-    const existingScript = document.getElementById('tiktok-embed-script');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.id = 'tiktok-embed-script';
-      script.src = 'https://www.tiktok.com/embed.js';
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
-
-  // Autoplay Logic
-  useEffect(() => {
-    if (isHovered) return;
-
-    const interval = setInterval(() => {
-      goNext();
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [isHovered, currentIndex]);
-
-  const goNext = () => {
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev + 1);
-  };
-
-  const goPrev = () => {
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev - 1);
-  };
-
-  // When transition ends, check if we landed on a clone zone and jump instantly
-  const handleTransitionEnd = () => {
-    if (currentIndex >= CLONE_COUNT + totalItems) {
-      // Past the last real item → jump back to corresponding real position
-      setIsTransitioning(false);
-      setCurrentIndex(currentIndex - totalItems);
-    } else if (currentIndex < CLONE_COUNT) {
-      // Before the first real item → jump forward to corresponding real position
-      setIsTransitioning(false);
-      setCurrentIndex(currentIndex + totalItems);
-    }
-  };
 
   return (
     <section className="relative py-12 md:py-16 overflow-hidden bg-gradient-to-br from-red-50 via-white to-rose-50 border-y border-red-100">
@@ -176,61 +96,49 @@ const OfficialChannelNotice = () => {
               </div>
             </div>
 
-            <Link
-              to="/official-channels"
-              className="inline-flex w-full items-center justify-between px-6 py-4 md:py-5 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-700 hover:via-red-600 hover:to-red-800 text-white font-bold rounded-sm transition-all duration-300 shadow-xl shadow-red-600/20 hover:shadow-red-600/40 group overflow-hidden relative"
-            >
-              <span className="relative z-10 text-base md:text-lg tracking-wide">{t('notice.ctaBtn')}</span>
-              <div className="relative z-10 bg-white/20 p-2 rounded-full group-hover:bg-white/30 transition-colors">
-                <svg className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-center -space-x-3 md:-space-x-4">
+                {[
+                  'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
+                  'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
+                  'https://atekatehnik.com/wp/uploads/asset_6abf70fa993fe1.48512687.png',
+                  'https://atekatehnik.com/wp/uploads/url_6abf716f9aaed5.45057497.png',
+                  'https://atekatehnik.com/wp/uploads/url_6abf7124b2c404.83625225.png',
+                  'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
+                  'https://atekatehnik.com/wp/uploads/asset_6abf7ae3e3bfb1.52267375.png',
+                  'https://atekatehnik.com/wp/uploads/url_6abf7b09b55362.55857568.webp'
+                ].map((src, i) => (
+                  <Link 
+                    key={i} 
+                    to="/official-channels"
+                    className="animate-bounce z-10 hover:z-20 block"
+                    style={{ animationDuration: '3.5s', animationDelay: `${i * 150}ms` }}
+                  >
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center p-2 hover:scale-125 transition-transform duration-300 cursor-pointer">
+                      <img src={src} className="w-full h-full object-contain drop-shadow-sm" alt="Channel Logo" />
+                    </div>
+                  </Link>
+                ))}
               </div>
-              <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-white/20 skew-x-12 transform group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out"></div>
-            </Link>
+
+              <Link
+                to="/official-channels"
+                className="inline-flex w-full items-center justify-between px-6 py-4 md:py-5 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-700 hover:via-red-600 hover:to-red-800 text-white font-bold rounded-sm transition-all duration-300 shadow-xl shadow-red-600/20 hover:shadow-red-600/40 group overflow-hidden relative"
+              >
+                <span className="relative z-10 text-base md:text-lg tracking-wide">{t('notice.ctaBtn')}</span>
+                <div className="relative z-10 bg-white/20 p-2 rounded-full group-hover:bg-white/30 transition-colors">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                </div>
+                <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-white/20 skew-x-12 transform group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out"></div>
+              </Link>
+            </div>
           </div>
 
         </div>
 
-        {/* TikTok Embeds Section */}
-        <div 
-          className="mt-8 bg-white/80 backdrop-blur-2xl rounded-sm p-4 md:p-6 shadow-2xl shadow-red-900/5 ring-1 ring-red-100/50 relative z-20 group overflow-hidden"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {/* Navigation Buttons */}
-          <button 
-            onClick={goPrev}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white text-red-600 shadow-xl border border-red-100 p-2.5 md:p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110"
-            aria-label="Previous slide"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path></svg>
-          </button>
-          <button 
-            onClick={goNext}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white text-red-600 shadow-xl border border-red-100 p-2.5 md:p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110"
-            aria-label="Next slide"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path></svg>
-          </button>
 
-          {/* Carousel Track */}
-          <div 
-            className="flex"
-            style={{
-              width: `${(totalSlides / itemsPerView) * 100}%`,
-              transform: `translateX(-${(currentIndex / totalSlides) * 100}%)`,
-              transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none',
-            }}
-            onTransitionEnd={handleTransitionEnd}
-          >
-            {loopEmbeds.map((embed, i) => (
-              <div key={i} className="shrink-0 flex justify-center px-2 md:px-4" style={{ width: `${100 / totalSlides}%` }}>
-                {embed}
-              </div>
-            ))}
-          </div>
-        </div>
 
       </div>
     </section>

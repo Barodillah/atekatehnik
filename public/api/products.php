@@ -73,6 +73,11 @@ switch ($method) {
             // List all with optional search, kategori filter & pagination
             $search   = trim($_GET['search'] ?? '');
             $kategori = trim($_GET['kategori'] ?? '');
+            $has_shopee = isset($_GET['has_shopee']) && $_GET['has_shopee'] === '1';
+            $has_tokopedia = isset($_GET['has_tokopedia']) && $_GET['has_tokopedia'] === '1';
+            $has_tiktokshop = isset($_GET['has_tiktokshop']) && $_GET['has_tiktokshop'] === '1';
+            $has_inaproc = isset($_GET['has_inaproc']) && $_GET['has_inaproc'] === '1';
+
             $page     = max(1, (int)($_GET['page'] ?? 1));
             $limit    = min(1000, max(1, (int)($_GET['limit'] ?? 12)));
             $offset   = ($page - 1) * $limit;
@@ -88,7 +93,50 @@ switch ($method) {
                 $conditions[] = "p.kategori = :kategori";
                 $params[':kategori'] = $kategori;
             }
+            if ($has_shopee) {
+                $conditions[] = "p.shopee_link IS NOT NULL AND p.shopee_link != ''";
+            }
+            if ($has_tokopedia) {
+                $conditions[] = "p.tokopedia_link IS NOT NULL AND p.tokopedia_link != ''";
+            }
+            if ($has_tiktokshop) {
+                $conditions[] = "p.tiktokshop_link IS NOT NULL AND p.tiktokshop_link != ''";
+            }
+            if ($has_inaproc) {
+                $conditions[] = "p.inaproc_link IS NOT NULL AND p.inaproc_link != ''";
+            }
             $where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
+
+            $stats = null;
+            if ($page === 1) {
+                $stats = [
+                    'byKategori' => [],
+                    'byLink' => [
+                        'shopee' => 0,
+                        'tokopedia' => 0,
+                        'tiktokshop' => 0,
+                        'inaproc' => 0
+                    ]
+                ];
+                // Base query without filters to get total stats
+                $statStmt = $db->query("SELECT kategori, 
+                    SUM(CASE WHEN shopee_link IS NOT NULL AND shopee_link != '' THEN 1 ELSE 0 END) as shopee,
+                    SUM(CASE WHEN tokopedia_link IS NOT NULL AND tokopedia_link != '' THEN 1 ELSE 0 END) as tokopedia,
+                    SUM(CASE WHEN tiktokshop_link IS NOT NULL AND tiktokshop_link != '' THEN 1 ELSE 0 END) as tiktokshop,
+                    SUM(CASE WHEN inaproc_link IS NOT NULL AND inaproc_link != '' THEN 1 ELSE 0 END) as inaproc,
+                    COUNT(*) as count 
+                    FROM products GROUP BY kategori");
+                
+                $statRows = $statStmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($statRows as $row) {
+                    $cat = $row['kategori'] ?: 'Uncategorized';
+                    $stats['byKategori'][$cat] = (int)$row['count'];
+                    $stats['byLink']['shopee'] += (int)$row['shopee'];
+                    $stats['byLink']['tokopedia'] += (int)$row['tokopedia'];
+                    $stats['byLink']['tiktokshop'] += (int)$row['tiktokshop'];
+                    $stats['byLink']['inaproc'] += (int)$row['inaproc'];
+                }
+            }
 
             // Total count
             $countSql = "SELECT COUNT(*) FROM products p $where";
@@ -101,19 +149,20 @@ switch ($method) {
             $sortOrder = strtoupper(trim($_GET['sort'] ?? 'DESC'));
             if ($sortOrder !== 'ASC') $sortOrder = 'DESC';
             
+            $sql = "SELECT p.*, COALESCE(v.view_count, 0) as views 
+                    FROM products p 
+                    LEFT JOIN (
+                        SELECT page_slug, COUNT(*) as view_count 
+                        FROM page_views 
+                        WHERE page_type = 'product' 
+                        GROUP BY page_slug
+                    ) v ON COALESCE(p.slug, CAST(p.id AS char)) = v.page_slug 
+                    $where ";
+            
             if ($sortBy === 'views') {
-                $sql = "SELECT p.*, COALESCE(v.view_count, 0) as views 
-                        FROM products p 
-                        LEFT JOIN (
-                            SELECT page_slug, COUNT(*) as view_count 
-                            FROM page_views 
-                            WHERE page_type = 'product' 
-                            GROUP BY page_slug
-                        ) v ON p.slug = v.page_slug 
-                        $where 
-                        ORDER BY views $sortOrder, p.created_at DESC LIMIT :limit OFFSET :offset";
+                $sql .= "ORDER BY views $sortOrder, p.created_at DESC LIMIT :limit OFFSET :offset";
             } else {
-                $sql = "SELECT p.* FROM products p $where ORDER BY p.created_at $sortOrder LIMIT :limit OFFSET :offset";
+                $sql .= "ORDER BY p.created_at $sortOrder LIMIT :limit OFFSET :offset";
             }
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v) {
@@ -132,13 +181,17 @@ switch ($method) {
             }
             unset($p);
 
-            jsonSuccess([
+            $response = [
                 'products'   => $products,
                 'total'      => $total,
                 'page'       => $page,
                 'limit'      => $limit,
                 'totalPages' => ceil($total / $limit),
-            ]);
+            ];
+            if ($stats !== null) {
+                $response['stats'] = $stats;
+            }
+            jsonSuccess($response);
         }
         break;
 
@@ -153,6 +206,8 @@ switch ($method) {
         $kategori   = trim($input['kategori'] ?? '');
         $shopeeLink = trim($input['shopeeLink'] ?? '');
         $inaprocLink = trim($input['inaprocLink'] ?? '');
+        $tokopediaLink = trim($input['tokopediaLink'] ?? '');
+        $tiktokshopLink = trim($input['tiktokshopLink'] ?? '');
         $spesifikasi = $input['spesifikasi'] ?? [];
 
         if (empty($nama) || empty($kategori)) {
@@ -163,8 +218,8 @@ switch ($method) {
         try {
             $slug = generateSlug($db, $nama);
             $stmt = $db->prepare("
-                INSERT INTO products (nama, slug, description, gambar, kategori, shopee_link, inaproc_link)
-                VALUES (:nama, :slug, :description, :gambar, :kategori, :shopee, :inaproc)
+                INSERT INTO products (nama, slug, description, gambar, kategori, shopee_link, inaproc_link, tokopedia_link, tiktokshop_link)
+                VALUES (:nama, :slug, :description, :gambar, :kategori, :shopee, :inaproc, :tokopedia, :tiktokshop)
             ");
             $stmt->execute([
                 ':nama'        => $nama,
@@ -174,6 +229,8 @@ switch ($method) {
                 ':kategori'    => $kategori,
                 ':shopee'      => $shopeeLink,
                 ':inaproc'     => $inaprocLink,
+                ':tokopedia'   => $tokopediaLink,
+                ':tiktokshop'  => $tiktokshopLink,
             ]);
             $productId = (int)$db->lastInsertId();
 
@@ -217,6 +274,8 @@ switch ($method) {
         $kategori   = trim($input['kategori'] ?? '');
         $shopeeLink = trim($input['shopeeLink'] ?? '');
         $inaprocLink = trim($input['inaprocLink'] ?? '');
+        $tokopediaLink = trim($input['tokopediaLink'] ?? '');
+        $tiktokshopLink = trim($input['tiktokshopLink'] ?? '');
         $spesifikasi = $input['spesifikasi'] ?? [];
 
         if (empty($nama) || empty($kategori)) {
@@ -227,7 +286,7 @@ switch ($method) {
         try {
             $slug = generateSlug($db, $nama, $id);
             $stmt = $db->prepare("
-                UPDATE products SET nama = :nama, slug = :slug, description = :description, gambar = :gambar, kategori = :kategori, shopee_link = :shopee, inaproc_link = :inaproc
+                UPDATE products SET nama = :nama, slug = :slug, description = :description, gambar = :gambar, kategori = :kategori, shopee_link = :shopee, inaproc_link = :inaproc, tokopedia_link = :tokopedia, tiktokshop_link = :tiktokshop
                 WHERE id = :id
             ");
             $stmt->execute([
@@ -238,6 +297,8 @@ switch ($method) {
                 ':kategori'    => $kategori,
                 ':shopee'      => $shopeeLink,
                 ':inaproc'     => $inaprocLink,
+                ':tokopedia'   => $tokopediaLink,
+                ':tiktokshop'  => $tiktokshopLink,
                 ':id'          => $id,
             ]);
 

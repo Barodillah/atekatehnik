@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -8,19 +8,48 @@ const Products = () => {
   const { searchQuery } = useOutletContext();
 
   const [products, setProducts] = useState([]);
+  const [stats, setStats] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, nama: '' });
+  const [copiedId, setCopiedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    kategori: '',
+    has_shopee: false,
+    has_tokopedia: false,
+    has_tiktokshop: false,
+    has_inaproc: false,
+  });
 
-  const fetchProducts = async (page = 1) => {
-    setIsLoading(true);
+  const observerTarget = useRef(null);
+
+  const fetchProducts = async (page = 1, append = false) => {
+    if (!append) setIsLoading(true);
     try {
-      const params = new URLSearchParams({ page, limit: 12 });
+      const params = new URLSearchParams({ page, limit: 18 });
       if (searchQuery) params.append('search', searchQuery);
+      if (filters.kategori) params.append('kategori', filters.kategori);
+      if (filters.has_shopee) params.append('has_shopee', '1');
+      if (filters.has_tokopedia) params.append('has_tokopedia', '1');
+      if (filters.has_tiktokshop) params.append('has_tiktokshop', '1');
+      if (filters.has_inaproc) params.append('has_inaproc', '1');
+
       const res = await authFetch(`/api/products.php?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
-        setProducts(data.products);
+        if (append) {
+          setProducts(prev => {
+             const existingIds = new Set(prev.map(p => p.id));
+             const newProds = data.products.filter(p => !existingIds.has(p.id));
+             return [...prev, ...newProds];
+          });
+        } else {
+          setProducts(data.products);
+        }
         setPagination({ page: data.page, totalPages: data.totalPages, total: data.total });
+        if (data.stats) {
+          setStats(data.stats);
+        }
       }
     } catch {
     } finally {
@@ -28,14 +57,45 @@ const Products = () => {
     }
   };
 
-  useEffect(() => { fetchProducts(1); }, [searchQuery]);
+  useEffect(() => {
+    fetchProducts(1, false);
+  }, [searchQuery, filters]);
 
-  const handleDelete = async (id, nama) => {
-    if (!window.confirm(`Hapus produk "${nama}"?`)) return;
+  const loadMore = useCallback(() => {
+    if (pagination.page < pagination.totalPages && !isLoading) {
+      fetchProducts(pagination.page + 1, true);
+    }
+  }, [pagination, isLoading, filters, searchQuery]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
     try {
-      await authFetch(`/api/products.php?id=${id}`, { method: 'DELETE' });
-      fetchProducts(pagination.page);
+      await authFetch(`/api/products.php?id=${deleteModal.id}`, { method: 'DELETE' });
+      setDeleteModal({ isOpen: false, id: null, nama: '' });
+      fetchProducts(1, false);
     } catch {}
+  };
+
+  const handleCopyLink = (product) => {
+    const link = `${window.location.origin}/product/${product.slug || product.id}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(product.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
@@ -61,22 +121,69 @@ const Products = () => {
       </div>
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 md:mb-12">
-        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
-          <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Products</p>
-          <p className="text-3xl font-headline font-bold text-primary">{pagination.total}</p>
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-surface-container-low p-4 rounded-sm border-l-4 border-primary">
+            <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Produk</p>
+            <p className="text-3xl font-headline font-bold text-primary">{pagination.total}</p>
+          </div>
+          <div className="bg-surface-container-low p-4 rounded-sm">
+            <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Kategori Utama</p>
+            <div className="text-xs text-on-surface-variant mt-2 space-y-1 font-bold">
+              <div className="flex justify-between"><span>Paket:</span> <span>{stats.byKategori['Paket'] || 0}</span></div>
+              <div className="flex justify-between"><span>Suku Cadang:</span> <span>{stats.byKategori['Suku Cadang'] || 0}</span></div>
+              <div className="flex justify-between"><span>Unit Mesin:</span> <span>{stats.byKategori['Unit Mesin Tunggal'] || 0}</span></div>
+              <div className="flex justify-between"><span>Peralatan:</span> <span>{stats.byKategori['Peralatan Pendukung'] || 0}</span></div>
+            </div>
+          </div>
+          <div className="bg-surface-container-low p-4 rounded-sm">
+            <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Marketplace Links</p>
+            <div className="text-xs text-on-surface-variant mt-2 space-y-1 font-bold">
+              <div className="flex justify-between text-orange-500"><span>Shopee:</span> <span>{stats.byLink.shopee}</span></div>
+              <div className="flex justify-between text-green-600"><span>Tokopedia:</span> <span>{stats.byLink.tokopedia}</span></div>
+              <div className="flex justify-between text-slate-800"><span>TikTok:</span> <span>{stats.byLink.tiktokshop}</span></div>
+            </div>
+          </div>
+          <div className="bg-surface-container-low p-4 rounded-sm border-l-4 border-red-500">
+            <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">E-Katalog</p>
+            <p className="text-2xl font-headline font-bold text-red-600 mt-1">{stats.byLink.inaproc}</p>
+            <p className="text-xs text-on-surface-variant font-bold">INAPROC terhubung</p>
+          </div>
         </div>
-        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
-          <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Paket</p>
-          <p className="text-2xl md:text-3xl font-headline font-bold text-primary">{products.filter(p => p.kategori === 'Paket').length}</p>
+      )}
+
+      {/* Filter Bar */}
+      <div className="bg-surface-container-low p-4 rounded-sm mb-8 flex flex-col xl:flex-row gap-4 xl:items-center">
+        <div className="flex-1">
+          <select 
+            value={filters.kategori}
+            onChange={e => setFilters(prev => ({ ...prev, kategori: e.target.value }))}
+            className="w-full xl:w-64 bg-white border border-outline-variant/30 text-sm py-2 px-3 outline-none focus:border-primary transition-colors font-bold text-on-surface"
+          >
+            <option value="">Semua Kategori</option>
+            <option value="Paket">Paket Lengkap</option>
+            <option value="Unit Mesin Tunggal">Unit Mesin Tunggal</option>
+            <option value="Peralatan Pendukung">Peralatan Pendukung</option>
+            <option value="Suku Cadang">Suku Cadang</option>
+          </select>
         </div>
-        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm">
-          <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Suku Cadang</p>
-          <p className="text-2xl md:text-3xl font-headline font-bold text-secondary">{products.filter(p => p.kategori === 'Suku Cadang').length}</p>
-        </div>
-        <div className="bg-surface-container-low p-4 md:p-6 rounded-sm border-l-4 border-secondary">
-          <p className="font-label text-[10px] text-outline font-bold uppercase tracking-widest mb-1">Total Pages</p>
-          <p className="text-2xl md:text-3xl font-headline font-bold text-primary">{pagination.totalPages}</p>
+        <div className="flex flex-wrap gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest">
+          <label className="flex items-center gap-1 cursor-pointer bg-orange-100 text-orange-700 px-3 py-2 rounded-sm hover:bg-orange-200 transition-colors">
+            <input type="checkbox" checked={filters.has_shopee} onChange={e => setFilters(prev => ({ ...prev, has_shopee: e.target.checked }))} className="accent-orange-500" />
+            Shopee
+          </label>
+          <label className="flex items-center gap-1 cursor-pointer bg-green-100 text-green-700 px-3 py-2 rounded-sm hover:bg-green-200 transition-colors">
+            <input type="checkbox" checked={filters.has_tokopedia} onChange={e => setFilters(prev => ({ ...prev, has_tokopedia: e.target.checked }))} className="accent-green-600" />
+            Tokopedia
+          </label>
+          <label className="flex items-center gap-1 cursor-pointer bg-slate-200 text-slate-800 px-3 py-2 rounded-sm hover:bg-slate-300 transition-colors">
+            <input type="checkbox" checked={filters.has_tiktokshop} onChange={e => setFilters(prev => ({ ...prev, has_tiktokshop: e.target.checked }))} className="accent-slate-800" />
+            TikTok
+          </label>
+          <label className="flex items-center gap-1 cursor-pointer bg-red-100 text-red-700 px-3 py-2 rounded-sm hover:bg-red-200 transition-colors">
+            <input type="checkbox" checked={filters.has_inaproc} onChange={e => setFilters(prev => ({ ...prev, has_inaproc: e.target.checked }))} className="accent-red-600" />
+            INAPROC
+          </label>
         </div>
       </div>
 
@@ -93,10 +200,10 @@ const Products = () => {
           <p className="text-sm mt-1">Tambahkan produk pertama Anda!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
           {products.map((product) => (
-            <div key={product.id} className="group bg-surface-container-lowest transition-all">
-              <div className="aspect-[16/10] bg-surface-container-highest overflow-hidden relative">
+            <div key={product.id} className="group bg-surface-container-lowest transition-all flex flex-col h-full">
+              <div className="aspect-square bg-surface-container-highest overflow-hidden relative">
                 {product.gambar ? (
                   <img
                     alt={product.nama}
@@ -108,31 +215,31 @@ const Products = () => {
                     <span className="material-symbols-outlined text-5xl">image</span>
                   </div>
                 )}
-                <div className="absolute top-4 left-4 bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter">
-                  {product.kategori}
+                <div className="absolute top-2 right-2 flex gap-1 items-center">
+                  {product.views !== undefined && (
+                    <div className="bg-surface/90 backdrop-blur-sm text-primary px-2 py-1 rounded-sm flex items-center gap-1 shadow-sm border border-outline-variant/20" title={`${product.views} kali dilihat`}>
+                      <span className="material-symbols-outlined text-[14px]">visibility</span>
+                      <span className="text-[10px] font-bold">{product.views}</span>
+                    </div>
+                  )}
+                  <button 
+                    onClick={() => handleCopyLink(product)}
+                    className="bg-surface/90 backdrop-blur-sm hover:bg-surface text-primary px-2 py-1 rounded-sm flex items-center justify-center shadow-sm border border-outline-variant/20 transition-colors" 
+                    title="Salin Link Produk"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">
+                      {copiedId === product.id ? 'check' : 'content_copy'}
+                    </span>
+                  </button>
                 </div>
               </div>
-              <div className="pt-6 pb-2 px-2">
-                <div className="flex justify-between items-start mb-2">
+              <div className="pt-4 pb-2 px-2 flex-grow flex flex-col">
+                <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="font-label text-[10px] text-secondary font-bold uppercase tracking-widest">{product.kategori}</p>
-                    <h3 className="font-headline text-xl font-bold text-primary">{product.nama}</h3>
+                    <p className="font-label text-[9px] text-secondary font-bold uppercase tracking-widest">{product.kategori}</p>
+                    <h3 className="font-headline text-sm font-bold text-primary leading-tight mt-1 line-clamp-2" title={product.nama}>{product.nama}</h3>
                   </div>
                 </div>
-                {/* Specs preview */}
-                {product.spesifikasi && product.spesifikasi.length > 0 && (
-                  <div className="py-3 space-y-1">
-                    {product.spesifikasi.slice(0, 3).map((spec, i) => (
-                      <p key={i} className="text-xs text-on-surface-variant flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[12px] text-secondary">check</span>
-                        {spec}
-                      </p>
-                    ))}
-                    {product.spesifikasi.length > 3 && (
-                      <p className="text-[10px] text-outline">+{product.spesifikasi.length - 3} spesifikasi lainnya</p>
-                    )}
-                  </div>
-                )}
                 {product.shopee_link && (
                   <a href={product.shopee_link} target="_blank" rel="noreferrer" className="text-xs text-orange-500 font-bold flex items-center gap-1 hover:underline mt-1">
                     <span className="material-symbols-outlined text-[14px]">shopping_bag</span> Shopee
@@ -143,7 +250,17 @@ const Products = () => {
                     <span className="material-symbols-outlined text-[14px]">storefront</span> INAPROC
                   </a>
                 )}
-                <div className="flex gap-2 mt-4 pt-4 border-t border-outline-variant/10">
+                {product.tokopedia_link && (
+                  <a href={product.tokopedia_link} target="_blank" rel="noreferrer" className="text-xs text-green-600 font-bold flex items-center gap-1 hover:underline mt-1">
+                    <span className="material-symbols-outlined text-[14px]">shopping_cart</span> Tokopedia
+                  </a>
+                )}
+                {product.tiktokshop_link && (
+                  <a href={product.tiktokshop_link} target="_blank" rel="noreferrer" className="text-xs text-slate-800 font-bold flex items-center gap-1 hover:underline mt-1">
+                    <span className="material-symbols-outlined text-[14px]">local_mall</span> TikTok Shop
+                  </a>
+                )}
+                <div className="flex gap-2 mt-auto pt-4 border-t border-outline-variant/10">
                   <button 
                     onClick={() => navigate(`/admin/products/edit/${product.id}`)}
                     className="flex-1 py-2 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors cursor-pointer"
@@ -151,7 +268,7 @@ const Products = () => {
                     Edit
                   </button>
                   <button 
-                    onClick={() => handleDelete(product.id, product.nama)}
+                    onClick={() => setDeleteModal({ isOpen: true, id: product.id, nama: product.nama })}
                     className="px-4 py-2 text-error hover:bg-error-container/30 transition-colors rounded-sm cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-sm">delete</span>
@@ -160,51 +277,41 @@ const Products = () => {
               </div>
             </div>
           ))}
-          
-          {/* Add New Placeholder Card */}
-          <div 
-            onClick={() => navigate('/admin/products/new')}
-            className="border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-12 hover:bg-surface-container transition-colors cursor-pointer group min-h-[400px]"
-          >
-            <div className="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-container group-hover:text-on-primary transition-all">
-              <span className="material-symbols-outlined text-3xl">add_circle</span>
-            </div>
-            <p className="font-headline font-bold text-primary">Register New Machine</p>
-            <p className="text-xs text-on-surface-variant mt-2">Upload specs and high-res imagery</p>
-          </div>
         </div>
       )}
 
-      {/* Pagination Controls */}
-      {pagination.totalPages > 1 && (
-        <div className="mt-12 md:mt-16 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs font-label uppercase tracking-widest text-outline">
-            Displaying page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
-          </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => fetchProducts(pagination.page - 1)}
-              disabled={pagination.page <= 1}
-              className="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined">chevron_left</span>
-            </button>
-            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map(p => (
+      {/* Infinite Scroll Trigger */}
+      {pagination.page < pagination.totalPages && (
+        <div ref={observerTarget} className="flex justify-center py-8">
+          <span className="material-symbols-outlined text-primary animate-spin text-3xl">progress_activity</span>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface w-full max-w-md p-8 rounded-sm shadow-2xl flex flex-col items-center text-center animate-fade-in-up">
+            <div className="w-16 h-16 bg-error-container text-error rounded-full flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-4xl">warning</span>
+            </div>
+            <h3 className="text-2xl font-headline font-bold text-on-surface mb-2">Hapus Produk?</h3>
+            <p className="text-on-surface-variant mb-8">
+              Anda yakin ingin menghapus <strong>{deleteModal.nama}</strong>?<br/>Aksi ini permanen dan tidak dapat dibatalkan.
+            </p>
+            <div className="flex gap-4 w-full">
               <button 
-                key={p}
-                onClick={() => fetchProducts(p)}
-                className={`w-10 h-10 flex items-center justify-center rounded-sm ${p === pagination.page ? 'bg-primary-container text-on-primary shadow-md' : 'bg-surface-container-low text-primary hover:bg-surface-container-highest transition-all'}`}
+                onClick={() => setDeleteModal({ isOpen: false, id: null, nama: '' })}
+                className="flex-1 py-4 bg-surface-container-highest text-on-surface font-bold text-sm uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors cursor-pointer"
               >
-                {p}
+                Batal
               </button>
-            ))}
-            <button 
-              onClick={() => fetchProducts(pagination.page + 1)}
-              disabled={pagination.page >= pagination.totalPages}
-              className="w-10 h-10 flex items-center justify-center bg-surface-container-low text-primary rounded-sm hover:bg-surface-container-highest transition-all disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined">chevron_right</span>
-            </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 py-4 bg-error text-white font-bold text-sm uppercase tracking-widest rounded-sm hover:bg-error/90 transition-colors cursor-pointer"
+              >
+                Hapus
+              </button>
+            </div>
           </div>
         </div>
       )}

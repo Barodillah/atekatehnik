@@ -13,6 +13,8 @@ const ProductForm = () => {
     kategori: 'Paket',
     shopeeLink: '',
     inaprocLink: '',
+    tokopediaLink: '',
+    tiktokshopLink: '',
     description: '',
   });
 
@@ -126,6 +128,8 @@ PENTING: Kembalikan respon HANYA dalam format JSON valid tanpa awalan atau akhir
               kategori: data.product.kategori || 'Paket',
               shopeeLink: data.product.shopee_link || '',
               inaprocLink: data.product.inaproc_link || '',
+              tokopediaLink: data.product.tokopedia_link || '',
+              tiktokshopLink: data.product.tiktokshop_link || '',
               description: data.product.description || '',
             });
             if (data.product.gambar) {
@@ -343,6 +347,34 @@ PENTING: Kembalikan respon HANYA dalam format JSON valid tanpa awalan atau akhir
                     onChange={handleInputChange}
                     className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
                     placeholder="https://katalog.inaproc.id/..." 
+                    type="url" 
+                  />
+                </div>
+                <div className="relative">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
+                    Tautan Tokopedia <span className="text-outline-variant lowercase tracking-normal">(Opsional)</span>
+                    <span className="material-symbols-outlined text-[14px] text-green-600">shopping_cart</span>
+                  </label>
+                  <input 
+                    name="tokopediaLink"
+                    value={formData.tokopediaLink}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
+                    placeholder="https://www.tokopedia.com/..." 
+                    type="url" 
+                  />
+                </div>
+                <div className="relative">
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2 flex items-center gap-2">
+                    Tautan TikTok Shop <span className="text-outline-variant lowercase tracking-normal">(Opsional)</span>
+                    <span className="material-symbols-outlined text-[14px] text-slate-800">local_mall</span>
+                  </label>
+                  <input 
+                    name="tiktokshopLink"
+                    value={formData.tiktokshopLink}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
+                    placeholder="https://www.tiktok.com/..." 
                     type="url" 
                   />
                 </div>

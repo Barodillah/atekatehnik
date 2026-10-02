@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { parseMarkdown } from '../utils/markdownParser';
 import { trackWaClick } from '../utils/trackWaClick';
+import MarketplaceButton from '../components/MarketplaceButton';
 
 const ProductDetail = () => {
     const { slug } = useParams();
@@ -252,17 +253,7 @@ const ProductDetail = () => {
                                     {lang === 'id' ? 'Permintaan Khusus' : 'Custom Request'}
                                 </Link>
 
-                                {product.shopee_link && (
-                                    <a
-                                        href={product.shopee_link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-[#ee4d2d] text-white px-8 py-4 rounded-sm font-headline font-extrabold text-lg hover:bg-[#cf4023] transition-all flex items-center gap-3 shadow-xl"
-                                    >
-                                        <span className="material-symbols-outlined">shopping_bag</span>
-                                        {t('products.buyOnShopee') || (lang === 'id' ? 'Beli di Shopee' : 'Buy on Shopee')}
-                                    </a>
-                                )}
+                                <MarketplaceButton product={product} size="large" />
 
                                 {product.inaproc_link && (
                                     <a

@@ -199,8 +199,10 @@
 | 5 | `kategori` | `varchar(100)` | NO | - | - | - |
 | 6 | `shopee_link` | `varchar(255)` | YES | - | NULL | - |
 | 7 | `inaproc_link` | `varchar(255)` | YES | - | NULL | - |
-| 8 | `description` | `text` | YES | - | NULL | - |
-| 9 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+| 8 | `tokopedia_link` | `varchar(255)` | YES | - | NULL | - |
+| 9 | `tiktokshop_link` | `varchar(255)` | YES | - | NULL | - |
+| 10 | `description` | `text` | YES | - | NULL | - |
+| 11 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
 
 ## `product_specs`
 

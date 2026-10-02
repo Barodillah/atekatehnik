@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const AdminGallery = () => {
@@ -7,6 +7,7 @@ const AdminGallery = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState(null);
   const { authFetch } = useAuth();
+  const { searchQuery } = useOutletContext();
 
   const fetchItems = async () => {
     setIsLoading(true);
@@ -62,6 +63,15 @@ const AdminGallery = () => {
   // Convert object of objects to array if the API didn't wrap it in a data property
   const itemsArray = Array.isArray(items) ? items : Object.values(items).filter(val => typeof val === 'object' && val !== null && 'id' in val);
 
+  const filteredItems = itemsArray.filter(item => {
+    if (!searchQuery) return true;
+    const lower = searchQuery.toLowerCase();
+    return (
+      (item.title && item.title.toLowerCase().includes(lower)) ||
+      (item.type && item.type.toLowerCase().includes(lower))
+    );
+  });
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -86,6 +96,7 @@ const AdminGallery = () => {
                 <th className="px-6 py-4">Preview</th>
                 <th className="px-6 py-4">Title</th>
                 <th className="px-6 py-4">Type</th>
+                <th className="px-6 py-4">Views</th>
                 <th className="px-6 py-4">Aspect Class</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
@@ -95,12 +106,14 @@ const AdminGallery = () => {
                 <tr>
                   <td colSpan="6" className="px-6 py-8 text-center text-slate-400">Loading gallery items...</td>
                 </tr>
-              ) : itemsArray.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-slate-400">No gallery items found. Click "Add New Media" to create one.</td>
+                  <td colSpan="6" className="px-6 py-8 text-center text-slate-400">
+                    {searchQuery ? 'No gallery items match your search.' : 'No gallery items found. Click "Add New Media" to create one.'}
+                  </td>
                 </tr>
               ) : (
-                itemsArray.map((item) => (
+                filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-3">
                       <div className="w-16 h-16 rounded-md overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center relative">
@@ -123,6 +136,12 @@ const AdminGallery = () => {
                       }`}>
                         {item.type}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-500">
+                      <div className="flex items-center gap-1" title="Jumlah tayangan">
+                        <span className="material-symbols-outlined text-[16px]">visibility</span>
+                        <span className="font-bold">{item.views || 0}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-slate-500">{item.height_class}</td>
                     <td className="px-6 py-4 text-right space-x-2">

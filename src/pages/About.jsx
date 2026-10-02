@@ -199,9 +199,9 @@ const About = () => {
                         <Link to="/contact" className="bg-secondary text-on-secondary px-10 py-4 rounded-sm font-headline font-bold text-lg hover:bg-secondary-container transition-colors duration-300">
                             {t('about.ctaBtn1')}
                         </Link>
-                        <a href="https://s.shopee.co.id/60NGq5Cp16" target="_blank" rel="noopener noreferrer" className="bg-white/10 text-white backdrop-blur-md px-10 py-4 rounded-sm font-headline font-bold text-lg hover:bg-white/20 transition-colors duration-300 inline-block">
+                        <Link to="/official-channels" className="bg-white/10 text-white backdrop-blur-md px-10 py-4 rounded-sm font-headline font-bold text-lg hover:bg-white/20 transition-colors duration-300 inline-block">
                             {t('about.ctaBtn2')}
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>
