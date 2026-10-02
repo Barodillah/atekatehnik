@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -7,8 +8,8 @@ const Gallery = () => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   usePageTitle(
-    selectedItem 
-      ? `${selectedItem.type === 'video' ? 'Video' : 'Gambar'} ${selectedItem.title}` 
+    selectedItem
+      ? `${selectedItem.type === 'video' ? 'Video' : 'Gambar'} ${selectedItem.title}`
       : (lang === 'id' ? 'Galeri' : 'Gallery')
   );
 
@@ -21,12 +22,25 @@ const Gallery = () => {
   const filteredGalleries = useMemo(() => {
     if (!searchQuery) return galleries;
     const lowerQuery = searchQuery.toLowerCase();
-    return galleries.filter(item => 
+    return galleries.filter(item =>
       item.title.toLowerCase().includes(lowerQuery)
     );
   }, [searchQuery, galleries]);
 
   const observerTarget = useRef(null);
+  const modalVideoRef = useRef(null);
+
+  // Memaksa iOS untuk autoplay dengan mengatur property muted secara manual dan memanggil play()
+  useEffect(() => {
+    if (selectedItem && selectedItem.type === 'video' && modalVideoRef.current) {
+      // Force play on iOS
+      modalVideoRef.current.defaultMuted = true;
+      modalVideoRef.current.muted = true;
+      modalVideoRef.current.play().catch((err) => {
+        console.warn('Autoplay prevented by browser:', err);
+      });
+    }
+  }, [selectedItem]);
 
   // Swipe states
   const [touchStartX, setTouchStartX] = useState(null);
@@ -34,6 +48,9 @@ const Gallery = () => {
   const [touchEndX, setTouchEndX] = useState(null);
   const [touchEndY, setTouchEndY] = useState(null);
   const [showSwipeInstruction, setShowSwipeInstruction] = useState(false);
+
+  // Link dropup state
+  const [showLinksDropup, setShowLinksDropup] = useState(false);
 
   // For deep linking
   const createSlug = (title, id) => {
@@ -71,7 +88,7 @@ const Gallery = () => {
           body: JSON.stringify({ page_type: 'gallery', slug })
         }).catch(console.error);
       }, 1500); // Tunggu 1.5 detik agar swipe cepat tidak terhitung sebagai view
-      
+
       return () => clearTimeout(timer);
     }
   }, [selectedItem]);
@@ -131,14 +148,16 @@ const Gallery = () => {
 
     setDisplayedGalleries(prev => {
       const prevCount = prev.length;
-      const nextCount = prevCount + 15;
+      if (prevCount >= filteredGalleries.length) return prev; // All items loaded
+
+      const nextCount = Math.min(prevCount + 15, filteredGalleries.length);
       const newItems = [];
 
       for (let i = prevCount; i < nextCount; i++) {
-        const originalItem = filteredGalleries[i % filteredGalleries.length];
+        const originalItem = filteredGalleries[i];
         newItems.push({
           ...originalItem,
-          uniqueKey: `${originalItem.id}_loop_${Math.floor(i / filteredGalleries.length)}_${i}`
+          uniqueKey: `${originalItem.id}_initial_${i}`
         });
       }
 
@@ -189,11 +208,13 @@ const Gallery = () => {
     setSelectedItem(null);
     updateUrl(null);
     setShowSwipeInstruction(false);
+    setShowLinksDropup(false);
   };
 
   const handleOpenModal = (item) => {
     setSelectedItem(item);
     updateUrl(item);
+    setShowLinksDropup(false);
     if (window.innerWidth < 768) {
       setShowSwipeInstruction(true);
     }
@@ -205,24 +226,25 @@ const Gallery = () => {
   const handleNext = (e) => {
     if (e) e.stopPropagation();
     setShowSwipeInstruction(false);
-    
+
     if (currentIndex < displayedGalleries.length - 1) {
       // Masih ada item di daftar yang sudah ter-load
       const nextItem = displayedGalleries[currentIndex + 1];
       setSelectedItem(nextItem);
       updateUrl(nextItem);
-    } else if (galleries.length > 0) {
+      setShowLinksDropup(false);
+    } else if (displayedGalleries.length < filteredGalleries.length) {
       // Sudah mencapai ujung dari displayedGalleries, muat lebih banyak!
-      const i = displayedGalleries.length;
-      const originalItem = galleries[i % galleries.length];
+      const nextOriginalItem = filteredGalleries[displayedGalleries.length];
       const nextItem = {
-          ...originalItem,
-          uniqueKey: `${originalItem.id}_loop_${Math.floor(i / galleries.length)}_${i}`
+        ...nextOriginalItem,
+        uniqueKey: `${nextOriginalItem.id}_initial_${displayedGalleries.length}`
       };
-      
+
       loadMoreItems(); // Load batch 15 gambar/video berikutnya ke memori
       setSelectedItem(nextItem); // Lanjut ke gambar pertama dari batch baru tersebut
       updateUrl(nextItem);
+      setShowLinksDropup(false);
     }
   };
 
@@ -233,6 +255,7 @@ const Gallery = () => {
       const prevItem = displayedGalleries[currentIndex - 1];
       setSelectedItem(prevItem);
       updateUrl(prevItem);
+      setShowLinksDropup(false);
     }
   };
 
@@ -324,40 +347,40 @@ const Gallery = () => {
         <header className="mb-8 w-full text-left">
           {/* Baris Atas: Judul (Kiri) dan Deskripsi (Kanan) */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-4 mb-6">
-             <div>
-                <h1 className="font-headline font-extrabold text-[#001f5b] dark:text-white tracking-tight text-3xl md:text-4xl">
-                  {lang === 'id' ? 'Galeri Kami' : 'Our Gallery'}
-                </h1>
-             </div>
-             
-             <div className="md:text-right max-w-xl">
-                <p className="text-sm text-outline dark:text-slate-400 font-body">
-                  {lang === 'id'
-                    ? 'Koleksi dokumentasi proyek, pemasangan, dan produk terbaik dari Ateka Tehnik.'
-                    : 'Collection of project documentation, installations, and our best products.'}
-                </p>
-             </div>
+            <div>
+              <h1 className="font-headline font-extrabold text-[#001f5b] dark:text-white tracking-tight text-3xl md:text-4xl">
+                {lang === 'id' ? 'Galeri Kami' : 'Our Gallery'}
+              </h1>
+            </div>
+
+            <div className="md:text-right max-w-xl">
+              <p className="text-sm text-outline dark:text-slate-400 font-body">
+                {lang === 'id'
+                  ? 'Koleksi dokumentasi proyek, pemasangan, dan produk terbaik dari Ateka Tehnik.'
+                  : 'Collection of project documentation, installations, and our best products.'}
+              </p>
+            </div>
           </div>
-          
+
           {/* Baris Bawah: Kotak Pencarian Lebar Penuh (Full Width) */}
           <div className="w-full relative shadow-sm rounded-full">
-             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-             <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={lang === 'id' ? "Cari nama galeri..." : "Search gallery..."}
-                className="w-full pl-12 pr-12 py-3.5 md:py-4 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm text-sm md:text-base transition-all"
-             />
-             {searchQuery && (
-               <button 
-                 onClick={() => setSearchQuery('')}
-                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full flex items-center justify-center transition-colors"
-                 aria-label="Clear search"
-               >
-                 <span className="material-symbols-outlined">close</span>
-               </button>
-             )}
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={lang === 'id' ? "Cari nama galeri..." : "Search gallery..."}
+              className="w-full pl-12 pr-12 py-3.5 md:py-4 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm text-sm md:text-base transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-2 rounded-full flex items-center justify-center transition-colors"
+                aria-label="Clear search"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            )}
           </div>
         </header>
 
@@ -407,15 +430,17 @@ const Gallery = () => {
               ))}
             </div>
             {/* Observer Target for Infinite Scroll */}
-            <div ref={observerTarget} className="h-20 w-full flex items-center justify-center mt-8">
-              <span className="material-symbols-outlined text-primary animate-spin text-2xl">progress_activity</span>
-            </div>
+            {displayedGalleries.length < filteredGalleries.length && (
+              <div ref={observerTarget} className="h-20 w-full flex items-center justify-center mt-8">
+                <span className="material-symbols-outlined text-primary animate-spin text-2xl">progress_activity</span>
+              </div>
+            )}
           </>
         ) : (
           <div className="text-center py-20 text-outline">
-            {searchQuery 
-               ? (lang === 'id' ? 'Gambar/video tidak ditemukan.' : 'No images/videos found.')
-               : (lang === 'id' ? 'Belum ada galeri.' : 'No gallery available yet.')}
+            {searchQuery
+              ? (lang === 'id' ? 'Gambar/video tidak ditemukan.' : 'No images/videos found.')
+              : (lang === 'id' ? 'Belum ada galeri.' : 'No gallery available yet.')}
           </div>
         )}
       </div>
@@ -450,21 +475,38 @@ const Gallery = () => {
             </button>
           </div>
 
+          {/* Desktop Navigation */}
           {currentIndex > 0 && (
             <button
               onClick={handlePrev}
-              className="absolute left-2 md:left-8 z-[120] text-white/50 hover:text-white bg-black/30 hover:bg-black/80 rounded-full p-2 md:p-4 transition-all backdrop-blur-sm shadow-lg"
+              className="hidden md:block absolute left-8 z-[120] text-white/50 hover:text-white bg-black/30 hover:bg-black/80 rounded-full p-4 transition-all backdrop-blur-sm shadow-lg"
             >
-              <span className="material-symbols-outlined text-3xl md:text-5xl">chevron_left</span>
+              <span className="material-symbols-outlined text-5xl">chevron_left</span>
             </button>
           )}
 
           <button
             onClick={handleNext}
-            className="absolute right-2 md:right-8 z-[120] text-white/50 hover:text-white bg-black/30 hover:bg-black/80 rounded-full p-2 md:p-4 transition-all backdrop-blur-sm shadow-lg"
+            className="hidden md:block absolute right-8 z-[120] text-white/50 hover:text-white bg-black/30 hover:bg-black/80 rounded-full p-4 transition-all backdrop-blur-sm shadow-lg"
           >
-            <span className="material-symbols-outlined text-3xl md:text-5xl">chevron_right</span>
+            <span className="material-symbols-outlined text-5xl">chevron_right</span>
           </button>
+
+          {/* Mobile Navigation (Bottom Right) */}
+          <div className="md:hidden absolute right-4 bottom-28 z-[120] flex flex-col gap-3">
+            <button
+              onClick={handlePrev}
+              className={`text-white/70 hover:text-white bg-black/40 hover:bg-black/80 rounded-full p-3 transition-all backdrop-blur-md shadow-lg border border-white/10 ${currentIndex === 0 ? 'opacity-30 pointer-events-none' : ''}`}
+            >
+              <span className="material-symbols-outlined text-2xl">keyboard_arrow_up</span>
+            </button>
+            <button
+              onClick={handleNext}
+              className="text-white/70 hover:text-white bg-black/40 hover:bg-black/80 rounded-full p-3 transition-all backdrop-blur-md shadow-lg border border-white/10"
+            >
+              <span className="material-symbols-outlined text-2xl">keyboard_arrow_down</span>
+            </button>
+          </div>
 
           {/* Reels-style Swipe Instruction (Mobile Only) */}
           {showSwipeInstruction && (
@@ -478,7 +520,7 @@ const Gallery = () => {
 
           <div
             className="relative w-full h-full md:max-w-5xl md:max-h-[90vh] md:rounded-lg overflow-hidden md:shadow-[0_0_50px_rgba(0,0,0,0.5)] flex items-center justify-center animate-zoom-in"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setShowLinksDropup(false); }}
           >
             {/* Watermark Overlay */}
             <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 overflow-hidden mix-blend-overlay opacity-60">
@@ -489,9 +531,15 @@ const Gallery = () => {
 
             {selectedItem.type === 'video' ? (
               <video
+                ref={modalVideoRef}
                 src={selectedItem.src}
                 controls
                 autoPlay
+                muted
+                defaultMuted
+                loop
+                playsInline
+                webkit-playsinline="true"
                 controlsList="nodownload"
                 onContextMenu={(e) => e.preventDefault()}
                 className="w-full h-full object-contain bg-black"
@@ -507,7 +555,72 @@ const Gallery = () => {
             )}
 
             {/* Caption */}
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 md:p-8 pt-24 md:pt-24 z-20 pointer-events-none">
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 md:p-8 pt-32 md:pt-32 z-20 pointer-events-none flex flex-col justify-end">
+
+              {/* Related Links Area */}
+              {selectedItem.links && selectedItem.links.length > 0 && (
+                <div className="mb-4 flex items-end pointer-events-auto relative">
+                  {selectedItem.links.length === 1 ? (
+                    (() => {
+                      const link = selectedItem.links[0];
+                      const route = link.type === 'product' ? `/product/${link.slug}`
+                        : link.type === 'portfolio' ? `/portfolio/${link.slug}`
+                          : `/news/${link.slug}`;
+                      const bgClass = link.type === 'product' ? 'bg-[#f0c14b] text-yellow-950'
+                        : link.type === 'portfolio' ? 'bg-blue-600 text-white'
+                          : 'bg-emerald-600 text-white';
+                      const icon = link.type === 'product' ? 'shopping_basket'
+                        : link.type === 'portfolio' ? 'business_center'
+                          : 'article';
+                      const shortTitle = link.title.length > 10 ? link.title.substring(0, 10) + '...' : link.title;
+
+                      return (
+                        <Link to={route} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition-transform ${bgClass}`}>
+                          <span className="material-symbols-outlined text-lg">{icon}</span>
+                          <span>{shortTitle}</span>
+                        </Link>
+                      );
+                    })()
+                  ) : (
+                    <div className="relative">
+                      {showLinksDropup && (
+                        <div className="absolute bottom-full left-0 mb-2 w-64 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl p-2 flex flex-col gap-1 overflow-hidden animate-fade-in border border-white/20">
+                          {selectedItem.links.map((link, idx) => {
+                            const route = link.type === 'product' ? `/products/${link.slug}`
+                              : link.type === 'portfolio' ? `/portfolio/${link.slug}`
+                                : `/news/${link.slug}`;
+                            const bgClass = link.type === 'product' ? 'bg-[#f0c14b]/20 text-yellow-800'
+                              : link.type === 'portfolio' ? 'bg-blue-100 text-blue-800'
+                                : 'bg-emerald-100 text-emerald-800';
+                            const icon = link.type === 'product' ? 'shopping_basket'
+                              : link.type === 'portfolio' ? 'business_center'
+                                : 'article';
+
+                            return (
+                              <Link key={idx} to={route} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 transition-colors">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${bgClass}`}>
+                                  <span className="material-symbols-outlined text-[16px]">{icon}</span>
+                                </div>
+                                <span className="text-sm font-bold text-slate-700 truncate">{link.title}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setShowLinksDropup(!showLinksDropup); }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition-transform bg-white/90 text-slate-800 border border-white/20"
+                      >
+                        <span className="material-symbols-outlined text-lg">layers</span>
+                        <span>{selectedItem.links.length} Link Terkait</span>
+                        <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${showLinksDropup ? 'rotate-180' : ''}`}>expand_more</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <h2 className="text-white font-headline font-bold text-xl md:text-3xl leading-snug">
                 {selectedItem.title}
               </h2>

@@ -91,7 +91,7 @@ const Portfolio = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch(`/api/posts.php?lang=${lang}&limit=50`);
+                const res = await fetch(`/api/posts.php?lang=${lang}&limit=1000`);
                 const data = await res.json();
                 if (data.success) {
                     setProjects(data.posts);

@@ -269,7 +269,8 @@ const Post = () => {
                                 post.category === 'Product News' ? (lang === 'id' ? 'Ringkasan Berita' : 'News Overview') :
                                     post.category === 'Maintenance Tips' ? (lang === 'id' ? 'Panduan Perawatan' : 'Maintenance Guide') :
                                         post.category === 'Company Update' ? (lang === 'id' ? 'Detail Pembaruan' : 'Update Details') :
-                                            t('postPage.projectOverview')}
+                                            post.category === 'Insight' ? (lang === 'id' ? 'Wawasan Utama' : 'Key Insights') :
+                                                t('postPage.projectOverview')}
                         </h2>
                         {/* Actions Bar */}
                         <div className="flex items-center space-x-6 py-4 border-y border-outline-variant/30 my-8">

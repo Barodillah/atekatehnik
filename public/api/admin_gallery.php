@@ -13,7 +13,7 @@ $db = getDB();
 
 if ($method === 'GET') {
     $stmt = $db->query("
-        SELECT g.*, COALESCE(v.view_count, 0) as views 
+        SELECT g.*, COALESCE(v.view_count, 0) as views, COALESCE(l.links_count, 0) as links_count 
         FROM galleries g
         LEFT JOIN (
             SELECT SUBSTRING_INDEX(page_slug, '-', -1) as gallery_id, COUNT(*) as view_count 
@@ -21,6 +21,11 @@ if ($method === 'GET') {
             WHERE page_type = 'gallery' AND page_slug != 'main'
             GROUP BY SUBSTRING_INDEX(page_slug, '-', -1)
         ) v ON CAST(g.id AS char) = v.gallery_id
+        LEFT JOIN (
+            SELECT gallery_id, COUNT(*) as links_count
+            FROM gallery_related_links
+            GROUP BY gallery_id
+        ) l ON g.id = l.gallery_id
         ORDER BY g.sort_order ASC, g.created_at DESC
     ");
     jsonSuccess(['data' => $stmt->fetchAll()]);

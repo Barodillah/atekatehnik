@@ -12,6 +12,7 @@ import ContactMe from '../components/ContactMe';
 import ReviewWidget from '../components/sections/ReviewWidget';
 import Portfolio from '../components/Portfolio';
 import GalleryCTA from '../components/sections/GalleryCTA';
+import FloatingVideo from '../components/FloatingVideo';
 
 const Home = () => {
   usePageTitle(null); // Uses default title
@@ -29,6 +30,7 @@ const Home = () => {
       <FaqHome />
       <OfficialChannelNotice />
       <ContactMe />
+      <FloatingVideo />
     </>
   );
 };

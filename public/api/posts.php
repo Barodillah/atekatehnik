@@ -174,7 +174,7 @@ switch ($method) {
             $category = $_GET['category'] ?? '';
             $excludeCategory = $_GET['exclude_category'] ?? '';
             $page = max(1, (int) ($_GET['page'] ?? 1));
-            $limit = min(50, max(1, (int) ($_GET['limit'] ?? 10)));
+            $limit = min(1000, max(1, (int) ($_GET['limit'] ?? 10)));
             $offset = ($page - 1) * $limit;
 
             $conditions = [];

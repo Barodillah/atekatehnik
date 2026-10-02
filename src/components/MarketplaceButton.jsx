@@ -63,7 +63,7 @@ const MarketplaceButton = ({ product, size = 'small' }) => {
       </button>
 
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 w-full ${size === 'mini' ? 'min-w-full' : 'min-w-[200px]'} bg-white border border-outline-variant/30 shadow-xl z-50 flex flex-col overflow-hidden animate-fade-in-up rounded-sm`}>
+        <div className={`absolute top-full left-0 mt-1 w-full ${size === 'mini' ? 'min-w-full' : 'min-w-[200px]'} bg-white border border-outline-variant/30 shadow-xl z-50 flex flex-col overflow-hidden animate-fade-in-up rounded-sm`}>
           {marketplaces.map((mp, i) => (
             <a
               key={i}

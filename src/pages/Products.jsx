@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { trackWaClick } from '../utils/trackWaClick';
 import MarketplaceButton from '../components/MarketplaceButton';
+import FloatingVideo from '../components/FloatingVideo';
 
 const Products = () => {
     const { t, lang } = useLanguage();
@@ -252,7 +253,7 @@ const Products = () => {
                                             <div className="flex-1 h-px bg-outline-variant/30"></div>
                                         </div>
                                     )}
-                                    <div className={`grid gap-4 md:gap-6 ${isSukuCadang ? 'grid-cols-2 md:grid-cols-4 xl:grid-cols-6' : 'grid-cols-2 md:grid-cols-3'}`}>
+                                    <div className={`grid gap-4 md:gap-6 ${isSukuCadang ? 'grid-cols-2 md:grid-cols-4 xl:grid-cols-6' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}>
                                         {productsInCategory.map((product) => (
                                             <div key={product.id} className="bg-surface-container-lowest group flex flex-col h-full border border-outline-variant/10">
                                                 <div className={`relative overflow-hidden ${isSukuCadang ? 'aspect-square' : 'h-48 md:h-80'}`}>
@@ -289,24 +290,19 @@ const Products = () => {
                                                 </div>
                                                 <div className={`flex-grow flex flex-col ${isSukuCadang ? 'p-3' : 'p-4 md:p-8'}`}>
                                                     <Link to={`/product/${product.slug || product.id}`} className="hover:opacity-80 transition-opacity">
-                                                        <h3 className={`font-headline font-extrabold text-primary-container ${isSukuCadang ? 'text-sm md:text-base mb-3 leading-tight line-clamp-2' : 'text-lg md:text-2xl mb-4 md:mb-6'}`} title={product.nama}>
+                                                        <h3 className={`font-headline font-extrabold text-primary-container ${isSukuCadang ? 'text-sm md:text-base mb-3 leading-tight line-clamp-2' : 'text-base md:text-xl mb-3 md:mb-4'}`} title={product.nama}>
                                                             {product.nama.length > 50 ? `${product.nama.substring(0, 50)}...` : product.nama}
                                                         </h3>
                                                     </Link>
                                                     
                                                     {!isSukuCadang && product.spesifikasi && product.spesifikasi.length > 0 && (
-                                                        <div className="hidden md:block space-y-2 md:space-y-4 mb-4 md:mb-8 flex-1">
-                                                            {product.spesifikasi.slice(0, 2).map((spec, i) => (
-                                                                <div key={i} className="flex items-start md:items-center gap-1 md:gap-2 py-1 md:py-2 border-b border-outline-variant/20">
-                                                                    <span className="material-symbols-outlined text-secondary text-sm mt-0.5 md:mt-0">check_circle</span>
-                                                                    <span className="text-primary-container font-medium text-xs md:text-sm">{spec}</span>
-                                                                </div>
-                                                            ))}
-                                                            {product.spesifikasi.length > 2 && (
-                                                                <div className="text-[10px] md:text-xs text-outline font-medium pt-1">
-                                                                    +{product.spesifikasi.length - 2} {lang === 'id' ? 'spesifikasi lainnya' : 'other specifications'}
-                                                                </div>
-                                                            )}
+                                                        <div className="mb-4 md:mb-6 flex-1">
+                                                            <div className="flex items-center gap-2 py-1.5 md:py-2 border-b border-outline-variant/20">
+                                                                <span className="material-symbols-outlined text-secondary text-sm md:text-base">checklist</span>
+                                                                <span className="text-primary-container font-medium text-xs md:text-sm">
+                                                                    {product.spesifikasi.length} {lang === 'id' ? 'spesifikasi teknis' : 'technical specifications'}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     )}
                                                     
@@ -382,6 +378,7 @@ const Products = () => {
                     </div>
                 </div>
             </section>
+            <FloatingVideo />
         </>
     );
 };

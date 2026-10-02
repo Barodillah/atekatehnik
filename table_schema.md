@@ -241,3 +241,14 @@
 | 5 | `height_class` | `varchar(50)` | YES | - | 'aspect-square' | - |
 | 6 | `sort_order` | `int(11)` | YES | - | 0 | - |
 | 7 | `created_at` | `datetime` | NO | - | current_timestamp() | - |
+
+## `gallery_related_links`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `gallery_id` | `int(11)` | NO | MUL | - | - |
+| 3 | `related_type` | `varchar(50)` | NO | - | - | - |
+| 4 | `related_id` | `int(11)` | NO | MUL | - | - |
+| 5 | `sort_order` | `int(11)` | YES | - | 0 | - |
+| 6 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
