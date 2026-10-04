@@ -180,7 +180,7 @@ const DashboardLayout = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 border-r border-blue-900/50 shadow-2xl flex flex-col py-6 font-inter text-sm font-medium tracking-wide transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`print:hidden h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 border-r border-blue-900/50 shadow-2xl flex flex-col py-6 font-inter text-sm font-medium tracking-wide transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="px-6 mb-8 mt-2 lg:mt-0 flex justify-between items-center">
           <div>
             <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase hidden lg:block">Industrial Admin</h1>
@@ -201,6 +201,10 @@ const DashboardLayout = () => {
             <span className="material-symbols-outlined">person_search</span>
             <span>Customer Leads</span>
             {counts.leads > 0 && <span className="ml-auto bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{counts.leads}</span>}
+          </Link>
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/rab')} to="/admin/rab">
+            <span className="material-symbols-outlined">request_quote</span>
+            <span>RAB Maker</span>
           </Link>
           <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/products')} to="/admin/products">
             <span className="material-symbols-outlined">precision_manufacturing</span>
@@ -255,9 +259,9 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content Wrapper */}
-      <main className="ml-0 lg:ml-64 flex-1 flex flex-col min-h-screen transition-all duration-300">
+      <main className="ml-0 lg:ml-64 print:ml-0 print:p-0 flex-1 flex flex-col min-h-screen transition-all duration-300">
         {/* Topbar */}
-        <header className="w-full h-16 sticky top-0 z-30 bg-slate-50 shadow-sm flex justify-between items-center px-4 lg:px-6 font-manrope tracking-tight">
+        <header className="print:hidden w-full h-16 sticky top-0 z-30 bg-slate-50 shadow-sm flex justify-between items-center px-4 lg:px-6 font-manrope tracking-tight">
           <div className="flex items-center gap-2 lg:gap-4 flex-1 min-w-0">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
@@ -486,7 +490,7 @@ const DashboardLayout = () => {
         <Outlet context={{ searchQuery: debouncedSearch }} />
 
         {/* Footer Decoration */}
-        <footer className="mt-auto py-8 px-8 border-t border-surface-container-low text-center opacity-50">
+        <footer className="print:hidden mt-auto py-8 px-8 border-t border-surface-container-low text-center opacity-50">
           <p className="text-[10px] font-bold font-label uppercase tracking-[0.4em] text-on-surface-variant">Ateka Tehnik Engineering Dashboard © 2026</p>
         </footer>
       </main>

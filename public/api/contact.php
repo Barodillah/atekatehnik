@@ -69,8 +69,8 @@ require_once __DIR__ . '/helpers.php';
 try {
     $db = getDB();
     $stmt = $db->prepare("
-        INSERT INTO leads (name, company, capacity_ref, location, email, phone, service_request, status)
-        VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New')
+        INSERT INTO leads (name, company, capacity_ref, location, email, phone, service_request, status, source)
+        VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New', 'Website')
     ");
     $stmt->execute([
         ':name' => $contactData['name'],

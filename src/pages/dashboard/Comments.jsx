@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate } from '../../utils/dateUtils';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 const Comments = () => {
   const { authFetch } = useAuth();
   const { searchQuery } = useOutletContext();
+  const { addToast } = useToast();
+  const { confirmDialog } = useConfirm();
 
   const [comments, setComments] = useState([]);
   const [filter, setFilter] = useState('pending'); // pending, approved, spam
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
   const [stats, setStats] = useState({ pending: 0, approved: 0, spam: 0 });
 
   // Fetch comments
@@ -26,7 +29,7 @@ const Comments = () => {
         setStats(data.stats);
       }
     } catch (err) {
-      setError('Failed to load comments.');
+      addToast('Failed to load comments.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -45,16 +48,17 @@ const Comments = () => {
       if (data.success) {
         fetchComments();
       } else {
-        setError(data.error || 'Failed to update.');
+        addToast(data.error || 'Failed to update.', 'error');
       }
     } catch (err) {
-      setError('Network error.');
+      addToast('Network error.', 'error');
     }
   };
 
   // Handle delete
   const handleDelete = async (commentId) => {
-    if (!confirm('Delete this comment permanently?')) return;
+    const confirmed = await confirmDialog('Delete this comment permanently?', 'Delete Comment', 'danger');
+    if (!confirmed) return;
     try {
       const res = await authFetch(`/api/admin_comments.php?id=${commentId}`, {
         method: 'DELETE',
@@ -62,9 +66,10 @@ const Comments = () => {
       const data = await res.json();
       if (data.success) {
         fetchComments();
+        addToast('Comment deleted', 'success');
       }
     } catch (err) {
-      setError('Failed to delete.');
+      addToast('Failed to delete.', 'error');
     }
   };
 
@@ -83,17 +88,6 @@ const Comments = () => {
           <p className="text-sm md:text-base text-on-surface-variant mt-1">Review and manage user comments on blog posts.</p>
         </div>
       </div>
-
-      {/* Error Banner */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 p-3 rounded-sm flex items-center gap-3">
-          <span className="material-symbols-outlined text-red-500 text-[18px]">error</span>
-          <p className="text-red-700 text-sm">{error}</p>
-          <button onClick={() => setError('')} className="ml-auto text-red-400 hover:text-red-600">
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        </div>
-      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

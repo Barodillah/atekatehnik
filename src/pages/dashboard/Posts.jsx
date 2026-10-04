@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate } from '../../utils/dateUtils';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useToast } from '../../contexts/ToastContext';
 
 const Posts = () => {
   const navigate = useNavigate();
   const { authFetch } = useAuth();
   const { searchQuery } = useOutletContext();
+  const { confirmDialog } = useConfirm();
+  const { addToast } = useToast();
 
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
@@ -60,11 +64,15 @@ const Posts = () => {
   useEffect(() => { fetchPosts(1); }, [searchQuery, filterPreset]);
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Hapus post "${title}"?`)) return;
+    const confirmed = await confirmDialog(`Hapus post "${title}"?`, 'Hapus Post', 'danger');
+    if (!confirmed) return;
     try {
       await authFetch(`/api/posts.php?id=${id}`, { method: 'DELETE' });
       fetchPosts(pagination.page);
-    } catch {}
+      addToast('Post berhasil dihapus', 'success');
+    } catch {
+      addToast('Gagal menghapus post', 'error');
+    }
   };
 
   return (

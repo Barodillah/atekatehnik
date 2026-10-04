@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import DatePicker from '../../components/dashboard/DatePicker';
@@ -19,7 +20,7 @@ const PostForm = () => {
   });
 
   const [deliverables, setDeliverables] = useState(['']);
-  
+
   const [techSpecs, setTechSpecs] = useState([
     { header: '', value: '', unit: '', description: '' }
   ]);
@@ -53,6 +54,13 @@ const PostForm = () => {
   const [translationResult, setTranslationResult] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
+  // AI Generation states
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiTab, setAiTab] = useState('news'); // 'news' or 'installation'
+  const [aiRawInput, setAiRawInput] = useState('');
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiError, setAiError] = useState('');
+
   useEffect(() => {
     if (id) {
       const fetchPost = async () => {
@@ -74,20 +82,20 @@ const PostForm = () => {
             });
 
             if (p.deliverables && p.deliverables.length) setDeliverables(p.deliverables);
-            
+
             if (p.techSpecs && p.techSpecs.length) {
               setTechSpecs(p.techSpecs.map(s => ({
-                header: s.header || '', 
-                value: s.spec_value || '', 
-                unit: s.unit || '', 
+                header: s.header || '',
+                value: s.spec_value || '',
+                unit: s.unit || '',
                 description: s.description || ''
               })));
             }
 
             if (p.phases && p.phases.length) {
-              setPhases(p.phases.map(ph => ({ 
-                title: ph.title || '', 
-                image: ph.image_url || '' 
+              setPhases(p.phases.map(ph => ({
+                title: ph.title || '',
+                image: ph.image_url || ''
               })));
             }
 
@@ -98,9 +106,9 @@ const PostForm = () => {
                 image: p.impact.image_url || ''
               });
               if (p.impact.stats && p.impact.stats.length) {
-                setImpactStats(p.impact.stats.map(st => ({ 
-                  value: st.stat_value || '', 
-                  label: st.stat_label || '' 
+                setImpactStats(p.impact.stats.map(st => ({
+                  value: st.stat_value || '',
+                  label: st.stat_label || ''
                 })));
               }
             }
@@ -121,7 +129,7 @@ const PostForm = () => {
         const res = await fetch('/api/products.php?limit=1000');
         const data = await res.json();
         if (data.success) setAllProducts(data.products || []);
-      } catch {}
+      } catch { }
     };
     fetchProducts();
   }, [id]);
@@ -134,7 +142,7 @@ const PostForm = () => {
         const res = await fetch(`/api/post_relations.php?post_slug=${postSlug}`);
         const data = await res.json();
         if (data.success) setRelatedProducts(data.relations || []);
-      } catch {}
+      } catch { }
     };
     fetchRelations();
   }, [postSlug]);
@@ -306,26 +314,26 @@ const PostForm = () => {
       if (data.success) {
         // 2. If user confirmed English version, save it as well
         if (withEnglish && translationResult) {
-           const enData = {
-               ...translationResult,
-               language: 'en'
-           };
-           // Note: Depending on your exact schema, we might need to link it
-           // but your posts API handles POST insertion properly if slug and language are set.
-           const enRes = await authFetch('/api/posts.php', {
-               method: 'POST',
-               body: JSON.stringify(enData)
-           });
-           const enDataRes = await enRes.json();
-           if (!enDataRes.success) {
-               console.error("Gagal save versi EN:", enDataRes.error);
-               // Still redirect because main id post saved
-           }
+          const enData = {
+            ...translationResult,
+            language: 'en'
+          };
+          // Note: Depending on your exact schema, we might need to link it
+          // but your posts API handles POST insertion properly if slug and language are set.
+          const enRes = await authFetch('/api/posts.php', {
+            method: 'POST',
+            body: JSON.stringify(enData)
+          });
+          const enDataRes = await enRes.json();
+          if (!enDataRes.success) {
+            console.error("Gagal save versi EN:", enDataRes.error);
+            // Still redirect because main id post saved
+          }
         }
-        
+
         setShowPreviewModal(false);
         navigate('/admin/posts');
-        
+
       } else {
         setSubmitError(data.error || 'Gagal menyimpan post.');
         setIsSubmitting(false);
@@ -336,23 +344,140 @@ const PostForm = () => {
     }
   };
 
+  const handleGenerateAI = async () => {
+    if (!aiRawInput.trim()) {
+      setAiError('Input tidak boleh kosong.');
+      return;
+    }
+    setIsGeneratingAI(true);
+    setAiError('');
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      if (!apiKey) throw new Error('VITE_OPENROUTER_API_KEY tidak ditemukan di .env');
+
+      let systemPrompt = '';
+      if (aiTab === 'news') {
+        systemPrompt = `Anda adalah jurnalis dan penulis konten profesional.
+Buat konten berdasarkan teks mentah dari pengguna.
+Kembalikan output DALAM FORMAT JSON SAJA dengan struktur:
+{
+  "title": "Judul Menarik, Singkat, Persuasif, SEO Google",
+  "subtitle": "Sub judul ringkas max 280 karakter",
+  "category": "Pilih salah satu: Product News, Insight, Company Update, Maintenance Tips",
+  "location": "Lokasi spesifik jika ada di teks mentah (contoh: Lamongan, Jawa Timur), kosongkan jika tidak ada",
+  "content": "Tuliskan isi artikel berita yang SANGAT INFORMATIF, KOMPREHENSIF, PANJANG, dan bergaya jurnalistik profesional. Gunakan format markdown secara VARIATIF dan DINAMIS (jangan monoton). Buat tabel jika ada data statistik/perbandingan. Gunakan blockquote (>) JIKA ADA kutipan narasumber di teks mentah (JANGAN mengarang kutipan jika tidak ada). Gunakan huruf tebal (bold), bullet list, atau numbering list untuk penekanan.\\nSEBELUM CTA, sertakan paragraf yang menjelaskan peluang bisnis/solusi dari berita ini, lalu arahkan pembaca untuk menggunakan mesin dari Ateka Tehnik yang relevan (misal: RMU kapasitas tertentu, Bed Dryer, dll), serta jelaskan keuntungan bermitra dengan Ateka Tehnik.\\nAkhiri dengan tombol CTA: [cta-wa]\\nSertakan Sumber Resmi di akhir (jika ada) menggunakan format markdown:\\n#### Sumber Resmi:\\n* [Judul](URL)",
+  "deliverables": ["Poin capaian utama/takeaway 1", "Poin capaian utama/takeaway 2 (Key deliverables berisi capaian utama atau hasil akhir yang berfungsi sebagai penanda utama informasi penting yang akan/telah diperoleh pembaca)"],
+  "impactTitle": "Judul impact (jika relevan)",
+  "impactDescription": "Deskripsi impact (jika relevan)",
+  "impactStats": [{ "value": "", "label": "" }]
+}
+PENTING: Untuk kategori berita (news), KOSONGKAN/JANGAN MENGISI bagian Technical Specs ("techSpecs": []).`;
+      } else {
+        systemPrompt = `Anda adalah penulis konten teknikal, naratif, dan industrial.
+Buat konten instalasi berdasarkan teks mentah pengguna (lokasi, instansi, produk, spesifikasi).
+Kembalikan output DALAM FORMAT JSON SAJA dengan struktur:
+{
+  "title": "Pemasangan [Mesin/Produk Utama] di [Nama Kota, Provinsi]. (Contoh: Pemasangan RMU 3 Ton/Jam di Lamongan, Jawa Timur)",
+  "subtitle": "Ringkasan pemasangan max 280 karakter",
+  "category": "Industrial Installations",
+  "location": "Nama kota dan provinsi lengkap (contoh: Lamongan, Jawa Timur)",
+  "content": "Gaya storytelling menceritakan demografis daerah dan dampak pemasangan, sebab akibat. Format markdown variatif.\\nSEBELUM CTA, buat paragraf yang mengajak pembaca/calon klien untuk ikut meningkatkan produktivitas usahanya, arahkan untuk menggunakan mesin dari Ateka Tehnik yang sesuai dengan studi kasus ini (contoh: RMU spesifik kapasitas berapa ton/jam, Bed Dryer, dll), dan jelaskan apa keuntungan bersama Ateka Tehnik.\\nAkhiri dengan CTA: [cta-wa]",
+  "deliverables": ["Capaian utama 1", "Capaian utama 2 (Key deliverables berisi capaian utama atau hasil akhir yang berfungsi sebagai penanda utama informasi penting yang telah diperoleh)"],
+  "techSpecs": [{ "header": "Nama Spesifikasi", "value": "Nilai", "unit": "Satuan", "description": "Fungsi logis dari komponen. CONTOH PENTING: Pada Rice Milling Unit (RMU), pipa/pralon berfungsi mengalirkan gabah/beras/debu/sekam, BUKAN membawa air!" }],
+  "instruction_techSpecs": "PENTING: Ekstrak SEMUA spesifikasi teknis dan daftar barang dari teks mentah ke techSpecs. Pahami betul konteks industrinya, jangan mengarang fungsi yang salah atau tidak logis.",
+  "impactTitle": "Judul dampak presisi",
+  "impactDescription": "Deskripsi dampak pemasangan secara logis dan terukur",
+  "impactStats": [{ "value": "", "label": "" }]
+}`;
+      }
+
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'google/gemma-3-27b-it',
+          max_tokens: 8192,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: aiRawInput }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || 'API Error dari OpenRouter');
+
+      let rawContent = data.choices[0].message.content.trim();
+      // Bersihkan jika AI masih mengembalikan blok markdown meskipun sudah response_format json_object
+      if (rawContent.startsWith('\`\`\`')) {
+        rawContent = rawContent.replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
+      }
+
+      const contentObj = JSON.parse(rawContent);
+
+      setFormData(prev => ({
+        ...prev,
+        title: contentObj.title || prev.title,
+        subtitle: contentObj.subtitle || prev.subtitle,
+        category: contentObj.category || prev.category,
+        location: contentObj.location || prev.location,
+        content: contentObj.content || prev.content
+      }));
+
+      if (contentObj.deliverables && contentObj.deliverables.length) setDeliverables(contentObj.deliverables);
+      if (contentObj.techSpecs && contentObj.techSpecs.length) setTechSpecs(contentObj.techSpecs);
+
+      if (contentObj.impactTitle || contentObj.impactDescription) {
+        setImpactData(prev => ({
+          ...prev,
+          title: contentObj.impactTitle || '',
+          description: contentObj.impactDescription || ''
+        }));
+        if (contentObj.impactStats && contentObj.impactStats.length) {
+          setImpactStats(contentObj.impactStats);
+        }
+      }
+
+      setShowAIModal(false);
+      setAiRawInput('');
+    } catch (err) {
+      setAiError(err.message);
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-6 md:space-y-8 w-full font-body">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button 
+      <div className="flex items-center gap-4 relative">
+        <button
           onClick={() => navigate('/admin/posts')}
           className="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:bg-slate-200 transition-colors cursor-pointer"
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <div>
+        <div className="flex-1">
           <span className="text-secondary font-bold text-xs tracking-widest uppercase">Content Entry</span>
           <h1 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">{id ? 'Edit Post' : 'Log New Project / Post'}</h1>
           <p className="text-xs md:text-sm text-on-surface-variant max-w-lg mt-1">
             {id ? 'Perbarui informasi dan struktur laporan proyek atau artikel Anda di sini.' : 'Lengkapi detail proyek untuk menampilkannya di halaman portofolio utama.'}
           </p>
         </div>
+
+        {/* Generate AI Button */}
+        <button
+          onClick={() => setShowAIModal(true)}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-lg flex items-center gap-2 transform transition hover:scale-105"
+        >
+          <span className="material-symbols-outlined text-sm">auto_awesome</span>
+          Generate AI
+        </button>
       </div>
 
 
@@ -369,40 +494,40 @@ const PostForm = () => {
 
       <div className="bg-surface-container-lowest shadow-sm rounded-sm overflow-hidden border border-surface-container-low">
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-8 md:space-y-12">
-          
+
           {/* General Information */}
           <div>
             <h3 className="text-sm font-label font-bold text-primary-container uppercase tracking-[0.2em] mb-6 border-b border-surface-container-low pb-2">Hero Section Settings</h3>
             <div className="space-y-6">
               <div className="relative">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Main Headline / Title *</label>
-                <input 
-                  required 
+                <input
+                  required
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-xl font-headline font-bold" 
-                  placeholder="e.g., Modernizing Agriculture: 5 Ton/Hr RMU..." 
-                  type="text" 
+                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-xl font-headline font-bold"
+                  placeholder="e.g., Modernizing Agriculture: 5 Ton/Hr RMU..."
+                  type="text"
                 />
               </div>
 
               <div className="relative">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Subtitle / Brief Summary</label>
-                <input 
+                <input
                   name="subtitle"
                   value={formData.subtitle}
                   onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
-                  placeholder="A Case Study in Industrial Precision..." 
-                  type="text" 
+                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm"
+                  placeholder="A Case Study in Industrial Precision..."
+                  type="text"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="relative">
                   <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Post Category *</label>
-                  <select 
+                  <select
                     required
                     name="category"
                     value={formData.category}
@@ -418,7 +543,7 @@ const PostForm = () => {
                   </select>
                 </div>
 
-                <DatePicker 
+                <DatePicker
                   label="TANGGAL PUBLIKASI"
                   name="date"
                   value={formData.date}
@@ -431,13 +556,13 @@ const PostForm = () => {
                     Hero Background Image URL
                     <span className="material-symbols-outlined text-[14px] text-secondary">image</span>
                   </label>
-                  <input 
+                  <input
                     name="coverImage"
                     value={formData.coverImage}
                     onChange={handleInputChange}
-                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
-                    placeholder="https://..." 
-                    type="url" 
+                    className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm"
+                    placeholder="https://..."
+                    type="url"
                   />
                 </div>
               </div>
@@ -483,7 +608,7 @@ const PostForm = () => {
                 <button type="button" className="p-1.5 hover:bg-surface-container-highest rounded-sm text-on-surface-variant transition-colors"><span className="material-symbols-outlined text-[18px]">image</span></button>
               </div>
               {/* Editor Area */}
-              <textarea 
+              <textarea
                 required
                 name="content"
                 value={formData.content}
@@ -506,11 +631,11 @@ const PostForm = () => {
               {deliverables.map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl">check_circle</span>
-                  <input 
+                  <input
                     value={item}
                     onChange={(e) => handleDeliverableChange(index, e.target.value)}
-                    className="flex-1 bg-surface-container-low border-none rounded-sm focus:ring-2 focus:ring-secondary/50 transition-colors py-2 px-4 outline-none text-sm" 
-                    placeholder="e.g., Integrated Control Panel Assembly" type="text" 
+                    className="flex-1 bg-surface-container-low border-none rounded-sm focus:ring-2 focus:ring-secondary/50 transition-colors py-2 px-4 outline-none text-sm"
+                    placeholder="e.g., Integrated Control Panel Assembly" type="text"
                   />
                   <button type="button" onClick={() => removeDeliverable(index)} className="w-10 h-10 text-slate-400 hover:text-error hover:bg-error-container/20 transition-all rounded-sm flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-[20px]">close</span>
@@ -532,23 +657,23 @@ const PostForm = () => {
               {techSpecs.map((spec, index) => (
                 <div key={index} className="bg-surface-container-low p-4 rounded-sm border border-outline-variant/30 flex gap-4 pr-12 relative">
                   <div className="flex-1 space-y-3">
-                    <input 
+                    <input
                       value={spec.header} onChange={(e) => handleSpecChange(index, 'header', e.target.value)}
-                      className="w-full bg-white border border-outline-variant/30 text-xs font-bold uppercase tracking-widest px-2 py-1 outline-none" placeholder="HEADER (e.g. System Throughput)" 
+                      className="w-full bg-white border border-outline-variant/30 text-xs font-bold uppercase tracking-widest px-2 py-1 outline-none" placeholder="HEADER (e.g. System Throughput)"
                     />
                     <div className="flex gap-2">
-                      <input 
+                      <input
                         value={spec.value} onChange={(e) => handleSpecChange(index, 'value', e.target.value)}
-                        className="w-2/3 bg-white border border-outline-variant/30 text-lg font-black px-2 py-1 outline-none" placeholder="Value (e.g. 5.0)" 
+                        className="w-2/3 bg-white border border-outline-variant/30 text-lg font-black px-2 py-1 outline-none" placeholder="Value (e.g. 5.0)"
                       />
-                      <input 
+                      <input
                         value={spec.unit} onChange={(e) => handleSpecChange(index, 'unit', e.target.value)}
-                        className="w-1/3 bg-white border border-outline-variant/30 text-sm font-medium px-2 py-1 outline-none" placeholder="Unit (T/Hr)" 
+                        className="w-1/3 bg-white border border-outline-variant/30 text-sm font-medium px-2 py-1 outline-none" placeholder="Unit (T/Hr)"
                       />
                     </div>
-                    <input 
+                    <input
                       value={spec.description} onChange={(e) => handleSpecChange(index, 'description', e.target.value)}
-                      className="w-full bg-white border border-outline-variant/30 text-xs px-2 py-1 outline-none" placeholder="Description (e.g. Optimized for...)" 
+                      className="w-full bg-white border border-outline-variant/30 text-xs px-2 py-1 outline-none" placeholder="Description (e.g. Optimized for...)"
                     />
                   </div>
                   <button type="button" onClick={() => removeSpec(index)} className="absolute top-2 right-2 p-1 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-sm">
@@ -574,13 +699,13 @@ const PostForm = () => {
                     {String(index + 1).padStart(2, '0')}
                   </div>
                   <div className="flex-1 space-y-3">
-                    <input 
+                    <input
                       value={phase.title} onChange={(e) => handlePhaseChange(index, 'title', e.target.value)}
-                      className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-2 px-3 outline-none font-bold text-sm" placeholder="Phase Title (e.g. Structural Foundation)" 
+                      className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-2 px-3 outline-none font-bold text-sm" placeholder="Phase Title (e.g. Structural Foundation)"
                     />
-                    <input 
+                    <input
                       value={phase.image} onChange={(e) => handlePhaseChange(index, 'image', e.target.value)}
-                      className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-2 px-3 outline-none text-xs" placeholder="Image URL" 
+                      className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-2 px-3 outline-none text-xs" placeholder="Image URL"
                     />
                   </div>
                   <button type="button" onClick={() => removePhase(index)} className="p-2 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-sm mt-2">
@@ -597,24 +722,24 @@ const PostForm = () => {
             <div className="space-y-6">
               <div className="relative">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Section Title</label>
-                <input 
+                <input
                   name="title"
                   value={impactData.title}
                   onChange={handleImpactChange}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm font-bold" 
-                  placeholder="e.g., The Impact of Precision" 
-                  type="text" 
+                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm font-bold"
+                  placeholder="e.g., The Impact of Precision"
+                  type="text"
                 />
               </div>
 
               <div className="relative">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Description Paragraph</label>
-                <textarea 
+                <textarea
                   name="description"
                   value={impactData.description}
                   onChange={handleImpactChange}
-                  className="w-full h-32 bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm resize-none" 
-                  placeholder="Post-installation metrics demonstrate a transformative shift..." 
+                  className="w-full h-32 bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm resize-none"
+                  placeholder="Post-installation metrics demonstrate a transformative shift..."
                 ></textarea>
               </div>
 
@@ -647,13 +772,13 @@ const PostForm = () => {
                   Impact Section Image URL
                   <span className="material-symbols-outlined text-[14px]">image</span>
                 </label>
-                <input 
+                <input
                   name="image"
                   value={impactData.image}
                   onChange={handleImpactChange}
-                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" 
-                  placeholder="https://..." 
-                  type="url" 
+                  className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm"
+                  placeholder="https://..."
+                  type="url"
                 />
               </div>
             </div>
@@ -763,7 +888,7 @@ const PostForm = () => {
 
           {/* Footer Actions */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-12 pb-24 border-t border-outline-variant/20">
-            <button 
+            <button
               type="button"
               onClick={generatePreview}
               disabled={isSubmitting}
@@ -772,16 +897,16 @@ const PostForm = () => {
               <span className="material-symbols-outlined">{isSubmitting && !showPreviewModal ? 'progress_activity' : 'auto_awesome'}</span>
               {isSubmitting && !showPreviewModal ? 'Generating Preview...' : 'Preview Auto-Generate English'}
             </button>
-            
+
             <div className="flex gap-4 w-full md:w-auto">
-              <button 
+              <button
                 type="button"
                 onClick={() => navigate('/admin/posts')}
                 className="flex-1 md:flex-none px-6 py-3 font-bold text-on-surface-variant bg-surface-container hover:bg-surface-container-high transition-colors rounded-sm cursor-pointer"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={(e) => handleSubmit(e, false)}
                 disabled={isSubmitting}
                 className="flex-1 md:flex-none px-8 py-3 font-bold text-white bg-secondary hover:bg-secondary-container transition-colors rounded-sm shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -798,8 +923,8 @@ const PostForm = () => {
       </div>
 
       {/* Preview Modal */}
-      {showPreviewModal && translationResult && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      {showPreviewModal && translationResult && createPortal(
+        <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4">
           <div className="bg-surface-container-lowest rounded-sm max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl">
             <div className="p-6 border-b border-outline-variant/20 flex justify-between items-center">
               <div>
@@ -810,7 +935,7 @@ const PostForm = () => {
                 <span className="material-symbols-outlined text-2xl">close</span>
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-surface-container">
               <div>
                 <label className="text-xs font-bold text-outline uppercase tracking-wider mb-1 block">Title</label>
@@ -833,14 +958,14 @@ const PostForm = () => {
             </div>
 
             <div className="p-6 border-t border-outline-variant/20 flex justify-end gap-4 bg-surface-container-lowest">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setShowPreviewModal(false)}
                 className="px-6 py-2 bg-surface-container font-bold text-on-surface-variant rounded-sm hover:bg-surface-container-high transition-colors cursor-pointer"
               >
-                Cancel 
+                Cancel
               </button>
-              <button 
+              <button
                 onClick={(e) => handleSubmit(e, true)}
                 disabled={isSubmitting}
                 className="px-6 py-2 bg-primary text-white font-bold rounded-sm shadow-md hover:bg-primary-container transition-colors cursor-pointer flex items-center gap-2"
@@ -849,7 +974,91 @@ const PostForm = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
+      )}
+
+      {/* AI Generate Modal */}
+      {showAIModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-16 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-surface-container-low bg-surface-container-lowest">
+              <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined text-purple-600">auto_awesome</span>
+                Generate Content via AI
+              </h2>
+              <button
+                onClick={() => !isGeneratingAI && setShowAIModal(false)}
+                disabled={isGeneratingAI}
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-low text-on-surface-variant transition-colors disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="flex-1 p-6 bg-surface-container-lowest">
+              {aiError && (
+                <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded text-red-700 text-sm flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">error</span>
+                  {aiError}
+                </div>
+              )}
+
+              {/* Tabs */}
+              <div className="flex gap-4 border-b border-outline-variant/30 mb-4">
+                <button
+                  onClick={() => setAiTab('news')}
+                  className={`pb-2 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors ${aiTab === 'news' ? 'border-purple-600 text-purple-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">newspaper</span> Berita
+                </button>
+                <button
+                  onClick={() => setAiTab('installation')}
+                  className={`pb-2 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors ${aiTab === 'installation' ? 'border-purple-600 text-purple-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">engineering</span> Instalasi
+                </button>
+              </div>
+
+              <div className="mb-2">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest block mb-2">
+                  {aiTab === 'news' ? 'Paste Berita / Press Release Mentah' : 'Paste Info Pemasangan / Spek Mentah'}
+                </label>
+                <textarea
+                  value={aiRawInput}
+                  onChange={(e) => setAiRawInput(e.target.value)}
+                  disabled={isGeneratingAI}
+                  placeholder={aiTab === 'news'
+                    ? "Masukkan teks panjang berisi informasi berita, sumber berita, angka capaian, dsb..."
+                    : "Masukkan lokasi, pelanggan, daftar barang, spek mentah..."}
+                  className="w-full h-48 p-3 border-2 border-slate-200 rounded outline-none focus:border-purple-500 transition-colors text-sm font-mono resize-none disabled:bg-slate-50"
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-surface-container-low bg-surface-container-lowest flex justify-end gap-3">
+              <button
+                onClick={() => setShowAIModal(false)}
+                disabled={isGeneratingAI}
+                className="px-6 py-2.5 rounded-sm font-bold text-on-surface-variant bg-surface-container hover:bg-surface-container-high transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleGenerateAI}
+                disabled={isGeneratingAI}
+                className="px-6 py-2.5 rounded-sm font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-colors flex items-center gap-2 shadow-md disabled:opacity-50"
+              >
+                {isGeneratingAI ? (
+                  <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Generating...</>
+                ) : (
+                  <><span className="material-symbols-outlined text-[18px]">auto_awesome</span> Generate & Isi Form</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

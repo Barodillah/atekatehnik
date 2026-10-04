@@ -252,3 +252,84 @@
 | 4 | `related_id` | `int(11)` | NO | MUL | - | - |
 | 5 | `sort_order` | `int(11)` | YES | - | 0 | - |
 | 6 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+
+## `company_profiles`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `company_name` | `varchar(150)` | NO | - | 'CV. ATEKA TEHNIK' | - |
+| 3 | `tagline` | `varchar(255)` | YES | - | 'RICE MILLING UNIT SOLUTION' | - |
+| 4 | `services` | `varchar(255)` | YES | - | NULL | - |
+| 5 | `address` | `text` | NO | - | - | - |
+| 6 | `phone` | `varchar(50)` | NO | - | - | - |
+| 7 | `email` | `varchar(100)` | NO | - | - | - |
+| 8 | `logo_url` | `varchar(255)` | YES | - | NULL | - |
+| 9 | `signature_image_url` | `varchar(255)` | YES | - | NULL | - |
+| 10 | `stamp_image_url` | `varchar(255)` | YES | - | NULL | - |
+| 11 | `signatory_name` | `varchar(100)` | NO | - | 'WARSITO' | - |
+| 12 | `signatory_title` | `varchar(100)` | NO | - | 'Pimpinan' | - |
+| 13 | `updated_at` | `timestamp` | YES | - | current_timestamp() | on update current_timestamp() |
+
+## `items`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `sku` | `varchar(50)` | YES | UNI | NULL | - |
+| 3 | `name` | `varchar(200)` | NO | - | - | - |
+| 4 | `category` | `varchar(100)` | NO | - | - | - |
+| 5 | `default_unit` | `varchar(30)` | NO | - | 'Unit' | - |
+| 6 | `default_price` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 7 | `specifications` | `text` | YES | - | NULL | - |
+| 8 | `description` | `text` | YES | - | NULL | - |
+| 9 | `image_url` | `varchar(255)` | YES | - | NULL | - |
+| 10 | `is_active` | `tinyint(1)` | YES | - | 1 | - |
+| 11 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+| 12 | `updated_at` | `timestamp` | YES | - | current_timestamp() | on update current_timestamp() |
+
+## `quotations`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `is_template` | `tinyint(1)` | YES | - | 0 | - |
+| 3 | `template_name` | `varchar(255)` | YES | - | NULL | - |
+| 4 | `lead_id` | `int(11)` | YES | MUL | NULL | - |
+| 5 | `quotation_number` | `varchar(100)` | YES | UNI | NULL | - |
+| 6 | `title` | `varchar(255)` | NO | - | - | - |
+| 7 | `capacity_label` | `varchar(100)` | YES | - | NULL | - |
+| 8 | `quotation_date` | `date` | YES | - | NULL | - |
+| 9 | `valid_until` | `varchar(100)` | YES | - | NULL | - |
+| 10 | `cover_title` | `varchar(255)` | YES | - | NULL | - |
+| 11 | `cover_description` | `text` | YES | - | NULL | - |
+| 12 | `cover_advantages` | `json` | YES | - | NULL | - |
+| 13 | `cover_image_url` | `varchar(255)` | YES | - | NULL | - |
+| 14 | `subtotal` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 15 | `installation_fee` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 16 | `shipping_fee` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 17 | `discount_amount` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 18 | `use_tax` | `tinyint(1)` | YES | - | 0 | - |
+| 19 | `tax_amount` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 20 | `grand_total` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 21 | `terms_conditions` | `text` | YES | - | NULL | - |
+| 22 | `status` | `enum('draft','sent','accepted','rejected')` | YES | - | 'draft' | - |
+| 23 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+| 24 | `updated_at` | `timestamp` | YES | - | current_timestamp() | on update current_timestamp() |
+
+## `quotation_items`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `quotation_id` | `int(11)` | NO | MUL | - | - |
+| 3 | `item_id` | `int(11)` | YES | - | NULL | - |
+| 4 | `name` | `varchar(200)` | NO | - | - | - |
+| 5 | `specifications` | `text` | YES | - | NULL | - |
+| 6 | `description` | `text` | YES | - | NULL | - |
+| 7 | `image_url` | `varchar(255)` | YES | - | NULL | - |
+| 8 | `qty` | `int(11)` | NO | - | 1 | - |
+| 9 | `unit` | `varchar(30)` | NO | - | 'Unit' | - |
+| 10 | `price` | `decimal(15,2)` | NO | - | 0.00 | - |
+| 11 | `show_on_cover` | `tinyint(1)` | YES | - | 0 | - |
+| 12 | `sort_order` | `int(11)` | NO | - | 0 | - |

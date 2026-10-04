@@ -33,7 +33,7 @@ function jsonSuccess(array $data = [], string $message = 'OK'): void {
 }
 
 function jsonError(int $status, string $message): void {
-    jsonResponse($status, ['success' => false, 'error' => $message]);
+    jsonResponse($status, ['success' => false, 'error' => $message, 'message' => $message]);
 }
 
 // ── Parse JSON Body ──────────────────────────────────────────────────

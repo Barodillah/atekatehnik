@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { useLocation, useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatAdminDate, formatAdminDateTime } from '../../utils/dateUtils';
 
 const Leads = () => {
   const { authFetch } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { searchQuery } = useOutletContext();
 
   const [modalMode, setModalMode] = useState(null); // 'create', 'edit', 'view'
@@ -18,6 +19,11 @@ const Leads = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [leadToDelete, setLeadToDelete] = useState(null);
+
+  // States for RAB Modal
+  const [rabModalLead, setRabModalLead] = useState(null);
+  const [rabModalData, setRabModalData] = useState([]);
+  const [isRabModalLoading, setIsRabModalLoading] = useState(false);
 
   // Modal form state
   const emptyForm = {
@@ -57,7 +63,7 @@ const Leads = () => {
       const res = await authFetch('/api/leads.php?action=stats');
       const data = await res.json();
       if (data.success) setStats(data.stats);
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -83,6 +89,23 @@ const Leads = () => {
     setModalMode(null);
     setSelectedLead(null);
     setFormData(emptyForm);
+  };
+
+  const handleOpenRabModal = async (lead) => {
+    setRabModalLead(lead);
+    setIsRabModalLoading(true);
+    try {
+      const res = await authFetch('/api/quotations.php?lead_id=' + lead.id);
+      const data = await res.json();
+      if (data.success) {
+        // Filter out templates
+        setRabModalData(data.quotations.filter(q => q.is_template != 1 && q.status !== 'template'));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsRabModalLoading(false);
+    }
   };
 
   // Handle status change
@@ -131,7 +154,7 @@ const Leads = () => {
       const isEdit = modalMode === 'edit';
       const url = isEdit ? `/api/leads.php?id=${selectedLead.id}` : '/api/leads.php';
       const method = isEdit ? 'PUT' : 'POST';
-      
+
       const res = await authFetch(url, {
         method,
         body: JSON.stringify(formData),
@@ -176,7 +199,7 @@ const Leads = () => {
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             CSV
           </button>
-          <button 
+          <button
             onClick={() => openModal('create')}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-container text-on-primary font-semibold rounded-sm hover:opacity-90 transition-all text-sm cursor-pointer"
           >
@@ -236,6 +259,7 @@ const Leads = () => {
                 <th className="px-6 py-4 text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant border-none">Service Request</th>
                 <th className="px-6 py-4 text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant border-none text-center">Date</th>
                 <th className="px-6 py-4 text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant border-none text-center">Status</th>
+                <th className="px-6 py-4 text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant border-none text-center">RAB</th>
                 <th className="px-6 py-4 text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant border-none text-right">Actions</th>
               </tr>
             </thead>
@@ -259,7 +283,14 @@ const Leads = () => {
                   <tr key={lead.id} className="hover:bg-surface-container-low transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-bold text-primary">{lead.name}</span>
+                        <span className="font-bold text-primary flex items-center gap-2">
+                          {lead.name}
+                          {lead.source === 'Website' ? (
+                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[9px] uppercase tracking-widest font-bold rounded-sm border border-blue-200">Web</span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[9px] uppercase tracking-widest font-bold rounded-sm border border-slate-200">Manual</span>
+                          )}
+                        </span>
                         <span className="text-xs text-on-surface-variant font-medium">{lead.company || '—'}</span>
                       </div>
                     </td>
@@ -286,7 +317,7 @@ const Leads = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <select 
+                      <select
                         value={lead.status}
                         onChange={(e) => handleStatusChange(lead.id, e.target.value)}
                         className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border-none cursor-pointer appearance-none text-center ${statusStyleMap[lead.status]?.bg || 'bg-surface-container-high text-on-surface-variant'}`}
@@ -296,20 +327,40 @@ const Leads = () => {
                         <option value="Closed">Closed</option>
                       </select>
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      {lead.rab_count > 0 ? (
+                        <button
+                          onClick={() => handleOpenRabModal(lead)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container font-bold text-xs hover:bg-secondary hover:text-white transition-colors"
+                          title="Lihat RAB"
+                        >
+                          {lead.rab_count}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => navigate('/admin/rab/create', { state: { lead_id: lead.id } })}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-surface-container-highest text-primary font-bold text-[10px] uppercase tracking-widest rounded-sm hover:bg-primary-container hover:text-white transition-colors"
+                          title="Buatkan RAB"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">add</span>
+                          Buat
+                        </button>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <button 
+                      <button
                         onClick={() => openModal('view', lead)}
                         className="text-on-surface-variant hover:text-primary transition-colors p-1" title="View details"
                       >
                         <span className="material-symbols-outlined text-[20px]">visibility</span>
                       </button>
-                      <button 
+                      <button
                         onClick={() => openModal('edit', lead)}
                         className="text-blue-500 hover:text-blue-700 transition-colors p-1 ml-1" title="Edit lead"
                       >
                         <span className="material-symbols-outlined text-[20px]">edit</span>
                       </button>
-                      <button 
+                      <button
                         onClick={() => requestDeleteLead(lead)}
                         className="text-red-400 hover:text-red-600 transition-colors p-1 ml-1" title="Delete lead"
                       >
@@ -322,14 +373,14 @@ const Leads = () => {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         <div className="px-6 py-4 bg-surface-container-low flex items-center justify-between border-t border-outline-variant/10">
           <span className="text-xs font-medium text-on-surface-variant">
             Showing page {pagination.page} of {pagination.totalPages} ({pagination.total} results)
           </span>
           <div className="flex gap-1">
-            <button 
+            <button
               onClick={() => fetchLeads(pagination.page - 1)}
               disabled={pagination.page <= 1}
               className="p-1.5 bg-surface-container-highest rounded-sm hover:opacity-80 disabled:opacity-50"
@@ -341,7 +392,7 @@ const Leads = () => {
               if (start + 4 > pagination.totalPages) start = Math.max(1, pagination.totalPages - 4);
               return start + i;
             }).map(p => (
-              <button 
+              <button
                 key={p}
                 onClick={() => fetchLeads(p)}
                 className={`px-3 py-1 text-xs font-bold rounded-sm ${p === pagination.page ? 'bg-primary-container text-white' : 'bg-surface-container-highest text-on-surface hover:bg-slate-200'}`}
@@ -349,7 +400,7 @@ const Leads = () => {
                 {p}
               </button>
             ))}
-            <button 
+            <button
               onClick={() => fetchLeads(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
               className="p-1.5 bg-surface-container-highest rounded-sm hover:opacity-80 disabled:opacity-50"
@@ -374,13 +425,13 @@ const Leads = () => {
               </p>
             </div>
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-surface-container-low bg-surface">
-              <button 
+              <button
                 onClick={() => setLeadToDelete(null)}
                 className="px-4 py-2 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
               >
                 Batal
               </button>
-              <button 
+              <button
                 onClick={confirmDeleteLead}
                 className="px-4 py-2 bg-red-500 text-white font-bold text-sm uppercase tracking-widest rounded-sm shadow-md hover:bg-red-600 transition-colors cursor-pointer"
               >
@@ -402,14 +453,14 @@ const Leads = () => {
                 {modalMode === 'edit' && 'Edit Lead'}
                 {modalMode === 'view' && 'Lead Details'}
               </h3>
-              <button 
+              <button
                 onClick={closeModal}
                 className="text-slate-400 hover:text-error transition-colors p-1 cursor-pointer rounded-full hover:bg-slate-100"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-8">
               {error && (
                 <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded-sm flex items-center gap-3">
@@ -440,22 +491,32 @@ const Leads = () => {
                           {selectedLead.status}
                         </span>
                       </div>
+                      <div>
+                        <span className="block text-[10px] uppercase tracking-widest font-bold text-outline">Source</span>
+                        <p className="text-sm font-bold text-on-surface mt-1">
+                          {selectedLead.source === 'Website' ? (
+                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px] text-blue-500">language</span>Website Form</span>
+                          ) : (
+                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px] text-slate-500">edit_document</span>Manual Input</span>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                    
+
                     <div className="flex-1 space-y-4">
                       <div>
                         <span className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-1">Contact Actions</span>
                         <div className="flex flex-wrap gap-2">
-                          <a 
-                            href={formatWhatsAppLink(selectedLead.phone)} 
+                          <a
+                            href={formatWhatsAppLink(selectedLead.phone)}
                             target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white font-bold rounded-sm text-xs hover:bg-green-600 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px]">chat</span>
                             WhatsApp
                           </a>
-                          <a 
-                            href={`mailto:${selectedLead.email}`} 
+                          <a
+                            href={`mailto:${selectedLead.email}`}
                             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-bold rounded-sm text-xs hover:bg-blue-600 transition-colors"
                           >
                             <span className="material-symbols-outlined text-[16px]">mail</span>
@@ -484,7 +545,7 @@ const Leads = () => {
                       {selectedLead.service_request}
                     </p>
                   </div>
-                  
+
                   <div className="text-xs text-outline font-medium pt-2">
                     Date Created: {formatAdminDateTime(selectedLead.created_at)}
                   </div>
@@ -507,9 +568,10 @@ const Leads = () => {
                       <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Capacity Ref</label>
                       <select name="capacity_ref" value={formData.capacity_ref} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none text-sm font-semibold">
                         <option value="">Select Capacity</option>
-                        <option value="1-5">1-5 Ton/Hour</option>
-                        <option value="5-15">5-15 Ton/Hour</option>
-                        <option value="15+">15+ Ton/Hour</option>
+                        <option value="-1 Ton/Hour">-1 Ton/Hour</option>
+                        <option value="1-5 Ton/Hour">1-5 Ton/Hour</option>
+                        <option value="5-15 Ton/Hour">5-15 Ton/Hour</option>
+                        <option value="15+ Ton/Hour">15+ Ton/Hour</option>
                       </select>
                     </div>
                     <div className="relative">
@@ -533,7 +595,7 @@ const Leads = () => {
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Service Request / Notes *</label>
                     <textarea required name="service_request" value={formData.service_request} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none resize-none text-sm" placeholder="Details about this lead's inquiry..." rows={3}></textarea>
                   </div>
-                  
+
                   {modalMode === 'edit' && (
                     <div className="relative">
                       <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Lead Status</label>
@@ -549,7 +611,7 @@ const Leads = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-end gap-3 px-4 md:px-8 py-4 md:py-5 border-t border-surface-container-low bg-surface">
-              <button 
+              <button
                 type="button"
                 onClick={closeModal}
                 className="w-full sm:w-auto px-6 py-2.5 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
@@ -557,7 +619,7 @@ const Leads = () => {
                 {modalMode === 'view' ? 'Close' : 'Cancel'}
               </button>
               {modalMode !== 'view' && (
-                <button 
+                <button
                   type="submit"
                   form="lead-form"
                   disabled={isSubmitting}
@@ -573,6 +635,87 @@ const Leads = () => {
                   )}
                 </button>
               )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* RAB Modal */}
+      {rabModalLead && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-blue-950/50 backdrop-blur-sm px-4">
+          <div className="bg-surface-container-lowest w-full max-w-lg rounded-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[80vh]">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-surface-container-low bg-surface">
+              <h3 className="text-xl font-headline font-bold text-primary-container flex items-center gap-2">
+                <span className="material-symbols-outlined">request_quote</span>
+                Daftar RAB
+              </h3>
+              <button
+                onClick={() => setRabModalLead(null)}
+                className="text-slate-400 hover:text-error transition-colors p-1 cursor-pointer rounded-full hover:bg-slate-100"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 bg-surface-container-lowest border-b border-surface-container-low flex flex-col">
+              <span className="text-xs text-outline font-bold uppercase tracking-widest">Lead Name</span>
+              <span className="text-lg font-bold text-on-surface">{rabModalLead.name}</span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-3 bg-surface">
+              {isRabModalLoading ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <span className="material-symbols-outlined animate-spin text-primary text-3xl">progress_activity</span>
+                  <span className="mt-2 text-sm text-on-surface-variant">Memuat data RAB...</span>
+                </div>
+              ) : rabModalData.length > 0 ? (
+                rabModalData.map(rab => (
+                  <div key={rab.id}
+                    onClick={() => navigate(`/admin/rab/edit/${rab.id}`)}
+                    className="p-4 border border-outline-variant/30 rounded-sm hover:border-primary hover:bg-surface-container-low transition-colors cursor-pointer group flex flex-col gap-2"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-primary group-hover:underline">{rab.quotation_number}</span>
+                        <span className="text-xs text-on-surface-variant">{rab.title}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 text-[9px] uppercase tracking-widest font-bold rounded-sm ${rab.status === 'sent' ? 'bg-green-100 text-green-700' :
+                          rab.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                            'bg-surface-container-highest text-on-surface-variant'
+                        }`}>
+                        {rab.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-end mt-2">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-outline font-bold uppercase tracking-widest">Grand Total</span>
+                        <span className="text-sm font-bold text-on-surface">Rp {Number(rab.grand_total).toLocaleString('id-ID')}</span>
+                      </div>
+                      <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-on-surface-variant">
+                  Belum ada RAB.
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 bg-surface border-t border-surface-container-low flex justify-end gap-3">
+              <button
+                onClick={() => setRabModalLead(null)}
+                className="px-4 py-2 text-sm font-bold uppercase tracking-widest text-outline hover:bg-surface-container-low transition-colors rounded-sm cursor-pointer"
+              >
+                Tutup
+              </button>
+              <button
+                onClick={() => navigate('/admin/rab/create', { state: { lead_id: rabModalLead.id } })}
+                className="px-4 py-2 bg-primary text-white text-sm font-bold uppercase tracking-widest rounded-sm shadow-md hover:bg-primary/90 transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">add</span>
+                Buat RAB Baru
+              </button>
             </div>
           </div>
         </div>,

@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 const AdminGallery = () => {
+  const { addToast } = useToast();
+  const { confirmDialog } = useConfirm();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState(null);
@@ -95,7 +99,8 @@ const AdminGallery = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this gallery item?')) return;
+    const confirmed = await confirmDialog('Are you sure you want to delete this gallery item?', 'Delete Media', 'danger');
+    if (!confirmed) return;
     
     const formData = new FormData();
     formData.append('action', 'delete');
@@ -108,13 +113,14 @@ const AdminGallery = () => {
       });
       const data = await res.json();
       if (data.success) {
+        addToast('Gallery item deleted', 'success');
         fetchItems();
       } else {
-        alert(data.error || 'Failed to delete');
+        addToast(data.error || 'Failed to delete', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Error deleting item');
+      addToast('Error deleting item', 'error');
     }
   };
 
@@ -150,7 +156,7 @@ const AdminGallery = () => {
 
   const handleAddLink = async (e) => {
     e.preventDefault();
-    if (!newLinkId) return alert('Silakan isi ID target.');
+    if (!newLinkId) return addToast('Silakan isi ID target.', 'warning');
 
     const formData = new FormData();
     formData.append('action', 'add');
@@ -167,19 +173,21 @@ const AdminGallery = () => {
       if (data.success) {
         setNewLinkId('');
         setSearchQueryInput('');
+        addToast('Link berhasil ditambahkan', 'success');
         fetchRelatedLinks(selectedGallery.id);
         fetchItems(); // refresh links_count in main table
       } else {
-        alert(data.error || 'Failed to add link');
+        addToast(data.error || 'Failed to add link', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Error adding link');
+      addToast('Error adding link', 'error');
     }
   };
 
   const handleDeleteLink = async (linkId) => {
-    if (!window.confirm('Yakin ingin menghapus link ini?')) return;
+    const confirmed = await confirmDialog('Yakin ingin menghapus link ini?', 'Hapus Link', 'danger');
+    if (!confirmed) return;
     
     const formData = new FormData();
     formData.append('action', 'delete');
@@ -192,10 +200,11 @@ const AdminGallery = () => {
       });
       const data = await res.json();
       if (data.success) {
+        addToast('Link berhasil dihapus', 'success');
         fetchRelatedLinks(selectedGallery.id);
         fetchItems(); // refresh links_count
       } else {
-        alert(data.error || 'Failed to delete');
+        addToast(data.error || 'Failed to delete', 'error');
       }
     } catch (err) {
       console.error(err);

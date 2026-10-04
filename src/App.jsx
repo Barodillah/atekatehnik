@@ -44,6 +44,13 @@ import ChatHistory from './pages/dashboard/ChatHistory';
 import WaClicks from './pages/dashboard/WaClicks';
 import AdminLogin from './pages/dashboard/Login';
 
+// RAB Maker
+import RabList from './pages/dashboard/rab/RabList';
+import RabBuilder from './pages/dashboard/rab/RabBuilder';
+import RabDocumentPreview from './pages/dashboard/rab/RabDocumentPreview';
+import CompanySetting from './pages/dashboard/rab/CompanySetting';
+import CatalogSetting from './pages/dashboard/rab/CatalogSetting';
+
 const PublicLayout = () => {
   return (
     <div className="relative flex flex-col min-h-screen">
@@ -61,6 +68,11 @@ const PublicLayout = () => {
 
 // Initialize Google Analytics
 ReactGA.initialize("G-VPFES0SYFN");
+
+import { ToastProvider } from './contexts/ToastContext';
+import { ConfirmProvider } from './contexts/ConfirmContext';
+
+// ... other imports ...
 
 function App() {
   const location = useLocation();
@@ -82,57 +94,67 @@ function App() {
 
   return (
     <LanguageProvider>
-      <Routes>
-        {/* Public Application Routes */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/product/:slug" element={<ProductDetail />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/portfolio/:slug" element={<Post />} />
-          <Route path="/news/:slug" element={<Post />} />
-          {/* Fallback for legacy links and admin comments */}
-          <Route path="/post/:slug" element={<Post />} />
-          <Route path="/official-channels" element={<OfficialChannels />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/edukasi" element={<Edukasi />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
+      <ToastProvider>
+        <ConfirmProvider>
+          <Routes>
+            {/* Public Application Routes */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:slug" element={<ProductDetail />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/portfolio/:slug" element={<Post />} />
+              <Route path="/news/:slug" element={<Post />} />
+              {/* Fallback for legacy links and admin comments */}
+              <Route path="/post/:slug" element={<Post />} />
+              <Route path="/official-channels" element={<OfficialChannels />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/edukasi" element={<Edukasi />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
 
-        {/* Admin Routes — Wrapped with AuthProvider */}
-        <Route element={<AuthProvider><Outlet /></AuthProvider>}>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="leads" element={<AdminLeads />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="products/new" element={<AdminProductForm />} />
-            <Route path="products/edit/:id" element={<AdminProductForm />} />
-            <Route path="posts" element={<AdminPosts />} />
-            <Route path="posts/new" element={<AdminPostForm />} />
-            <Route path="posts/edit/:id" element={<AdminPostForm />} />
-            <Route path="gallery" element={<AdminGallery />} />
-            <Route path="gallery/new" element={<AdminGalleryForm />} />
-            <Route path="gallery/edit/:id" element={<AdminGalleryForm />} />
-            <Route path="comments" element={<AdminComments />} />
-            <Route path="chat-history" element={<ChatHistory />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="wa-clicks" element={<WaClicks />} />
-            <Route path="logs" element={<ActivityLogs />} />
+            {/* Admin Routes — Wrapped with AuthProvider */}
+            <Route element={<AuthProvider><Outlet /></AuthProvider>}>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<DashboardLayout />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="leads" element={<AdminLeads />} />
+                <Route path="rab" element={<RabList />} />
+                <Route path="rab/create" element={<RabBuilder />} />
+                <Route path="rab/edit/:id" element={<RabBuilder />} />
+                <Route path="rab/preview/:id" element={<RabDocumentPreview />} />
+                <Route path="rab/company" element={<CompanySetting />} />
+                <Route path="rab/catalog" element={<CatalogSetting />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="products/new" element={<AdminProductForm />} />
+                <Route path="products/edit/:id" element={<AdminProductForm />} />
+                <Route path="posts" element={<AdminPosts />} />
+                <Route path="posts/new" element={<AdminPostForm />} />
+                <Route path="posts/edit/:id" element={<AdminPostForm />} />
+                <Route path="gallery" element={<AdminGallery />} />
+                <Route path="gallery/new" element={<AdminGalleryForm />} />
+                <Route path="gallery/edit/:id" element={<AdminGalleryForm />} />
+                <Route path="comments" element={<AdminComments />} />
+                <Route path="chat-history" element={<ChatHistory />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="wa-clicks" element={<WaClicks />} />
+                <Route path="logs" element={<ActivityLogs />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Route>
+
+            {/* Global catch-all */}
             <Route path="*" element={<NotFound />} />
-          </Route>
-        </Route>
-
-        {/* Global catch-all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          </Routes>
+        </ConfirmProvider>
+      </ToastProvider>
     </LanguageProvider>
   );
 }

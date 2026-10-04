@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { parseMarkdown } from '../utils/markdownParser';
+import { useToast } from '../contexts/ToastContext';
 
 // Media Helper Functions
 const isYouTube = (url) => {
@@ -23,6 +24,7 @@ const Post = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { t, lang } = useLanguage();
+    const { addToast } = useToast();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -186,10 +188,10 @@ const Post = () => {
                 // Auto-hide success message after 5s
                 setTimeout(() => setCommentSuccess(''), 5000);
             } else {
-                alert(data.error || 'Failed to submit comment.');
+                addToast(data.error || 'Failed to submit comment.', 'error');
             }
         } catch (err) {
-            alert('Network error. Please try again.');
+            addToast('Network error. Please try again.', 'error');
         } finally {
             setCommentSubmitting(false);
         }

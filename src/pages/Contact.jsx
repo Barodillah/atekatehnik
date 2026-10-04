@@ -139,6 +139,7 @@ const Contact = () => {
                                     <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">{t('contactPage.labelCapacity')}</label>
                                     <select name="capacity" value={formData.capacity} onChange={handleInputChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none disabled:opacity-50" disabled={isSubmitting}>
                                         <option value="">{t('contactPage.selectCapacity')}</option>
+                                        <option value="-1 Ton/Hour">-1 Ton/Hour</option>
                                         <option value="1-5 Ton/Hour">1-5 Ton/Hour</option>
                                         <option value="5-15 Ton/Hour">5-15 Ton/Hour</option>
                                         <option value="15+ Ton/Hour">15+ Ton/Hour</option>

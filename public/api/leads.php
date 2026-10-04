@@ -89,7 +89,7 @@ switch ($method) {
             $countStmt->execute($params);
             $total = (int)$countStmt->fetchColumn();
 
-            $sql = "SELECT * FROM leads $where $orderBy LIMIT :limit OFFSET :offset";
+            $sql = "SELECT leads.*, (SELECT COUNT(*) FROM quotations WHERE quotations.lead_id = leads.id AND quotations.is_template = 0) as rab_count FROM leads $where $orderBy LIMIT :limit OFFSET :offset";
             $stmt = $db->prepare($sql);
             foreach ($params as $k => $v) $stmt->bindValue($k, $v);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -129,8 +129,8 @@ switch ($method) {
         }
 
         $stmt = $db->prepare("
-            INSERT INTO leads (name, company, capacity_ref, location, email, phone, service_request, status)
-            VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New')
+            INSERT INTO leads (name, company, capacity_ref, location, email, phone, service_request, status, source)
+            VALUES (:name, :company, :cap, :loc, :email, :phone, :svc, 'New', 'Manual')
         ");
         $stmt->execute([
             ':name'    => $name,
@@ -164,7 +164,7 @@ switch ($method) {
         $fields = [];
         $params = [':id' => $id];
 
-        $updatable = ['name', 'company', 'capacity_ref', 'location', 'email', 'phone', 'service_request', 'status'];
+        $updatable = ['name', 'company', 'capacity_ref', 'location', 'email', 'phone', 'service_request', 'status', 'source'];
         foreach ($updatable as $field) {
             if (isset($input[$field])) {
                 $fields[] = "$field = :$field";

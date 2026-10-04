@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../contexts/ToastContext';
+import ImageCollectionModal from './rab/ImageCollectionModal';
 
 const ASPECT_RATIO_OPTIONS = [
   { value: 'aspect-square', label: '1:1 (Square)' },
@@ -17,6 +19,7 @@ const AdminGalleryForm = () => {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const { authFetch } = useAuth();
+  const { addToast } = useToast();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -30,6 +33,13 @@ const AdminGalleryForm = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+
+  const handleSelectFromCollection = (url) => {
+    setFile(null);
+    setFormData(prev => ({ ...prev, src: url, type: 'image' }));
+    setPreviewUrl(url);
+  };
 
   // For Edit Mode: Fetch existing data
   useEffect(() => {
@@ -160,7 +170,7 @@ const AdminGalleryForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file && !formData.src) {
-      alert('Please provide a file or a URL.');
+      addToast('Please provide a file or a URL.', 'warning');
       return;
     }
 
@@ -185,13 +195,14 @@ const AdminGalleryForm = () => {
       });
       const result = await res.json();
       if (result.success) {
+        addToast(isEdit ? 'Gallery item updated' : 'Gallery item saved', 'success');
         navigate('/admin/gallery');
       } else {
-        alert(result.error || 'Failed to save gallery item');
+        addToast(result.error || 'Failed to save gallery item', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred while saving.');
+      addToast('An error occurred while saving.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -272,6 +283,29 @@ const AdminGalleryForm = () => {
               </div>
               {file && <p className="text-[10px] text-amber-600 mt-1">Clear file selection to use URL.</p>}
             </div>
+
+            <div className="flex items-center my-4">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="px-3 text-xs text-slate-400 font-medium uppercase">OR</span>
+              <div className="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            {/* Select from collection (excluding gallery) */}
+            <button
+              type="button"
+              onClick={() => setIsCollectionOpen(true)}
+              className="w-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 py-2 rounded-sm text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">collections_bookmark</span>
+              Pilih dari Koleksi Gambar
+            </button>
+
+            <ImageCollectionModal
+              isOpen={isCollectionOpen}
+              onClose={() => setIsCollectionOpen(false)}
+              onSelect={handleSelectFromCollection}
+              excludeSources={['Galeri']}
+            />
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 space-y-4">

@@ -17,6 +17,56 @@ const isVideoFile = (url) => {
     return url?.match(/\.(mp4|webm|ogg)$/i);
 };
 
+const MediaItem = ({ phase, isActive }) => {
+  const ytid = getYouTubeId(phase.image_url);
+  const isDirectVideo = isVideoFile(phase.image_url);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (isDirectVideo && videoRef.current) {
+      if (isActive) {
+        videoRef.current.play().catch(e => console.log("Play prevented:", e));
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isActive, isDirectVideo]);
+
+  if (ytid) {
+    return (
+      <iframe 
+        className="w-full max-w-4xl aspect-video rounded-sm shadow-2xl" 
+        src={`https://www.youtube.com/embed/${ytid}?autoplay=${isActive ? '1' : '0'}&mute=1&playsinline=1`} 
+        title={phase.title} 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowFullScreen>
+      </iframe>
+    );
+  }
+
+  if (isDirectVideo) {
+    return (
+      <video
+        ref={videoRef}
+        className="w-full max-w-4xl max-h-[60vh] object-contain rounded-sm shadow-2xl"
+        src={phase.image_url}
+        controls
+        playsInline
+        muted
+        loop
+      />
+    );
+  }
+
+  return (
+    <img 
+      alt={phase.title}
+      className="w-auto max-w-full max-h-[60vh] object-contain rounded-sm shadow-2xl"
+      src={phase.image_url} 
+    />
+  );
+};
+
 const HeroSection = () => {
   const { t, lang } = useLanguage();
 
@@ -219,14 +269,18 @@ const HeroSection = () => {
     {isModalOpen && latestProject && (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md">
          {/* Close Button */}
-         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all z-10">
-           <span className="material-symbols-outlined text-2xl block">close</span>
+         <button 
+           onClick={() => setIsModalOpen(false)} 
+           onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setIsModalOpen(false); }}
+           className="absolute top-2 right-2 md:top-6 md:right-6 text-white/70 md:hover:text-white bg-white/10 md:hover:bg-white/20 active:bg-white/20 p-2 rounded-full transition-all z-[60] cursor-pointer"
+         >
+           <span className="material-symbols-outlined text-2xl block pointer-events-none">close</span>
          </button>
 
          <div className="w-full max-w-5xl max-h-[90vh] flex flex-col bg-surface/5 rounded-sm overflow-hidden relative">
             {/* Modal Header */}
             <div className="p-6 md:p-8 bg-black/40 border-b border-white/10 relative z-20">
-               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pr-10 md:pr-0">
                   <div>
                     <h3 className="text-2xl md:text-3xl font-headline font-bold text-white mb-2">{latestProject.title}</h3>
                     <p className="text-white/70 text-sm md:text-base line-clamp-2">{latestProject.subtitle}</p>
@@ -252,11 +306,19 @@ const HeroSection = () => {
                ) : (
                  <>
                    {/* Navigation Arrows (Visible on all devices) */}
-                   <button onClick={prevSlide} className="flex absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 hover:bg-white/30 text-white p-2 md:p-3 rounded-full opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all">
-                     <span className="material-symbols-outlined">chevron_left</span>
+                   <button 
+                     onClick={prevSlide} 
+                     onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); prevSlide(); }}
+                     className="flex absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 md:hover:bg-white/30 active:bg-white/30 text-white p-2 md:p-3 rounded-full opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
+                   >
+                     <span className="material-symbols-outlined pointer-events-none">chevron_left</span>
                    </button>
-                   <button onClick={nextSlide} className="flex absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 hover:bg-white/30 text-white p-2 md:p-3 rounded-full opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all">
-                     <span className="material-symbols-outlined">chevron_right</span>
+                   <button 
+                     onClick={nextSlide} 
+                     onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); nextSlide(); }}
+                     className="flex absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 md:hover:bg-white/30 active:bg-white/30 text-white p-2 md:p-3 rounded-full opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
+                   >
+                     <span className="material-symbols-outlined pointer-events-none">chevron_right</span>
                    </button>
 
                    {/* Slider Track */}
@@ -265,32 +327,11 @@ const HeroSection = () => {
                      style={{ transform: `translateX(-${activePhaseIndex * 100}%)` }}
                    >
                      {projectDetails.phases.map((phase, index) => {
-                         const ytid = getYouTubeId(phase.image_url);
-                         const isDirectVideo = isVideoFile(phase.image_url);
+                         const isActive = index === activePhaseIndex;
                          
                          return (
                            <div key={index} className="w-full h-full flex-shrink-0 relative flex items-center justify-center p-4 pb-16 md:pb-8 md:p-8">
-                             {ytid ? (
-                                <iframe 
-                                  className="w-full max-w-4xl aspect-video rounded-sm shadow-2xl" 
-                                  src={`https://www.youtube.com/embed/${ytid}?autoplay=0`} 
-                                  title={phase.title} 
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                  allowFullScreen>
-                                </iframe>
-                             ) : isDirectVideo ? (
-                                <video
-                                  className="w-full max-w-4xl max-h-[60vh] object-contain rounded-sm shadow-2xl"
-                                  src={phase.image_url}
-                                  controls
-                                />
-                             ) : (
-                                <img 
-                                  alt={phase.title}
-                                  className="w-auto max-w-full max-h-[60vh] object-contain rounded-sm shadow-2xl"
-                                  src={phase.image_url} 
-                                />
-                             )}
+                             <MediaItem phase={phase} isActive={isActive} />
                              
                              {/* Phase Title Overlay */}
                              {phase.title && (
