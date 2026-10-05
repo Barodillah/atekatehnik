@@ -566,13 +566,32 @@ const Leads = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
                       <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Capacity Ref</label>
-                      <select name="capacity_ref" value={formData.capacity_ref} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none text-sm font-semibold">
-                        <option value="">Select Capacity</option>
-                        <option value="-1 Ton/Hour">-1 Ton/Hour</option>
-                        <option value="1-5 Ton/Hour">1-5 Ton/Hour</option>
-                        <option value="5-15 Ton/Hour">5-15 Ton/Hour</option>
-                        <option value="15+ Ton/Hour">15+ Ton/Hour</option>
-                      </select>
+                      <div className="flex flex-col gap-2">
+                        <input 
+                          name="capacity_ref" 
+                          value={formData.capacity_ref} 
+                          onChange={handleFormChange} 
+                          className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm font-semibold" 
+                          placeholder="Type capacity or select below" 
+                          type="text" 
+                        />
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {['500 Kg/Jam', '500 Kg - 1 Ton/Jam', '1 - 5 Ton/Jam', '> 5 Ton/Jam'].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => handleFormChange({ target: { name: 'capacity_ref', value: preset } })}
+                              className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                                formData.capacity_ref === preset
+                                  ? 'bg-secondary text-white border-secondary'
+                                  : 'bg-transparent border-outline-variant text-outline hover:bg-surface-container-high'
+                              }`}
+                            >
+                              {preset}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="relative">
                       <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Location Region</label>
@@ -582,12 +601,12 @@ const Leads = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Email Contact *</label>
-                      <input required name="email" value={formData.email} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" placeholder="name@company.com" type="email" />
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Email Contact</label>
+                      <input name="email" value={formData.email} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" placeholder="name@company.com" type="email" />
                     </div>
                     <div className="relative">
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Phone Number *</label>
-                      <input required name="phone" value={formData.phone} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" placeholder="+62 812-XXXX-XXXX" type="tel" />
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">Phone Number</label>
+                      <input name="phone" value={formData.phone} onChange={handleFormChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none text-sm" placeholder="+62 812-XXXX-XXXX" type="tel" />
                     </div>
                   </div>
 

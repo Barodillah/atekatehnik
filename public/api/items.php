@@ -93,6 +93,7 @@ if ($method === 'GET') {
             ':is_active' => $isActive
         ]);
         $newId = $db->lastInsertId();
+        logActivity('create', 'rab', $newId, "Menambahkan Item Katalog: $name", $user['user_id'] ?? null);
         jsonSuccess(['message' => 'Item created successfully', 'id' => $newId]);
     } catch (PDOException $e) {
         if ($e->getCode() == 23000) {
@@ -150,6 +151,7 @@ if ($method === 'GET') {
             ':is_active' => $isActive,
             ':id' => $id
         ]);
+        logActivity('update', 'rab', $id, "Memperbarui Item Katalog: $name", $user['user_id'] ?? null);
         jsonSuccess(['message' => 'Item updated successfully']);
     } catch (PDOException $e) {
         if ($e->getCode() == 23000) {
@@ -162,8 +164,15 @@ if ($method === 'GET') {
         jsonError('Item ID is required for deletion');
     }
     
+    $stmt = $db->prepare("SELECT name FROM items WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $item = $stmt->fetch();
+
     $stmt = $db->prepare("DELETE FROM items WHERE id = :id");
     if ($stmt->execute([':id' => $id])) {
+        if ($item) {
+            logActivity('delete', 'rab', $id, "Menghapus Item Katalog: {$item['name']}", $user['user_id'] ?? null);
+        }
         jsonSuccess(['message' => 'Item deleted successfully']);
     } else {
         jsonError('Failed to delete item');

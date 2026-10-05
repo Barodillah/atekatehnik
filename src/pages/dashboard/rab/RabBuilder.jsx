@@ -90,6 +90,7 @@ const RabBuilder = () => {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [dbTemplates, setDbTemplates] = useState([]);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [templateSearchTerm, setTemplateSearchTerm] = useState('');
 
   // States - Save Template Modal
   const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] = useState(false);
@@ -1379,24 +1380,38 @@ Output HARUS berupa JSON murni dengan format berikut:
       {isTemplateModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-blue-950/60 backdrop-blur-sm" onClick={() => setIsTemplateModalOpen(false)}></div>
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col relative z-10 overflow-hidden">
-            <div className="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[85vh] flex flex-col relative z-10 overflow-hidden">
+            <div className="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="font-bold text-blue-900 text-lg flex items-center gap-2">
                 <span className="material-symbols-outlined">view_carousel</span>
                 Pilih Template RAB
               </h2>
-              <button onClick={() => setIsTemplateModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors p-1">
-                <span className="material-symbols-outlined">close</span>
-              </button>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="relative flex-1 sm:w-64">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                  <input
+                    type="text"
+                    placeholder="Cari template..."
+                    value={templateSearchTerm}
+                    onChange={(e) => setTemplateSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  />
+                </div>
+                <button onClick={() => setIsTemplateModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors p-1">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50">
+            <div className="flex-1 overflow-y-auto p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 bg-slate-50">
               {isLoadingTemplates ? (
-                <div className="col-span-2 text-center py-10 text-slate-500">Memuat template...</div>
+                <div className="col-span-full text-center py-10 text-slate-500">Memuat template...</div>
               ) : dbTemplates.length === 0 ? (
-                <div className="col-span-2 text-center py-10 text-slate-500">Belum ada template tersimpan.</div>
+                <div className="col-span-full text-center py-10 text-slate-500">Belum ada template tersimpan.</div>
+              ) : dbTemplates.filter(t => (t.template_name || t.title || '').toLowerCase().includes(templateSearchTerm.toLowerCase()) || (t.cover_description || '').toLowerCase().includes(templateSearchTerm.toLowerCase())).length === 0 ? (
+                <div className="col-span-full text-center py-10 text-slate-500">Pencarian tidak ditemukan.</div>
               ) : (
-                dbTemplates.map(template => (
+                dbTemplates.filter(t => (t.template_name || t.title || '').toLowerCase().includes(templateSearchTerm.toLowerCase()) || (t.cover_description || '').toLowerCase().includes(templateSearchTerm.toLowerCase())).map(template => (
                   <div key={template.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow flex flex-col group">
                     <div className="h-32 bg-slate-100 overflow-hidden relative">
                       {template.cover_image_url ? (
@@ -1679,13 +1694,32 @@ Output HARUS berupa JSON murni dengan format berikut:
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative">
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Ref Kapasitas</label>
-                    <select name="capacity_ref" value={leadFormData.capacity_ref} onChange={handleLeadFormChange} className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none appearance-none text-sm font-semibold">
-                      <option value="">Pilih Kapasitas</option>
-                      <option value="-1 Ton/Hour">-1 Ton/Hour</option>
-                      <option value="1-5 Ton/Hour">1-5 Ton/Hour</option>
-                      <option value="5-15 Ton/Hour">5-15 Ton/Hour</option>
-                      <option value="15+ Ton/Hour">15+ Ton/Hour</option>
-                    </select>
+                    <div className="flex flex-col gap-2">
+                      <input 
+                        name="capacity_ref" 
+                        value={leadFormData.capacity_ref} 
+                        onChange={handleLeadFormChange} 
+                        className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm font-semibold" 
+                        placeholder="Ketik kapasitas atau pilih opsi..." 
+                        type="text" 
+                      />
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {['500 Kg/Jam', '500 Kg - 1 Ton/Jam', '1 - 5 Ton/Jam', '> 5 Ton/Jam'].map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => handleLeadFormChange({ target: { name: 'capacity_ref', value: preset } })}
+                            className={`px-3 py-1.5 text-[10px] sm:text-xs rounded-full border transition-colors ${
+                              leadFormData.capacity_ref === preset
+                                ? 'bg-blue-500 text-white border-blue-500'
+                                : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'
+                            }`}
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <div className="relative">
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Wilayah / Lokasi</label>
@@ -1695,12 +1729,12 @@ Output HARUS berupa JSON murni dengan format berikut:
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative">
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Email *</label>
-                    <input required name="email" value={leadFormData.email} onChange={handleLeadFormChange} className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm" placeholder="name@company.com" type="email" />
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Email</label>
+                    <input name="email" value={leadFormData.email} onChange={handleLeadFormChange} className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm" placeholder="name@company.com" type="email" />
                   </div>
                   <div className="relative">
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">No WhatsApp/Telp *</label>
-                    <input required name="phone" value={leadFormData.phone} onChange={handleLeadFormChange} className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm" placeholder="+62 812-XXXX-XXXX" type="tel" />
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">No WhatsApp/Telp</label>
+                    <input name="phone" value={leadFormData.phone} onChange={handleLeadFormChange} className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm" placeholder="+62 812-XXXX-XXXX" type="tel" />
                   </div>
                 </div>
 

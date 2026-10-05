@@ -178,6 +178,12 @@ elseif ($method === 'POST' || $method === 'PUT') {
         }
 
         $pdo->commit();
+        
+        $action = ($method === 'POST') ? 'create' : 'update';
+        $descType = $is_template ? "Template RAB" : "RAB";
+        $descName = $is_template ? $template_name : $quotation_number;
+        logActivity($action, 'rab', $quotation_id, "Menyimpan $descType: $descName", $user['user_id'] ?? null);
+
         jsonSuccess([
             'message' => 'Quotation saved successfully', 
             'id' => $quotation_id,
@@ -194,10 +200,21 @@ elseif ($method === 'DELETE') {
     if (!$id) jsonError(400, 'ID required');
 
     try {
+        $stmt = $pdo->prepare("SELECT quotation_number, template_name, is_template FROM quotations WHERE id = ?");
+        $stmt->execute([$id]);
+        $rabInfo = $stmt->fetch();
+
         $pdo->beginTransaction();
         $pdo->prepare("DELETE FROM quotation_items WHERE quotation_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM quotations WHERE id = ?")->execute([$id]);
         $pdo->commit();
+        
+        if ($rabInfo) {
+            $descType = $rabInfo['is_template'] ? "Template RAB" : "RAB";
+            $descName = $rabInfo['is_template'] ? $rabInfo['template_name'] : $rabInfo['quotation_number'];
+            logActivity('delete', 'rab', $id, "Menghapus $descType: $descName", $user['user_id'] ?? null);
+        }
+
         jsonSuccess(['message' => 'Quotation deleted successfully']);
     } catch (Exception $e) {
         $pdo->rollBack();

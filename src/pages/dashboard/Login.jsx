@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -10,6 +10,69 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [dbStatus, setDbStatus] = useState('checking'); // 'checking', 'online', 'error'
+  const [dbErrorDetail, setDbErrorDetail] = useState('');
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [showErrorDetail, setShowErrorDetail] = useState(false);
+
+  const images = [
+    "https://atekatehnik.com/wp-content/uploads/herobarukecil_1.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/herobarukecil_2.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/hero_size_kecil.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/hero_baru_kecil_lagi_4.jpg",
+    "https://atekatehnik.com/wp-content/uploads/hero_baru_kecil_lagi_3.jpeg",
+    "https://atekatehnik.com/wp-content/uploads/hero_baru_kecil_lagi_5.jpg",
+    "https://atekatehnik.com/wp/uploads/asset_6ac365b8c6fa36.79078384.png"
+  ];
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  useEffect(() => {
+    const checkDb = async () => {
+      try {
+        const res = await fetch('/api/db_status.php');
+        const data = await res.json();
+        if (data.status === 'connected') {
+          setDbStatus('online');
+        } else {
+          setDbStatus('error');
+          setDbErrorDetail(data.error_detail || 'Unknown error from server');
+        }
+      } catch (err) {
+        setDbStatus('error');
+        setDbErrorDetail(err.message || 'Fetch failed');
+      }
+    };
+    checkDb();
+  }, []);
+
+  const handleDbClick = () => {
+    if (dbStatus === 'error') {
+      setIsPinModalOpen(true);
+      setPinInput('');
+      setPinError('');
+      setShowErrorDetail(false);
+    }
+  };
+
+  const handlePinSubmit = (e) => {
+    e.preventDefault();
+    if (pinInput === '2098') {
+      setShowErrorDetail(true);
+      setPinError('');
+    } else {
+      setPinError('PIN Salah.');
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,22 +94,36 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface relative overflow-hidden font-body selection:bg-secondary-container selection:text-on-secondary-container">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-950/5 skew-x-12 translate-x-32 hidden md:block"></div>
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary-container/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden font-body selection:bg-secondary-container selection:text-on-secondary-container">
+      {/* Fullscreen Background Slider */}
+      {images.map((img, index) => (
+        <div
+          key={img}
+          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0"
+            }`}
+        >
+          <img
+            src={img}
+            alt="Ateka Tehnik Factory"
+            className="w-full h-full object-cover"
+          />
+          {/* Light Overlay for better contrast */}
+          <div className="absolute inset-0 bg-white/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent"></div>
+        </div>
+      ))}
 
-      <div className="w-full max-w-md bg-white shadow-2xl z-10 rounded-sm overflow-hidden flex flex-col">
+      <div className="w-full max-w-md bg-white shadow-2xl z-10 rounded-sm overflow-hidden flex flex-col mx-4">
         {/* Header Block */}
         <div className="bg-blue-950 px-10 py-12 flex flex-col items-center justify-center text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
-            <img 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtdNy3OfX3zStgDUwt4bpJcTpGNWnZwmB9phP5I66C8r9h4VBljrltVc15z4xcn1sqhGwGI6B093nqVfMSR58xe-XXUorwf5Y65VCgzoddmoCYA08AMX1F9-jdXzPDaSjmcgrswzpxld2CAjhIWUc-n4cDALMaFP-2uSosy95mIQ6gxzydYHAwTPAnmRoIVVOJ7FJgw_wji1siBrDxtdiwe7JvwFVk3Oc13tWGBVR0RkShqHIFrV5vdwhvfofdkdjoRh1EINIdD94" 
-              alt="Blueprint" 
+            <img
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtdNy3OfX3zStgDUwt4bpJcTpGNWnZwmB9phP5I66C8r9h4VBljrltVc15z4xcn1sqhGwGI6B093nqVfMSR58xe-XXUorwf5Y65VCgzoddmoCYA08AMX1F9-jdXzPDaSjmcgrswzpxld2CAjhIWUc-n4cDALMaFP-2uSosy95mIQ6gxzydYHAwTPAnmRoIVVOJ7FJgw_wji1siBrDxtdiwe7JvwFVk3Oc13tWGBVR0RkShqHIFrV5vdwhvfofdkdjoRh1EINIdD94"
+              alt="Blueprint"
               className="w-full h-full object-cover mix-blend-overlay"
             />
           </div>
-          
+
           <div className="w-16 h-16 bg-secondary flex items-center justify-center rounded-sm shadow-lg mb-6 relative z-10">
             <span className="material-symbols-outlined text-white text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>precision_manufacturing</span>
           </div>
@@ -96,7 +173,7 @@ const Login = () => {
               </div>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
               className="w-full bg-primary text-white py-3.5 mt-4 rounded-sm font-bold text-sm uppercase tracking-widest hover:bg-blue-900 transition-colors shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
@@ -117,13 +194,76 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <div className="bg-surface-container-low py-4 text-center border-t border-outline-variant/10">
-          <p className="text-[10px] font-bold font-label uppercase text-on-surface-variant flex items-center justify-center gap-1">
+        <div className="bg-surface-container-low py-4 px-6 border-t border-outline-variant/10 flex justify-between items-center">
+          <p className="text-[10px] font-bold font-label uppercase text-on-surface-variant flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">shield</span>
-            Secure Environment 256-bit AES
+            Secure 256-bit AES
           </p>
+          <div
+            onClick={handleDbClick}
+            className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm border transition-colors ${dbStatus === 'checking' ? 'border-slate-200 text-slate-500 bg-slate-50' :
+              dbStatus === 'online' ? 'border-green-200 text-green-700 bg-green-50' :
+                'border-red-200 text-red-700 bg-red-50 cursor-pointer hover:bg-red-100'
+              }`}
+            title={dbStatus === 'error' ? 'Klik untuk diagnosa' : 'Status Database'}
+          >
+            <span className={`w-2 h-2 rounded-full ${dbStatus === 'checking' ? 'bg-slate-400 animate-pulse' :
+              dbStatus === 'online' ? 'bg-green-500' :
+                'bg-red-500 animate-pulse'
+              }`}></span>
+            {dbStatus === 'checking' ? 'Checking DB' : dbStatus === 'online' ? 'DB Online' : 'DB Offline'}
+          </div>
         </div>
       </div>
+
+      {/* PIN Diagnostic Modal */}
+      {isPinModalOpen && (
+        <div className="fixed inset-0 bg-blue-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setIsPinModalOpen(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+            {!showErrorDetail ? (
+              <form onSubmit={handlePinSubmit}>
+                <h3 className="font-bold text-slate-800 text-lg mb-2">Diagnostic Akses</h3>
+                <p className="text-sm text-slate-500 mb-4">Masukkan akses untuk melihat detail error database.</p>
+
+                {pinError && (
+                  <div className="mb-3 p-2 bg-red-50 text-red-600 text-xs font-bold rounded-sm border border-red-100 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">error</span>
+                    {pinError}
+                  </div>
+                )}
+
+                <input
+                  type="password"
+                  value={pinInput}
+                  onChange={e => setPinInput(e.target.value)}
+                  className="w-full border border-slate-300 rounded-sm px-3 py-2 text-center text-xl tracking-[0.5em] font-mono focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4"
+                  maxLength={4}
+                  autoFocus
+                />
+
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setIsPinModalOpen(false)} className="flex-1 px-4 py-2 bg-slate-100 text-slate-600 rounded-sm text-sm font-bold hover:bg-slate-200 transition-colors">Batal</button>
+                  <button type="submit" className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-sm text-sm font-bold hover:bg-blue-800 transition-colors">Verifikasi</button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-red-600 text-lg flex items-center gap-2">
+                    <span className="material-symbols-outlined">warning</span>
+                    Database Error
+                  </h3>
+                  <button onClick={() => setIsPinModalOpen(false)} className="text-slate-400 hover:text-slate-700"><span className="material-symbols-outlined text-[20px]">close</span></button>
+                </div>
+                <div className="bg-slate-900 text-green-400 font-mono text-xs p-4 rounded-sm overflow-x-auto whitespace-pre-wrap">
+                  {dbErrorDetail}
+                </div>
+                <button onClick={() => setIsPinModalOpen(false)} className="w-full mt-4 px-4 py-2 bg-slate-100 text-slate-700 rounded-sm text-sm font-bold hover:bg-slate-200 transition-colors">Tutup</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

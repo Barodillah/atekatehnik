@@ -137,13 +137,34 @@ const Contact = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="relative">
                                     <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">{t('contactPage.labelCapacity')}</label>
-                                    <select name="capacity" value={formData.capacity} onChange={handleInputChange} className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none appearance-none disabled:opacity-50" disabled={isSubmitting}>
-                                        <option value="">{t('contactPage.selectCapacity')}</option>
-                                        <option value="-1 Ton/Hour">-1 Ton/Hour</option>
-                                        <option value="1-5 Ton/Hour">1-5 Ton/Hour</option>
-                                        <option value="5-15 Ton/Hour">5-15 Ton/Hour</option>
-                                        <option value="15+ Ton/Hour">15+ Ton/Hour</option>
-                                    </select>
+                                    <div className="flex flex-col gap-2">
+                                        <input 
+                                            name="capacity" 
+                                            value={formData.capacity} 
+                                            onChange={handleInputChange} 
+                                            className="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors py-3 px-4 outline-none disabled:opacity-50" 
+                                            placeholder={t('contactPage.selectCapacity') || 'Ketik kapasitas...'} 
+                                            type="text" 
+                                            disabled={isSubmitting}
+                                        />
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {[t('contactPage.capOpt1'), t('contactPage.capOpt2'), t('contactPage.capOpt3'), t('contactPage.capOpt4')].map((preset) => (
+                                                <button
+                                                    key={preset}
+                                                    type="button"
+                                                    onClick={() => handleInputChange({ target: { name: 'capacity', value: preset } })}
+                                                    className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                                                        formData.capacity === preset
+                                                            ? 'bg-secondary text-white border-secondary'
+                                                            : 'bg-transparent border-outline-variant text-outline hover:bg-surface-container-high'
+                                                    }`}
+                                                    disabled={isSubmitting}
+                                                >
+                                                    {preset}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="relative">
                                     <label className="block text-[10px] uppercase tracking-widest font-bold text-outline mb-2">{t('contactPage.labelLocation')}</label>
