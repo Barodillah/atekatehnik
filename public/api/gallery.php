@@ -28,8 +28,9 @@ try {
     
     // Fetch all related links
     $linkStmt = $db->query("
-        SELECT l.gallery_id, l.related_type,
+        SELECT l.gallery_id, l.related_type, l.external_url, l.external_title,
                CASE 
+                   WHEN l.related_type = 'external' THEN l.external_title
                    WHEN l.related_type = 'product' THEN (SELECT nama FROM products p WHERE p.id = l.related_id)
                    ELSE (SELECT title FROM posts po WHERE po.id = l.related_id)
                END as target_title,
@@ -44,7 +45,13 @@ try {
 
     $linksByGallery = [];
     foreach ($allLinks as $link) {
-        if ($link['target_title'] && $link['target_slug']) {
+        if ($link['related_type'] === 'external') {
+            $linksByGallery[$link['gallery_id']][] = [
+                'type' => $link['related_type'],
+                'title' => $link['target_title'] ?: $link['external_url'],
+                'url' => $link['external_url']
+            ];
+        } elseif ($link['target_title'] && $link['target_slug']) {
             $linksByGallery[$link['gallery_id']][] = [
                 'type' => $link['related_type'],
                 'title' => $link['target_title'],

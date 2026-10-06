@@ -38,6 +38,10 @@ switch ($action) {
             jsonError(401, 'Invalid email or password.');
         }
 
+        if ($GLOBALS['db_status_info']['active_db'] === 'fallback' && $user['role'] !== 'superadmin') {
+            jsonError(503, 'Sistem sedang berjalan menggunakan Database Cadangan. Hanya superadmin yang diizinkan untuk login sementara ini.');
+        }
+
         // Generate a secure random token
         $token = bin2hex(random_bytes(32));
         $expiresAt = date('Y-m-d H:i:s', strtotime('+7 days'));

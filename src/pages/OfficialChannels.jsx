@@ -65,6 +65,22 @@ const OfficialChannels = () => {
                 <a href="https://maps.app.goo.gl/sCfYncxzxEtxHjBb9" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-800 transition-colors">
                   {t('channels.openMaps')} <span className="material-symbols-outlined text-sm">open_in_new</span>
                 </a>
+
+                {/* Lokasi Cabang / Sparepart (Link Saja) */}
+                <div className="mt-2 p-4 bg-emerald-50/50 rounded-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined">storefront</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-emerald-900 text-sm">{t('channels.sparepartTitle')}</h4>
+                      <p className="text-xs text-emerald-700 mt-0.5">{t('channels.sparepartDesc')}</p>
+                    </div>
+                  </div>
+                  <a href="https://maps.app.goo.gl/inXvTXJEXd4oF2is5" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-emerald-200 text-emerald-700 font-bold text-xs rounded-sm hover:bg-emerald-50 transition-colors shrink-0 w-full sm:w-auto shadow-sm">
+                    {t('channels.openMaps')} <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  </a>
+                </div>
               </div>
 
               {/* Verified Socials */}

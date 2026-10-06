@@ -1,10 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import GeographicMap from '../../components/dashboard/GeographicMap';
 
 const DashboardHome = () => {
-  const { authFetch } = useAuth();
+  const { authFetch, user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleSync = async () => {
+    setShowSyncModal(false);
+    try {
+      const res = await authFetch('/api/admin_sync_db.php', { method: 'POST' });
+      const json = await res.json();
+      if (json.success) {
+        showToast(json.message || 'Sinkronisasi berhasil!', 'success');
+      } else {
+        showToast('Gagal: ' + json.error, 'error');
+      }
+    } catch (err) {
+      showToast('Terjadi kesalahan saat menghubungi server.', 'error');
+    }
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -103,6 +126,15 @@ const DashboardHome = () => {
             <span className="material-symbols-outlined text-sm">calendar_today</span>
             Overview
           </button>
+          {user?.role === 'superadmin' && (
+            <button 
+              onClick={() => setShowSyncModal(true)}
+              className="px-4 py-2 bg-error-container text-on-error-container text-xs font-bold uppercase tracking-widest rounded-sm flex items-center gap-2 hover:bg-error hover:text-white transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">sync</span>
+              Sync DB
+            </button>
+          )}
         </div>
       </div>
 
@@ -260,6 +292,9 @@ const DashboardHome = () => {
         </div>
       </div>
 
+      {/* Geographic Map Card */}
+      <GeographicMap data={data.geographicStats || []} />
+
       {/* Featured Slots (Products & Posts) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
         
@@ -347,6 +382,53 @@ const DashboardHome = () => {
           </div>
         )}
       </div>
+
+      {/* Sync Modal */}
+      {showSyncModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-surface rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4 text-error">
+                <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-2xl">warning</span>
+                </div>
+                <h3 className="text-xl font-bold text-on-surface">Konfirmasi Sinkronisasi</h3>
+              </div>
+              <p className="text-on-surface-variant mb-6 text-sm">
+                Apakah Anda yakin ingin mensinkronisasi database utama ke cadangan? Proses ini akan menimpa data cadangan yang ada saat ini.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button 
+                  onClick={() => setShowSyncModal(false)}
+                  className="px-4 py-2 text-sm font-bold text-primary hover:bg-surface-container-high rounded-sm transition-colors"
+                >
+                  BATAL
+                </button>
+                <button 
+                  onClick={handleSync}
+                  className="px-4 py-2 bg-error text-white text-sm font-bold rounded-sm shadow-md hover:bg-error/90 transition-colors flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-sm">sync</span>
+                  YA, SINKRONISASI
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded shadow-lg animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-primary text-on-primary' : 'bg-error text-white'}`}>
+          <span className="material-symbols-outlined text-xl">
+            {toast.type === 'success' ? 'check_circle' : 'error'}
+          </span>
+          <p className="text-sm font-semibold">{toast.message}</p>
+          <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+            <span className="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

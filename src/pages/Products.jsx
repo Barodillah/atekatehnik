@@ -21,6 +21,14 @@ const Products = () => {
     const [loadCount, setLoadCount] = useState(15);
     const observerTarget = useRef(null);
 
+    // Marketplace filters for Suku Cadang
+    const [marketplaceFilters, setMarketplaceFilters] = useState({
+        shopee: false,
+        tokopedia: false,
+        tiktokshop: false,
+        inaproc: false,
+    });
+
     const categories = [
         { value: '', label: t('products.catAll') || 'Semua Produk', icon: 'apps' },
         { value: 'Paket', label: t('products.catPaketLengkap') || 'Paket Lengkap', icon: 'settings_input_component' },
@@ -60,6 +68,16 @@ const Products = () => {
         setActiveCategory(urlKategori);
     }, [searchParams]);
 
+    // Reset marketplace filters when category changes
+    useEffect(() => {
+        setMarketplaceFilters({
+            shopee: false,
+            tokopedia: false,
+            tiktokshop: false,
+            inaproc: false,
+        });
+    }, [activeCategory]);
+
     // Fetch products whenever activeCategory or searchQuery changes (with debounce)
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -97,6 +115,17 @@ const Products = () => {
             filtered = filtered.filter(p => p.nama.toLowerCase().includes(lowerQuery));
         }
 
+        // Apply marketplace filters
+        const { shopee, tokopedia, tiktokshop, inaproc } = marketplaceFilters;
+        if (shopee || tokopedia || tiktokshop || inaproc) {
+            filtered = filtered.filter(p => {
+                return (shopee && p.shopee_link) ||
+                       (tokopedia && p.tokopedia_link) ||
+                       (tiktokshop && p.tiktokshop_link) ||
+                       (inaproc && p.inaproc_link);
+            });
+        }
+
         // Apply custom sort for "Semua Produk"
         if (activeCategory === '') {
             filtered = [...filtered].sort((a, b) => {
@@ -108,7 +137,7 @@ const Products = () => {
 
         // Apply chunk limit (Infinite scroll)
         return filtered.slice(0, loadCount);
-    }, [products, searchQuery, activeCategory, loadCount]);
+    }, [products, searchQuery, activeCategory, loadCount, marketplaceFilters]);
 
     // Infinite scroll trigger
     const loadMoreProducts = useCallback(() => {
@@ -211,6 +240,35 @@ const Products = () => {
                                     {cat.label}
                                 </button>
                             ))}
+                        </div>
+                    )}
+
+                    {/* Marketplace Filter */}
+                    {!isSearchActive && (
+                        <div className="flex flex-row overflow-x-auto md:flex-wrap items-center justify-start md:justify-end gap-1.5 md:gap-2 text-[9px] md:text-[10px] font-bold uppercase tracking-widest pt-3 border-t border-outline-variant/20 hide-scrollbar pb-1">
+                            {(activeCategory === 'Suku Cadang' || activeCategory === '') && (
+                                <>
+                                    <label className="shrink-0 flex items-center gap-1 cursor-pointer bg-orange-100 text-orange-700 px-2 md:px-2.5 py-1 md:py-1.5 rounded-sm hover:bg-orange-200 transition-colors">
+                                        <input type="checkbox" checked={marketplaceFilters.shopee} onChange={e => setMarketplaceFilters(prev => ({ ...prev, shopee: e.target.checked }))} className="accent-orange-500 scale-75 md:scale-90" />
+                                        Shopee
+                                    </label>
+                                    <label className="shrink-0 flex items-center gap-1 cursor-pointer bg-green-100 text-green-700 px-2 md:px-2.5 py-1 md:py-1.5 rounded-sm hover:bg-green-200 transition-colors">
+                                        <input type="checkbox" checked={marketplaceFilters.tokopedia} onChange={e => setMarketplaceFilters(prev => ({ ...prev, tokopedia: e.target.checked }))} className="accent-green-600 scale-75 md:scale-90" />
+                                        Tokopedia
+                                    </label>
+                                    <label className="shrink-0 flex items-center gap-1 cursor-pointer bg-slate-200 text-slate-800 px-2 md:px-2.5 py-1 md:py-1.5 rounded-sm hover:bg-slate-300 transition-colors">
+                                        <input type="checkbox" checked={marketplaceFilters.tiktokshop} onChange={e => setMarketplaceFilters(prev => ({ ...prev, tiktokshop: e.target.checked }))} className="accent-slate-800 scale-75 md:scale-90" />
+                                        TikTok
+                                    </label>
+                                </>
+                            )}
+
+                            {activeCategory !== 'Suku Cadang' && (
+                                <label className="shrink-0 flex items-center gap-1 cursor-pointer bg-red-100 text-red-700 px-2 md:px-2.5 py-1 md:py-1.5 rounded-sm hover:bg-red-200 transition-colors">
+                                    <input type="checkbox" checked={marketplaceFilters.inaproc} onChange={e => setMarketplaceFilters(prev => ({ ...prev, inaproc: e.target.checked }))} className="accent-red-600 scale-75 md:scale-90" />
+                                    INAPROC
+                                </label>
+                            )}
                         </div>
                     )}
                 </div>

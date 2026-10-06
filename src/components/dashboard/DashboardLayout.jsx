@@ -9,6 +9,24 @@ const DashboardLayout = () => {
 
   const [isEntryModalOpen, setEntryModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Database Lockdown State
+  const [dbLockdown, setDbLockdown] = useState(null);
+
+  useEffect(() => {
+    const checkDbStatus = async () => {
+      try {
+        const res = await fetch('/api/db_status.php');
+        const json = await res.json();
+        if (json.active_db === 'fallback') {
+          setDbLockdown(json.primary_error || 'Koneksi ke database utama terputus.');
+        }
+      } catch (e) {
+        // Ignore if fetch fails completely
+      }
+    };
+    checkDbStatus();
+  }, []);
 
   // ── Global Search State ─────────────────────────────────────────────
   const [searchInput, setSearchInput] = useState('');
@@ -146,6 +164,40 @@ const DashboardLayout = () => {
   // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  // Database Lockdown Screen for non-superadmins
+  if (dbLockdown && user?.role !== 'superadmin') {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-error-container text-on-error-container rounded-lg shadow-2xl overflow-hidden text-center animate-in zoom-in-95 duration-300">
+          <div className="p-8 pb-4">
+            <span className="material-symbols-outlined text-6xl text-error mb-4">database</span>
+            <h2 className="text-2xl font-bold mb-2">MODE CADANGAN AKTIF</h2>
+            <p className="text-sm font-medium mb-4 opacity-90">
+              Sistem saat ini dialihkan ke database cadangan secara otomatis.
+            </p>
+            <div className="bg-error/10 p-3 rounded text-left text-xs mb-6 font-mono break-all text-error font-bold">
+              Alasan: {dbLockdown}
+            </div>
+            <p className="text-sm mb-6 opacity-90">
+              Portal Admin dikunci sementara untuk melindungi integritas data Anda. Segala penambahan atau perubahan data dimatikan sampai database utama kembali normal.
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-error text-white font-bold py-3 px-6 rounded-sm uppercase tracking-wider text-sm hover:opacity-90 w-full flex justify-center items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">refresh</span>
+              Cek Ulang Koneksi
+            </button>
+          </div>
+          <div className="bg-error text-white py-3 px-6 flex justify-between items-center mt-4">
+            <span className="text-xs font-bold uppercase">Sistem Terproteksi</span>
+            <button onClick={logout} className="text-xs font-bold underline hover:text-white/80">Logout</button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const isActive = (path) => {
@@ -485,6 +537,19 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
+
+        {/* Superadmin Fallback Warning Banner */}
+        {dbLockdown && user?.role === 'superadmin' && (
+          <div className="bg-amber-100 border-b border-amber-200 text-amber-800 px-4 py-3 md:px-8 text-xs font-bold flex flex-col md:flex-row md:items-center justify-between shadow-inner gap-2">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-600">warning</span>
+              <span>
+                MODE CADANGAN AKTIF: Sistem menggunakan database fallback. Harap berhati-hati dalam melakukan operasi tulis (tambah/edit/hapus data).
+                <div className="opacity-70 font-normal mt-1 md:mt-0 md:ml-2 font-mono text-[10px]">Error utama: {dbLockdown}</div>
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Page Content Canvas */}
         <Outlet context={{ searchQuery: debouncedSearch }} />

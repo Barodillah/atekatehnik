@@ -249,9 +249,11 @@
 | 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
 | 2 | `gallery_id` | `int(11)` | NO | MUL | - | - |
 | 3 | `related_type` | `varchar(50)` | NO | - | - | - |
-| 4 | `related_id` | `int(11)` | NO | MUL | - | - |
-| 5 | `sort_order` | `int(11)` | YES | - | 0 | - |
-| 6 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
+| 4 | `related_id` | `int(11)` | YES | MUL | NULL | - |
+| 5 | `external_url` | `varchar(500)` | YES | - | NULL | - |
+| 6 | `external_title`| `varchar(255)` | YES | - | NULL | - |
+| 7 | `sort_order` | `int(11)` | YES | - | 0 | - |
+| 8 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
 
 ## `company_profiles`
 

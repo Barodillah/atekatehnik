@@ -75,6 +75,10 @@ function requireAuth(): array {
         jsonError(401, 'Invalid or expired token.');
     }
 
+    if ($GLOBALS['db_status_info']['active_db'] === 'fallback' && $session['role'] !== 'superadmin') {
+        jsonError(503, 'Sistem sedang berjalan menggunakan Database Cadangan. Hanya superadmin yang dapat mengakses portal.');
+    }
+
     // Check expiry
     if (strtotime($session['expires_at']) < time()) {
         // Clean up expired session

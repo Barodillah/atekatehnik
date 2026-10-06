@@ -116,6 +116,43 @@ $latestPostStmt = $db->query("SELECT p.title, p.category, p.cover_image, p.slug,
     FROM posts p ORDER BY p.id DESC LIMIT 1");
 $featuredPost = $latestPostStmt->fetch();
 
+// ── 6. Geographic Stats (Country & City) ────────────────────────────────
+$geoDataStmt = $db->query("
+    SELECT country, city, COUNT(*) as count
+    FROM page_views
+    WHERE country IS NOT NULL AND country != ''
+    GROUP BY country, city
+    ORDER BY count DESC
+");
+$geoDataRaw = $geoDataStmt->fetchAll();
+
+$countryMap = [];
+foreach ($geoDataRaw as $row) {
+    $country = trim($row['country']);
+    $city = trim($row['city']) ?: 'Unknown';
+    $count = (int)$row['count'];
+    
+    if (!isset($countryMap[$country])) {
+        $countryMap[$country] = [
+            'country' => $country,
+            'total' => 0,
+            'cities' => []
+        ];
+    }
+    
+    $countryMap[$country]['total'] += $count;
+    $countryMap[$country]['cities'][] = [
+        'city' => $city,
+        'count' => $count
+    ];
+}
+
+// Convert to array and sort by total descending
+$geographicStats = array_values($countryMap);
+usort($geographicStats, function($a, $b) {
+    return $b['total'] - $a['total'];
+});
+
 jsonSuccess([
     'kpis' => [
         'totalLeads' => $totalLeads,
@@ -134,5 +171,6 @@ jsonSuccess([
     'viewChart' => $chartArray,
     'recentActivity' => $recentActivity,
     'featuredProduct' => $featuredProduct,
-    'featuredPost' => $featuredPost
+    'featuredPost' => $featuredPost,
+    'geographicStats' => $geographicStats
 ]);

@@ -12,7 +12,9 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [dbStatus, setDbStatus] = useState('checking'); // 'checking', 'online', 'error'
+  const [activeDb, setActiveDb] = useState('');
   const [dbErrorDetail, setDbErrorDetail] = useState('');
+  const [primaryError, setPrimaryError] = useState('');
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
@@ -43,6 +45,10 @@ const Login = () => {
         const data = await res.json();
         if (data.status === 'connected') {
           setDbStatus('online');
+          setActiveDb(data.active_db);
+          if (data.active_db === 'fallback') {
+            setPrimaryError(data.primary_error || 'Unknown Error');
+          }
         } else {
           setDbStatus('error');
           setDbErrorDetail(data.error_detail || 'Unknown error from server');
@@ -56,7 +62,7 @@ const Login = () => {
   }, []);
 
   const handleDbClick = () => {
-    if (dbStatus === 'error') {
+    if (dbStatus === 'error' || (dbStatus === 'online' && activeDb === 'fallback')) {
       setIsPinModalOpen(true);
       setPinInput('');
       setPinError('');
@@ -201,17 +207,19 @@ const Login = () => {
           </p>
           <div
             onClick={handleDbClick}
-            className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm border transition-colors ${dbStatus === 'checking' ? 'border-slate-200 text-slate-500 bg-slate-50' :
-              dbStatus === 'online' ? 'border-green-200 text-green-700 bg-green-50' :
-                'border-red-200 text-red-700 bg-red-50 cursor-pointer hover:bg-red-100'
-              }`}
-            title={dbStatus === 'error' ? 'Klik untuk diagnosa' : 'Status Database'}
+            className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm border transition-colors ${
+              dbStatus === 'checking' ? 'border-slate-200 text-slate-500 bg-slate-50' :
+              dbStatus === 'online' ? (activeDb === 'fallback' ? 'border-amber-200 text-amber-700 bg-amber-50 cursor-pointer hover:bg-amber-100' : 'border-green-200 text-green-700 bg-green-50') :
+              'border-red-200 text-red-700 bg-red-50 cursor-pointer hover:bg-red-100'
+            }`}
+            title={dbStatus === 'error' ? 'Klik untuk diagnosa' : (activeDb === 'fallback' ? 'Klik untuk melihat detail fallback' : 'Status Database')}
           >
-            <span className={`w-2 h-2 rounded-full ${dbStatus === 'checking' ? 'bg-slate-400 animate-pulse' :
-              dbStatus === 'online' ? 'bg-green-500' :
-                'bg-red-500 animate-pulse'
-              }`}></span>
-            {dbStatus === 'checking' ? 'Checking DB' : dbStatus === 'online' ? 'DB Online' : 'DB Offline'}
+            <span className={`w-2 h-2 rounded-full ${
+              dbStatus === 'checking' ? 'bg-slate-400 animate-pulse' :
+              dbStatus === 'online' ? (activeDb === 'fallback' ? 'bg-amber-500' : 'bg-green-500') :
+              'bg-red-500 animate-pulse'
+            }`}></span>
+            {dbStatus === 'checking' ? 'Checking DB' : dbStatus === 'online' ? (activeDb === 'fallback' ? 'DB CADANGAN' : 'DB UTAMA') : 'DB Offline'}
           </div>
         </div>
       </div>
@@ -249,14 +257,14 @@ const Login = () => {
             ) : (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-bold text-red-600 text-lg flex items-center gap-2">
+                  <h3 className={`font-bold text-lg flex items-center gap-2 ${dbStatus === 'error' ? 'text-red-600' : 'text-amber-600'}`}>
                     <span className="material-symbols-outlined">warning</span>
-                    Database Error
+                    {dbStatus === 'error' ? 'Database Error' : 'Database Cadangan Aktif'}
                   </h3>
                   <button onClick={() => setIsPinModalOpen(false)} className="text-slate-400 hover:text-slate-700"><span className="material-symbols-outlined text-[20px]">close</span></button>
                 </div>
                 <div className="bg-slate-900 text-green-400 font-mono text-xs p-4 rounded-sm overflow-x-auto whitespace-pre-wrap">
-                  {dbErrorDetail}
+                  {dbStatus === 'error' ? dbErrorDetail : `Primary Database Error:\n${primaryError}`}
                 </div>
                 <button onClick={() => setIsPinModalOpen(false)} className="w-full mt-4 px-4 py-2 bg-slate-100 text-slate-700 rounded-sm text-sm font-bold hover:bg-slate-200 transition-colors">Tutup</button>
               </div>

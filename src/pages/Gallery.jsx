@@ -558,19 +558,33 @@ const Gallery = () => {
                   {selectedItem.links.length === 1 ? (
                     (() => {
                       const link = selectedItem.links[0];
-                      const route = link.type === 'product' ? `/product/${link.slug}`
+                      const route = link.type === 'external' ? link.url
+                        : link.type === 'product' ? `/product/${link.slug}`
                         : link.type === 'portfolio' ? `/portfolio/${link.slug}`
                           : `/news/${link.slug}`;
-                      const bgClass = link.type === 'product' ? 'bg-[#f0c14b] text-yellow-950'
+                      const bgClass = link.type === 'external' ? 'bg-purple-600 text-white'
+                        : link.type === 'product' ? 'bg-[#f0c14b] text-yellow-950'
                         : link.type === 'portfolio' ? 'bg-blue-600 text-white'
                           : 'bg-emerald-600 text-white';
-                      const icon = link.type === 'product' ? 'shopping_basket'
+                      const icon = link.type === 'external' ? 'open_in_new'
+                        : link.type === 'product' ? 'shopping_basket'
                         : link.type === 'portfolio' ? 'business_center'
                           : 'article';
                       const shortTitle = link.title.length > 10 ? link.title.substring(0, 10) + '...' : link.title;
+                      
+                      const linkClasses = `flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition-transform ${bgClass}`;
+
+                      if (link.type === 'external') {
+                        return (
+                          <a href={route} target="_blank" rel="noopener noreferrer" className={linkClasses}>
+                            <span className="material-symbols-outlined text-lg">{icon}</span>
+                            <span>{shortTitle}</span>
+                          </a>
+                        );
+                      }
 
                       return (
-                        <Link to={route} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition-transform ${bgClass}`}>
+                        <Link to={route} className={linkClasses}>
                           <span className="material-symbols-outlined text-lg">{icon}</span>
                           <span>{shortTitle}</span>
                         </Link>
@@ -581,22 +595,40 @@ const Gallery = () => {
                       {showLinksDropup && (
                         <div className="absolute bottom-full left-0 mb-2 w-64 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl p-2 flex flex-col gap-1 overflow-hidden animate-fade-in border border-white/20">
                           {selectedItem.links.map((link, idx) => {
-                            const route = link.type === 'product' ? `/products/${link.slug}`
+                            const route = link.type === 'external' ? link.url
+                              : link.type === 'product' ? `/products/${link.slug}`
                               : link.type === 'portfolio' ? `/portfolio/${link.slug}`
                                 : `/news/${link.slug}`;
-                            const bgClass = link.type === 'product' ? 'bg-[#f0c14b]/20 text-yellow-800'
+                            const bgClass = link.type === 'external' ? 'bg-purple-100 text-purple-800'
+                              : link.type === 'product' ? 'bg-[#f0c14b]/20 text-yellow-800'
                               : link.type === 'portfolio' ? 'bg-blue-100 text-blue-800'
                                 : 'bg-emerald-100 text-emerald-800';
-                            const icon = link.type === 'product' ? 'shopping_basket'
+                            const icon = link.type === 'external' ? 'open_in_new'
+                              : link.type === 'product' ? 'shopping_basket'
                               : link.type === 'portfolio' ? 'business_center'
                                 : 'article';
-
-                            return (
-                              <Link key={idx} to={route} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 transition-colors">
+                            
+                            const linkClasses = "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 transition-colors";
+                            const content = (
+                              <>
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${bgClass}`}>
                                   <span className="material-symbols-outlined text-[16px]">{icon}</span>
                                 </div>
                                 <span className="text-sm font-bold text-slate-700 truncate">{link.title}</span>
+                              </>
+                            );
+
+                            if (link.type === 'external') {
+                              return (
+                                <a key={idx} href={route} target="_blank" rel="noopener noreferrer" className={linkClasses}>
+                                  {content}
+                                </a>
+                              );
+                            }
+
+                            return (
+                              <Link key={idx} to={route} className={linkClasses}>
+                                {content}
                               </Link>
                             );
                           })}

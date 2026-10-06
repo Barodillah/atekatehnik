@@ -22,7 +22,7 @@ if ($method === 'GET') {
             GROUP BY SUBSTRING_INDEX(page_slug, '-', -1)
         ) v ON CAST(g.id AS char) = v.gallery_id
         LEFT JOIN (
-            SELECT gallery_id, COUNT(*) as links_count
+            SELECT gallery_id, COUNT(*) as links_count, GROUP_CONCAT(DISTINCT related_type) as link_types
             FROM gallery_related_links
             GROUP BY gallery_id
         ) l ON g.id = l.gallery_id

@@ -18,6 +18,12 @@ const AdminGallery = () => {
   const [isLoadingLinks, setIsLoadingLinks] = useState(false);
   const [newLinkType, setNewLinkType] = useState('product');
   const [newLinkId, setNewLinkId] = useState('');
+  const [newExternalUrl, setNewExternalUrl] = useState('');
+  const [newExternalTitle, setNewExternalTitle] = useState('');
+
+  // Filters
+  const [mediaTypeFilter, setMediaTypeFilter] = useState('all');
+  const [linkTypeFilter, setLinkTypeFilter] = useState('all');
 
   // Autocomplete states
   const [searchOptions, setSearchOptions] = useState([]);
@@ -137,6 +143,8 @@ const AdminGallery = () => {
     setNewLinkType('product');
     setNewLinkId('');
     setSearchQueryInput('');
+    setNewExternalUrl('');
+    setNewExternalTitle('');
   };
 
   const fetchRelatedLinks = async (galleryId) => {
@@ -156,13 +164,16 @@ const AdminGallery = () => {
 
   const handleAddLink = async (e) => {
     e.preventDefault();
-    if (!newLinkId) return addToast('Silakan isi ID target.', 'warning');
+    if (newLinkType !== 'external' && !newLinkId) return addToast('Silakan isi ID target.', 'warning');
+    if (newLinkType === 'external' && !newExternalUrl) return addToast('Silakan isi URL untuk link eksternal.', 'warning');
 
     const formData = new FormData();
     formData.append('action', 'add');
     formData.append('gallery_id', selectedGallery.id);
     formData.append('related_type', newLinkType);
     formData.append('related_id', newLinkId);
+    formData.append('external_url', newExternalUrl);
+    formData.append('external_title', newExternalTitle);
 
     try {
       const res = await authFetch('/api/admin_gallery_links.php', {
@@ -215,12 +226,27 @@ const AdminGallery = () => {
   const itemsArray = Array.isArray(items) ? items : Object.values(items).filter(val => typeof val === 'object' && val !== null && 'id' in val);
 
   const filteredItems = itemsArray.filter(item => {
-    if (!searchQuery) return true;
-    const lower = searchQuery.toLowerCase();
-    return (
-      (item.title && item.title.toLowerCase().includes(lower)) ||
-      (item.type && item.type.toLowerCase().includes(lower))
-    );
+    // Media Type Filter
+    if (mediaTypeFilter !== 'all' && item.type !== mediaTypeFilter) return false;
+
+    // Link Type Filter
+    if (linkTypeFilter !== 'all') {
+      if (linkTypeFilter === 'no_link' && parseInt(item.links_count || 0) > 0) return false;
+      if (linkTypeFilter !== 'no_link') {
+        const linkTypes = item.link_types ? item.link_types.split(',') : [];
+        if (!linkTypes.includes(linkTypeFilter)) return false;
+      }
+    }
+
+    // Search Query Filter
+    if (searchQuery) {
+      const lower = searchQuery.toLowerCase();
+      const matchesSearch = (item.title && item.title.toLowerCase().includes(lower)) ||
+                            (item.type && item.type.toLowerCase().includes(lower));
+      if (!matchesSearch) return false;
+    }
+
+    return true;
   });
 
   const filteredOptions = searchOptions.filter(opt => 
@@ -244,7 +270,36 @@ const AdminGallery = () => {
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-6">
+        <div className="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="text-sm text-slate-500 font-medium">
+            Showing <span className="font-bold text-slate-700">{filteredItems.length}</span> items
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <select
+              value={mediaTypeFilter}
+              onChange={(e) => setMediaTypeFilter(e.target.value)}
+              className="bg-white border border-slate-300 text-slate-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none shadow-sm"
+            >
+              <option value="all">All Media Types</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+            <select
+              value={linkTypeFilter}
+              onChange={(e) => setLinkTypeFilter(e.target.value)}
+              className="bg-white border border-slate-300 text-slate-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none shadow-sm"
+            >
+              <option value="all">All Link Types</option>
+              <option value="no_link">No Link (0)</option>
+              <option value="product">Product</option>
+              <option value="portfolio">Portfolio</option>
+              <option value="news">News</option>
+              <option value="external">External Link</option>
+            </select>
+          </div>
+        </div>
+        
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-bold">
@@ -398,14 +453,40 @@ const AdminGallery = () => {
                       <option value="product">Product</option>
                       <option value="portfolio">Portfolio</option>
                       <option value="news">News</option>
+                      <option value="external">External Link</option>
                     </select>
                   </div>
 
                   <div className="relative w-full sm:flex-1">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Search Target</label>
-                    <div className="flex items-center bg-white border border-slate-300 rounded-md focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-colors shadow-sm overflow-hidden">
-                      <span className="material-symbols-outlined text-slate-400 px-3">search</span>
-                      <input
+                    {newLinkType === 'external' ? (
+                      <div className="flex gap-2">
+                        <div className="w-1/3">
+                          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Link Title</label>
+                          <input 
+                            type="text" 
+                            value={newExternalTitle} 
+                            onChange={(e) => setNewExternalTitle(e.target.value)} 
+                            className="w-full bg-white border border-slate-300 text-slate-800 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none shadow-sm"
+                            placeholder="e.g. Tokopedia"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL</label>
+                          <input 
+                            type="text" 
+                            value={newExternalUrl} 
+                            onChange={(e) => setNewExternalUrl(e.target.value)} 
+                            className="w-full bg-white border border-slate-300 text-slate-800 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none shadow-sm"
+                            placeholder="https://"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Search Target</label>
+                        <div className="flex items-center bg-white border border-slate-300 rounded-md focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-colors shadow-sm overflow-hidden">
+                          <span className="material-symbols-outlined text-slate-400 px-3">search</span>
+                          <input
                         type="text"
                         value={searchQueryInput}
                         onChange={(e) => { 
@@ -458,15 +539,17 @@ const AdminGallery = () => {
                         No matching {newLinkType} found or already linked.
                       </div>
                     )}
+                    </>
+                  )}
                   </div>
                 </div>
 
                 <form onSubmit={handleAddLink} className="flex justify-end">
                   <button 
                     type="submit"
-                    disabled={!newLinkId}
+                    disabled={newLinkType === 'external' ? !newExternalUrl : !newLinkId}
                     className={`font-bold py-2.5 px-6 rounded-md shadow-sm transition-colors uppercase tracking-wider text-sm flex items-center justify-center gap-2 whitespace-nowrap ${
-                      newLinkId 
+                      (newLinkType === 'external' ? newExternalUrl : newLinkId) 
                         ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                         : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                     }`}
@@ -506,14 +589,24 @@ const AdminGallery = () => {
                               <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
                                 link.related_type === 'product' ? 'bg-orange-100 text-orange-700' :
                                 link.related_type === 'portfolio' ? 'bg-blue-100 text-blue-700' :
+                                link.related_type === 'external' ? 'bg-purple-100 text-purple-700' :
                                 'bg-emerald-100 text-emerald-700'
                               }`}>
                                 {link.related_type}
                               </span>
                             </td>
                             <td className="px-4 py-3 font-medium">
-                              ID: {link.related_id}
-                              {link.target_title && <span className="block text-xs text-slate-400 font-normal mt-0.5">{link.target_title}</span>}
+                              {link.related_type === 'external' ? (
+                                <>
+                                  <a href={link.external_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{link.external_url}</a>
+                                  {link.target_title && <span className="block text-xs text-slate-400 font-normal mt-0.5">{link.target_title}</span>}
+                                </>
+                              ) : (
+                                <>
+                                  ID: {link.related_id}
+                                  {link.target_title && <span className="block text-xs text-slate-400 font-normal mt-0.5">{link.target_title}</span>}
+                                </>
+                              )}
                             </td>
                             <td className="px-4 py-3 text-right">
                               <button 
