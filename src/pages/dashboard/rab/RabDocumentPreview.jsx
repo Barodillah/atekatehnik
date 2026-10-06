@@ -27,15 +27,22 @@ const RabDocumentPreview = () => {
   const [measureRef, heights] = useBlockHeights();
 
   const [isEditingAdvantages, setIsEditingAdvantages] = useState(false);
-  const [advantagesText, setAdvantagesText] = useState(`Efisiensi tenaga kerja dengan alur sistem vertikal otomatis yang terintegrasi.\nTingkat rendemen optimal dengan meminimalkan beras patah pada proses poles.\nKomponen mesin berkualitas industri untuk durabilitas dan pemakaian jangka panjang.`);
+  const [advantagesText, setAdvantagesText] = useState('');
 
+  // Load from local storage or default text when quotationDetails changes
   useEffect(() => {
-    const saved = localStorage.getItem('rab_preview_advantages');
-    if (saved) setAdvantagesText(saved);
-  }, []);
+    if (quotationDetails) {
+      const saved = localStorage.getItem(`rab_preview_advantages_${id}`);
+      if (saved !== null) {
+        setAdvantagesText(saved);
+      } else {
+        setAdvantagesText(`Efisiensi tenaga kerja dengan alur sistem vertikal otomatis yang terintegrasi.\nTingkat rendemen optimal dengan meminimalkan beras patah pada proses poles.\nKomponen mesin berkualitas industri untuk durabilitas dan pemakaian jangka panjang.`);
+      }
+    }
+  }, [id, quotationDetails]);
 
   const handleSaveAdvantages = () => {
-    localStorage.setItem('rab_preview_advantages', advantagesText);
+    localStorage.setItem(`rab_preview_advantages_${id}`, advantagesText);
     setIsEditingAdvantages(false);
   };
 
@@ -374,7 +381,7 @@ const RabDocumentPreview = () => {
   const detailPages = heights ? paginate(detailBlocks, () => availSimple) : [];
   const totalPages = coverPages.length + detailPages.length;
 
-  const renderRun = (run, idx) => {
+  const renderRun = (run, idx, runsArray) => {
     const key = `${run.blocks[0].id}-${idx}`;
     if (run.group === 'cover') {
       return (
@@ -386,8 +393,12 @@ const RabDocumentPreview = () => {
       );
     }
     if (run.group === 'table') {
+      const isLastRow = run.blocks[run.blocks.length - 1].number === q.items.length;
+      const pageHasSummary = runsArray.some(r => r.blocks.some(b => b.type === 'summary'));
+      const showSummaryNote = isLastRow && !pageHasSummary;
+
       return (
-        <RabTable key={key}>
+        <RabTable key={key} showSummaryNote={showSummaryNote}>
           {run.blocks.map(b => <RabTableRow key={b.id} item={b.item} number={b.number} />)}
         </RabTable>
       );

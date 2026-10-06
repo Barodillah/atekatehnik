@@ -17,7 +17,7 @@ export const RabHeader = ({ quotationNumber }) => (
  * Table container for a run of rows on one page; the header is repeated on every page.
  * `table-fixed` keeps column widths independent of content so measured row heights match.
  */
-export const RabTable = ({ measureId, children }) => (
+export const RabTable = ({ measureId, children, showSummaryNote }) => (
   <div className="flow-root" data-measure={measureId}>
     <div className="pb-4">
       <table className="w-full table-fixed text-xs text-left border border-slate-800">
@@ -33,6 +33,11 @@ export const RabTable = ({ measureId, children }) => (
         </thead>
         <tbody>{children}</tbody>
       </table>
+      {showSummaryNote && (
+        <div className="mt-2 text-[10px] text-right text-slate-500 italic">
+          * Rincian Subtotal hingga Grand Total dilanjutkan pada lembar berikutnya
+        </div>
+      )}
     </div>
   </div>
 );

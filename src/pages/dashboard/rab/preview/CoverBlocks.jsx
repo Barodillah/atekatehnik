@@ -237,6 +237,23 @@ export const CoverItemRow = ({ items, startNumber }) => (
 /** "Keunggulan Investasi" block. `editable` is false in the measure layer. */
 export const InvestAdvantages = ({ text, editable, isEditing, setIsEditing, setText, onSave }) => {
   const editingNow = editable && isEditing;
+  const isEmpty = !text || text.trim() === '';
+
+  if (isEmpty && !editingNow) {
+    if (!editable) return null;
+    
+    return (
+      <div 
+        onDoubleClick={() => setIsEditing(true)}
+        className="no-print opacity-0 hover:opacity-100 transition-opacity p-4 border-2 border-dashed border-slate-300 rounded-lg text-center cursor-pointer text-slate-400 hover:bg-slate-50 flex flex-col items-center gap-2"
+        title="Klik 2x untuk tambah Keunggulan Investasi"
+      >
+        <span className="material-symbols-outlined text-3xl">add_box</span>
+        <span className="text-xs font-bold uppercase tracking-wider">Tambah Keunggulan Investasi</span>
+      </div>
+    );
+  }
+
   return (
     <div
       onDoubleClick={() => editable && setIsEditing(true)}
