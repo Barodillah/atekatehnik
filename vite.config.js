@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://atekatehnik.com',
+        target: 'http://localhost/atekaapi',
         changeOrigin: true,
-        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

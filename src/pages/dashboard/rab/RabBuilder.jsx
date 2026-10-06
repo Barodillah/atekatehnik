@@ -112,7 +112,13 @@ const RabBuilder = () => {
 
   // States - Items
   const [items, setItems] = useState([]);
+  const [draggedIndex, setDraggedIndex] = useState(null);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+
+  // States - Auto Save
+  const [autoSaveCountdown, setAutoSaveCountdown] = useState(0);
+  const [lastSavedPayloadStr, setLastSavedPayloadStr] = useState(null);
+  const handleSaveRef = useRef();
 
   // States - Calculation
   const [installFee, setInstallFee] = useState(0);
@@ -281,6 +287,7 @@ Output HARUS berupa JSON murni dengan format berikut:
   "cover_title": "Judul Visualisasi Utama (string, singkat dan menarik)",
   "cover_description": "Deskripsi untuk Visualisasi Utama (string, menjelaskan secara umum apa yang ditawarkan)",
   "cover_advantages": ["Keunggulan 1", "Keunggulan 2", "Keunggulan 3"],
+  "terms": "Syarat & Ketentuan (T&C) penawaran (dukung baris baru dengan \\n). Modifikasi/isi jika user memintanya secara khusus.",
   "items": [
     {
       "item_id": "ID_DARI_KATALOG_JIKA_ADA_ATAU_NULL",
@@ -292,7 +299,12 @@ Output HARUS berupa JSON murni dengan format berikut:
       "price": angka (harga satuan)
     }
   ]
-}`;
+}
+
+Sebagai referensi, ini adalah Syarat & Ketentuan (T&C) standar kami. Anda bisa memodifikasinya atau menambahkan poin baru HANYA jika teks pengguna meminta persyaratan/kondisi khusus. Jika tidak ada permintaan khusus, Anda dapat mengembalikan teks standar ini:
+"""
+${defaultTerms}
+"""`;
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -329,6 +341,7 @@ Output HARUS berupa JSON murni dengan format berikut:
         if (parsedData.cover_advantages && Array.isArray(parsedData.cover_advantages)) {
           setCoverAdvantages(parsedData.cover_advantages);
         }
+        if (parsedData.terms) setTerms(parsedData.terms);
 
         // Set items
         if (parsedData.items && Array.isArray(parsedData.items)) {
@@ -507,7 +520,32 @@ Output HARUS berupa JSON murni dengan format berikut:
   };
 
   const updateItem = (id, field, value) => {
-    setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+    setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const onItemDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
+  };
+
+  const onItemDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const onItemDrop = (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    setItems(prev => {
+      const newItems = [...prev];
+      const draggedItem = newItems[draggedIndex];
+      newItems.splice(draggedIndex, 1);
+      newItems.splice(targetIndex, 0, draggedItem);
+      return newItems;
+    });
+    setDraggedIndex(null);
   };
 
   const removeItem = (id) => {
@@ -681,9 +719,10 @@ Output HARUS berupa JSON murni dengan format berikut:
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (isAutoSave = false) => {
+    const autoSave = isAutoSave === true;
     try {
-      setIsSaving(true);
+      if (!autoSave) setIsSaving(true);
       const payload = generatePayload(false, null);
 
       const method = id ? 'PUT' : 'POST';
@@ -704,7 +743,14 @@ Output HARUS berupa JSON murni dengan format berikut:
         if (!id) {
           navigate(`/admin/rab/edit/${data.id}`, { replace: true });
         }
-        addToast("Draft penawaran berhasil disimpan!", 'success');
+        
+        setLastSavedPayloadStr(JSON.stringify(payload));
+        
+        if (autoSave) {
+          addToast("Perubahan otomatis disimpan.", 'success');
+        } else {
+          addToast("Draft penawaran berhasil disimpan!", 'success');
+        }
       } else {
         addToast("Gagal menyimpan: " + (data.message || 'Unknown error'), 'error');
       }
@@ -712,9 +758,54 @@ Output HARUS berupa JSON murni dengan format berikut:
       console.error(err);
       addToast("Terjadi kesalahan saat menyimpan draft.", 'error');
     } finally {
-      setIsSaving(false);
+      if (!autoSave) setIsSaving(false);
     }
   };
+
+  // --- Auto Save Logic ---
+  useEffect(() => {
+    handleSaveRef.current = handleSave;
+  });
+
+  const currentPayloadStr = JSON.stringify(generatePayload(false, null));
+
+  useEffect(() => {
+    if (id && !isLoading && lastSavedPayloadStr === null) {
+      setLastSavedPayloadStr(currentPayloadStr);
+    }
+  }, [id, isLoading, currentPayloadStr, lastSavedPayloadStr]);
+
+  useEffect(() => {
+    if (!id || isLoading || lastSavedPayloadStr === null) return;
+    
+    if (currentPayloadStr === lastSavedPayloadStr) {
+      setAutoSaveCountdown(0);
+      return;
+    }
+
+    let timeoutId = setTimeout(() => {
+      setAutoSaveCountdown(5);
+      let count = 5;
+      let intervalId = setInterval(() => {
+        count -= 1;
+        if (count <= 0) {
+          clearInterval(intervalId);
+          setAutoSaveCountdown(0);
+          if (handleSaveRef.current) handleSaveRef.current(true);
+        } else {
+          setAutoSaveCountdown(count);
+        }
+      }, 1000);
+      timeoutId.intervalId = intervalId; 
+    }, 5000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (timeoutId && timeoutId.intervalId) clearInterval(timeoutId.intervalId);
+      setAutoSaveCountdown(0);
+    };
+  }, [id, isLoading, currentPayloadStr, lastSavedPayloadStr]);
+  // -----------------------
 
   return (
     <div className="p-4 sm:p-6 pb-32">
@@ -1109,6 +1200,7 @@ Output HARUS berupa JSON murni dengan format berikut:
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="bg-slate-100 text-slate-600 text-[11px] uppercase tracking-wider">
+                    <th className="p-3 w-8"></th>
                     <th className="p-3 w-24 text-center">Cover</th>
                     <th className="p-3">Nama & Spek</th>
                     <th className="p-3 w-20">Qty</th>
@@ -1120,7 +1212,23 @@ Output HARUS berupa JSON murni dengan format berikut:
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, index) => (
-                    <tr key={item.id} className="hover:bg-slate-50 group align-top">
+                    <tr 
+                      key={item.id} 
+                      className={`hover:bg-slate-50 group align-top ${draggedIndex === index ? 'opacity-50 bg-slate-100' : ''}`}
+                      onDragOver={onItemDragOver}
+                      onDrop={(e) => onItemDrop(e, index)}
+                    >
+                      <td className="p-3 text-center align-middle">
+                        <div 
+                          draggable
+                          onDragStart={(e) => onItemDragStart(e, index)}
+                          onDragEnd={() => setDraggedIndex(null)}
+                          className="cursor-grab hover:text-blue-500 text-slate-400 active:cursor-grabbing"
+                          title="Geser untuk memindah urutan"
+                        >
+                          <span className="material-symbols-outlined">drag_indicator</span>
+                        </div>
+                      </td>
                       <td className="p-3 text-center">
                         <input
                           type="checkbox"
@@ -1133,7 +1241,7 @@ Output HARUS berupa JSON murni dengan format berikut:
                           <button
                             type="button"
                             onClick={() => setItemImageModalId(item.id)}
-                            title={!item.item_id ? 'Klik untuk ubah gambar' : 'Lihat gambar'}
+                            title="Klik untuk ubah gambar"
                             className="mt-2 mx-auto block w-16 h-16 rounded-md border border-slate-200 bg-slate-50 overflow-hidden hover:border-blue-500 hover:shadow transition-all relative group/thumb"
                           >
                             {item.image_url ? (
@@ -1148,11 +1256,11 @@ Output HARUS berupa JSON murni dengan format berikut:
                               />
                             ) : (
                               <span className="material-symbols-outlined text-slate-400 text-[22px] leading-[64px]">
-                                {!item.item_id ? 'add_photo_alternate' : 'image_not_supported'}
+                                add_photo_alternate
                               </span>
                             )}
                             <span className="absolute inset-0 bg-blue-900/50 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">
-                              <span className="material-symbols-outlined text-white text-[18px]">{!item.item_id ? 'edit' : 'zoom_in'}</span>
+                              <span className="material-symbols-outlined text-white text-[18px]">edit</span>
                             </span>
                           </button>
                         )}
@@ -1204,7 +1312,7 @@ Output HARUS berupa JSON murni dengan format berikut:
                         {formatRupiah(item.qty * item.price)}
                       </td>
                       <td className="p-3 text-center pt-4">
-                        <button onClick={() => removeItem(item.id)} className="text-slate-400 hover:text-red-500 transition-colors">
+                        <button onClick={() => removeItem(item.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Hapus">
                           <span className="material-symbols-outlined">delete</span>
                         </button>
                       </td>
@@ -1359,8 +1467,8 @@ Output HARUS berupa JSON murni dengan format berikut:
           Batal
         </button>
         <div className="flex gap-3">
-          <button onClick={handleSave} disabled={isSaving} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2 rounded-lg font-bold text-sm transition-colors disabled:opacity-50">
-            {isSaving ? 'Menyimpan...' : 'Simpan Draft'}
+          <button onClick={handleSave} disabled={isSaving} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2 rounded-lg font-bold text-sm transition-colors disabled:opacity-50 min-w-[140px]">
+            {isSaving ? 'Menyimpan...' : (autoSaveCountdown > 0 ? `Auto Save (${autoSaveCountdown}s)...` : 'Simpan Draft')}
           </button>
           <button onClick={() => id ? navigate(`/admin/rab/preview/${id}`) : addToast("Silakan simpan draft terlebih dahulu sebelum melihat preview.", "warning")} className="bg-blue-950 hover:bg-blue-900 text-white px-6 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg transition-colors">
             <span className="material-symbols-outlined text-[18px]">visibility</span>
@@ -1467,7 +1575,6 @@ Output HARUS berupa JSON murni dengan format berikut:
               </button>
             </div>
             <div className="p-5 overflow-y-auto">
-              {isActiveItemCustom ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-3">
                     {/* Option 1: Drag & Drop Upload */}
@@ -1573,24 +1680,6 @@ Output HARUS berupa JSON murni dengan format berikut:
                     )}
                   </div>
                 </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-full border border-slate-200 rounded-lg bg-slate-100 flex items-center justify-center p-2 min-h-[240px]">
-                    {activeImageItem.image_url ? (
-                      <img src={activeImageItem.image_url} alt={activeImageItem.name} className="max-h-[60vh] w-auto object-contain rounded" />
-                    ) : (
-                      <div className="text-center text-slate-400 flex flex-col items-center">
-                        <span className="material-symbols-outlined text-4xl mb-1 opacity-40">image_not_supported</span>
-                        <span className="text-xs font-medium">Item katalog ini belum memiliki gambar</span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-500 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">info</span>
-                    Gambar item katalog diatur dari menu Katalog Item.
-                  </p>
-                </div>
-              )}
             </div>
             <div className="p-4 border-t border-slate-200 bg-slate-50 text-right">
               <button onClick={() => setItemImageModalId(null)} className="text-sm font-bold bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">

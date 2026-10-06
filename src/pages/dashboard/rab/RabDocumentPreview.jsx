@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../contexts/ToastContext';
+import { defaultTerms } from './mockRabData';
+import { PAPER_SIZES, mmToPx } from './preview/utils';
+import { paginate, groupRuns, useBlockHeights } from './preview/pagination';
+import { HeaderKop, SimpleHeaderKop, Block, PageFrame } from './preview/Layout';
+import { CoverIntro, CoverSection, CoverItemRow, InvestAdvantages } from './preview/CoverBlocks';
+import { RabHeader, RabTable, RabTableRow, SummaryBlock, TermsSignatureBlock } from './preview/DetailBlocks';
+
+/** Space kept free at the bottom of every page for the page number footer. */
+const BOTTOM_RESERVE_MM = 12;
+/** Extra tolerance for screen vs print rendering differences. */
+const SAFETY_MM = 3;
 
 const RabDocumentPreview = () => {
   const { id } = useParams();
@@ -13,6 +24,7 @@ const RabDocumentPreview = () => {
   const [quotationDetails, setQuotationDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [paperSize, setPaperSize] = useState('A4');
+  const [measureRef, heights] = useBlockHeights();
 
   const [isEditingAdvantages, setIsEditingAdvantages] = useState(false);
   const [advantagesText, setAdvantagesText] = useState(`Efisiensi tenaga kerja dengan alur sistem vertikal otomatis yang terintegrasi.\nTingkat rendemen optimal dengan meminimalkan beras patah pada proses poles.\nKomponen mesin berkualitas industri untuk durabilitas dan pemakaian jangka panjang.`);
@@ -255,64 +267,7 @@ const RabDocumentPreview = () => {
     };
   }, [quotationDetails]);
 
-  const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
-
-  const terbilang = (angka) => {
-    angka = Math.floor(Math.abs(angka));
-    const bilangan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
-    let temp = '';
-    
-    if (angka < 12) {
-      temp = ' ' + bilangan[angka];
-    } else if (angka < 20) {
-      temp = terbilang(angka - 10) + ' Belas';
-    } else if (angka < 100) {
-      temp = terbilang(Math.floor(angka / 10)) + ' Puluh' + terbilang(angka % 10);
-    } else if (angka < 200) {
-      temp = ' Seratus' + terbilang(angka - 100);
-    } else if (angka < 1000) {
-      temp = terbilang(Math.floor(angka / 100)) + ' Ratus' + terbilang(angka % 100);
-    } else if (angka < 2000) {
-      temp = ' Seribu' + terbilang(angka - 1000);
-    } else if (angka < 1000000) {
-      temp = terbilang(Math.floor(angka / 1000)) + ' Ribu' + terbilang(angka % 1000);
-    } else if (angka < 1000000000) {
-      temp = terbilang(Math.floor(angka / 1000000)) + ' Juta' + terbilang(angka % 1000000);
-    } else if (angka < 1000000000000) {
-      temp = terbilang(Math.floor(angka / 1000000000)) + ' Milyar' + terbilang(angka % 1000000000);
-    } else if (angka < 1000000000000000) {
-      temp = terbilang(Math.floor(angka / 1000000000000)) + ' Trilyun' + terbilang(angka % 1000000000000);
-    }
-    
-    return temp;
-  };
-
   useEffect(() => {
-    // Add print styles dynamically
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @page { size: A4 portrait; margin: 0; }
-      @media print {
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; }
-        .no-print { display: none !important; }
-        .print-container { padding: 0 !important; background: white !important; box-shadow: none !important; }
-        .a4-page { 
-          width: 210mm !important; 
-          height: 297mm !important; 
-          min-height: 297mm !important; 
-          margin: 0 !important; 
-          padding: 0 !important;
-          border: none !important; 
-          box-shadow: none !important; 
-          page-break-after: always;
-          page-break-inside: avoid;
-          position: relative !important;
-          overflow: hidden !important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
     const fetchCompanyProfile = async () => {
       try {
         const token = localStorage.getItem('ateka_token');
@@ -328,197 +283,195 @@ const RabDocumentPreview = () => {
       }
     };
     fetchCompanyProfile();
+  }, []);
 
+  // Print styles follow the selected paper size
+  useEffect(() => {
+    const { widthMm, heightMm } = PAPER_SIZES[paperSize];
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @page { size: ${widthMm}mm ${heightMm}mm; margin: 0; }
+      @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; }
+        .no-print { display: none !important; }
+        .print-container { padding: 0 !important; background: white !important; box-shadow: none !important; }
+        .a4-page {
+          width: ${widthMm}mm !important;
+          height: ${heightMm}mm !important;
+          margin: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+          break-after: page;
+          page-break-after: always;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        .rab-pages > .a4-page:last-child { break-after: auto; page-break-after: auto; }
+      }
+    `;
+    document.head.appendChild(style);
     return () => {
       document.head.removeChild(style);
     };
-  }, []);
-
-  // Update dynamic page numbers after content loads
-  useEffect(() => {
-    if (!quotationDetails) return;
-
-    const updatePages = () => {
-      const pages = document.querySelectorAll('.a4-page');
-      const total = pages.length;
-      pages.forEach((page, index) => {
-        const el = page.querySelector('.page-number-dynamic');
-        if (el) {
-          el.textContent = `Halaman ${index + 1} dari ${total}`;
-        }
-      });
-    };
-    
-    updatePages();
-    const t = setTimeout(updatePages, 500);
-    return () => clearTimeout(t);
-  }, [quotationDetails]);
+  }, [paperSize]);
 
   if (isLoading) {
     return <div className="p-10 text-center">Loading document...</div>;
   }
   if (!quotationDetails) return null;
 
-  const subtotalItems = quotationDetails.items.reduce((s, i) => s + (i.qty * i.price), 0);
-  const dpp = subtotalItems + quotationDetails.install_fee + quotationDetails.shipping_fee - quotationDetails.discount;
-  const tax = quotationDetails.use_tax ? Math.ceil(dpp * 0.11) : 0;
+  const q = quotationDetails;
+  const subtotalItems = q.items.reduce((s, i) => s + (i.qty * i.price), 0);
+  const dpp = subtotalItems + q.install_fee + q.shipping_fee - q.discount;
+  const tax = q.use_tax ? Math.ceil(dpp * 0.11) : 0;
   const grandTotal = dpp + tax;
 
-  const coverItems = quotationDetails.items.filter(i => i.showOnCover);
+  const coverItems = q.items.filter(i => i.showOnCover);
+  const coverRows = [];
+  for (let i = 0; i < coverItems.length; i += 2) coverRows.push(coverItems.slice(i, i + 2));
 
+  const edit = { editStates, editValues, setEditValues, startEdit, cancelEdit, saveEdit };
+  const summaryProps = { q, subtotalItems, dpp, tax, grandTotal };
 
+  // ---------- Pagination (based on measured heights) ----------
+  const paper = PAPER_SIZES[paperSize];
+  const paperHeight = `${paper.heightMm}mm`;
+  const h = (key) => heights?.[key] ?? 0;
+  const sumHeights = (prefix, count) => {
+    let s = 0;
+    for (let i = 0; i < count; i++) s += h(`${prefix}-${i}`);
+    return s;
+  };
 
-  const HeaderKop = (
-    <div className="border-b-4 border-blue-900 pb-4 mb-6 pt-10 px-10">
-      <div className="flex justify-between items-end">
-        <div className="flex items-center gap-4">
-          {companyProfile?.logo_url && (
-            <img src={companyProfile.logo_url} alt="Logo" className="h-16 object-contain" />
-          )}
-          <div>
-            <h1 className="text-3xl font-black text-blue-950 uppercase tracking-tighter">{companyProfile?.company_name || 'CV. ATEKA TEHNIK'}</h1>
-            <p className="text-sm font-bold text-orange-500 tracking-widest uppercase">{companyProfile?.tagline || 'Rice Milling Unit Solution'}</p>
-            <p className="text-[9px] font-bold text-blue-900 tracking-wider uppercase mt-1 opacity-80">{companyProfile?.services || 'ELEVATOR, HULLER, POLISHER, DRYER, HAMMERMILL, SERVICE, SPAREPART'}</p>
-          </div>
-        </div>
-        <div className="text-right text-[10px] text-slate-600 flex flex-col items-end leading-tight">
-          <p className="max-w-[220px] whitespace-pre-wrap leading-snug mb-0.5">{companyProfile?.address || 'Jl. Raya Madiun - Ngawi Km 12'}</p>
-          <p>Telp/WA: {companyProfile?.phone || '0812-3456-7890'}</p>
-          <p>Email: {companyProfile?.email || 'admin@atekatehnik.com'}</p>
-          <p>Website: atekatehnik.com</p>
-        </div>
-      </div>
-    </div>
-  );
+  const reservePx = mmToPx(BOTTOM_RESERVE_MM + SAFETY_MM);
+  const paperPx = mmToPx(paper.heightMm);
+  const availFirstCover = paperPx - h('hdr-full') - reservePx;
+  const availSimple = paperPx - h('hdr-simple') - reservePx;
 
-  const SimpleHeaderKop = (
-    <div className="border-b border-slate-300 pb-2 mb-4 pt-8 px-10 flex justify-between items-end">
-      <div className="flex items-center gap-3">
-        {companyProfile?.logo_url && (
-          <img src={companyProfile.logo_url} alt="Logo" className="h-8 object-contain" />
-        )}
-        <div>
-          <h1 className="text-xl font-black text-blue-950 uppercase tracking-tighter leading-none">{companyProfile?.company_name || 'CV. ATEKA TEHNIK'}</h1>
-          <p className="text-[9px] font-bold text-orange-500 tracking-widest uppercase mt-0.5">{companyProfile?.tagline || 'Rice Milling Unit Solution'}</p>
-        </div>
-      </div>
-      <div className="text-right text-[9px] text-slate-500 font-medium flex flex-col items-end">
-        <p className="whitespace-pre-wrap leading-tight max-w-[250px]">{companyProfile?.address || 'Jl. Raya Madiun - Ngawi Km 12'}</p>
-        <p className="mt-0.5">Telp/WA: {companyProfile?.phone || '0812-3456-7890'} | Email: {companyProfile?.email || 'admin@atekatehnik.com'}</p>
-      </div>
-    </div>
-  );
+  const coverGroupHeader = Math.max(0, h('cover-section') - sumHeights('cover-row', coverRows.length));
+  const coverBlocks = [
+    { id: 'cover-intro', type: 'coverIntro', height: h('cover-intro') },
+    ...coverRows.map((items, i) => ({
+      id: `cover-row-${i}`, type: 'coverRow', items, rowIndex: i, startNumber: i * 2 + 1,
+      height: h(`cover-row-${i}`), group: 'cover', groupHeader: coverGroupHeader,
+    })),
+    { id: 'invest', type: 'invest', height: h('invest') },
+  ];
 
-  const paperHeight = paperSize === 'A4' ? '297mm' : '330mm';
-  
-  // Cover Pagination Logic
-  const FIRST_COVER_LIMIT = paperSize === 'A4' ? 6 : 8;
-  const NEXT_COVER_LIMIT = paperSize === 'A4' ? 14 : 18;
-  
-  const coverChunks = [];
-  let remainingCoverItems = [...coverItems];
-  if (remainingCoverItems.length > 0) {
-    coverChunks.push(remainingCoverItems.splice(0, FIRST_COVER_LIMIT));
-  } else {
-    coverChunks.push([]); 
-  }
-  while (remainingCoverItems.length > 0) {
-    coverChunks.push(remainingCoverItems.splice(0, NEXT_COVER_LIMIT));
-  }
+  const tableGroupHeader = Math.max(0, h('rab-table') - sumHeights('rab-row', q.items.length));
+  const detailBlocks = [
+    { id: 'rab-header', type: 'rabHeader', height: h('rab-header'), keepWithNext: true },
+    ...q.items.map((item, i) => ({
+      id: `rab-row-${i}`, type: 'rabRow', item, number: i + 1,
+      height: h(`rab-row-${i}`), group: 'table', groupHeader: tableGroupHeader,
+    })),
+    { id: 'summary', type: 'summary', height: h('summary') },
+    { id: 'terms', type: 'terms', height: h('terms') },
+  ];
 
-  // Details Pagination Logic
-  const FIRST_PAGE_LIMIT = paperSize === 'A4' ? 18 : 24;
-  const NEXT_PAGE_LIMIT = paperSize === 'A4' ? 28 : 34;
+  const coverPages = heights ? paginate(coverBlocks, (i) => (i === 0 ? availFirstCover : availSimple)) : [];
+  // RAB always starts on a fresh page
+  const detailPages = heights ? paginate(detailBlocks, () => availSimple) : [];
+  const totalPages = coverPages.length + detailPages.length;
 
-  const rawChunks = [];
-  let remainingItems = [...quotationDetails.items];
-  
-  if (remainingItems.length > 0) {
-    rawChunks.push(remainingItems.splice(0, FIRST_PAGE_LIMIT));
-  }
-  while (remainingItems.length > 0) {
-    rawChunks.push(remainingItems.splice(0, NEXT_PAGE_LIMIT));
-  }
-
-  const chunksMetadata = rawChunks.map(chunk => ({ items: chunk, hasSubtotal: false, hasTnc: false }));
-
-  if (chunksMetadata.length > 0) {
-     const lastIndex = chunksMetadata.length - 1;
-     const lastChunkItemsCount = chunksMetadata[lastIndex].items.length;
-     const currentLimit = (lastIndex === 0) ? FIRST_PAGE_LIMIT : NEXT_PAGE_LIMIT;
-
-     const SUBTOTAL_SPACE = 5;
-     const TNC_SPACE = 12;
-     const TOTAL_SPACE = SUBTOTAL_SPACE + TNC_SPACE;
-
-     const remainingSpace = currentLimit - lastChunkItemsCount;
-
-     if (remainingSpace >= TOTAL_SPACE) {
-         chunksMetadata[lastIndex].hasSubtotal = true;
-         chunksMetadata[lastIndex].hasTnc = true;
-     } else if (remainingSpace >= SUBTOTAL_SPACE) {
-         chunksMetadata[lastIndex].hasSubtotal = true;
-         chunksMetadata.push({ items: [], hasSubtotal: false, hasTnc: true });
-     } else {
-         chunksMetadata.push({ items: [], hasSubtotal: true, hasTnc: true });
-     }
-  } else {
-     chunksMetadata.push({ items: [], hasSubtotal: true, hasTnc: true });
-  }
+  const renderRun = (run, idx) => {
+    const key = `${run.blocks[0].id}-${idx}`;
+    if (run.group === 'cover') {
+      return (
+        <CoverSection key={key} isContinuation={run.blocks[0].rowIndex > 0}>
+          {run.blocks.map(b => (
+            <Block key={b.id} className="pb-4"><CoverItemRow items={b.items} startNumber={b.startNumber} /></Block>
+          ))}
+        </CoverSection>
+      );
+    }
+    if (run.group === 'table') {
+      return (
+        <RabTable key={key}>
+          {run.blocks.map(b => <RabTableRow key={b.id} item={b.item} number={b.number} />)}
+        </RabTable>
+      );
+    }
+    const b = run.blocks[0];
+    switch (b.type) {
+      case 'coverIntro':
+        return <Block key={key}><CoverIntro q={q} edit={edit} /></Block>;
+      case 'invest':
+        return (
+          <Block key={key}>
+            <InvestAdvantages
+              text={advantagesText}
+              editable
+              isEditing={isEditingAdvantages}
+              setIsEditing={setIsEditingAdvantages}
+              setText={setAdvantagesText}
+              onSave={handleSaveAdvantages}
+            />
+          </Block>
+        );
+      case 'rabHeader':
+        return <Block key={key}><RabHeader quotationNumber={q.quotation_number} /></Block>;
+      case 'summary':
+        return <Block key={key}><SummaryBlock {...summaryProps} /></Block>;
+      case 'terms':
+        return <Block key={key}><TermsSignatureBlock q={q} companyProfile={companyProfile} edit={edit} /></Block>;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="bg-slate-200 min-h-screen py-8 print-container font-sans text-slate-800">
+    <div className="bg-slate-200 min-h-screen py-8 print-container font-sans text-slate-800 relative">
 
       {/* Action Bar (No Print) */}
       <div className="no-print fixed bottom-8 right-8 z-50 flex gap-2 items-center">
-        {quotationDetails && (
-          <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-3 border border-slate-200 mr-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status:</span>
-            <span className={`text-xs font-bold uppercase tracking-widest ${
-              quotationDetails.status === 'draft' ? 'text-slate-500' :
-              quotationDetails.status === 'sent' ? 'text-blue-500' :
-              quotationDetails.status === 'accepted' ? 'text-green-500' :
-              'text-red-500'
-            }`}>
-              {quotationDetails.status}
-            </span>
-            
-            <div className="w-px h-4 bg-slate-200 mx-1"></div>
-            
-            {quotationDetails.status === 'draft' && (
-              <button onClick={() => handleUpdateStatus('sent')} className="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Terkirim">
-                <span className="material-symbols-outlined text-[14px]">send</span> Terkirim
+        <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-3 border border-slate-200 mr-2">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status:</span>
+          <span className={`text-xs font-bold uppercase tracking-widest ${
+            q.status === 'draft' ? 'text-slate-500' :
+            q.status === 'sent' ? 'text-blue-500' :
+            q.status === 'accepted' ? 'text-green-500' :
+            'text-red-500'
+          }`}>
+            {q.status}
+          </span>
+
+          <div className="w-px h-4 bg-slate-200 mx-1"></div>
+
+          {q.status === 'draft' && (
+            <button onClick={() => handleUpdateStatus('sent')} className="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Terkirim">
+              <span className="material-symbols-outlined text-[14px]">send</span> Terkirim
+            </button>
+          )}
+
+          {q.status === 'sent' && (
+            <>
+              <button onClick={() => handleUpdateStatus('accepted')} className="text-green-600 hover:text-green-800 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Disetujui (Deal)">
+                <span className="material-symbols-outlined text-[14px]">handshake</span> Deal
               </button>
-            )}
-            
-            {quotationDetails.status === 'sent' && (
-              <>
-                <button onClick={() => handleUpdateStatus('accepted')} className="text-green-600 hover:text-green-800 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Disetujui (Deal)">
-                  <span className="material-symbols-outlined text-[14px]">handshake</span> Deal
-                </button>
-                <button onClick={() => handleUpdateStatus('rejected')} className="text-red-500 hover:text-red-700 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Ditolak">
-                  <span className="material-symbols-outlined text-[14px]">cancel</span> Batal
-                </button>
-              </>
-            )}
-            
-            {(quotationDetails.status === 'accepted' || quotationDetails.status === 'rejected') && (
-              <button onClick={() => handleUpdateStatus('draft')} className="text-slate-400 hover:text-slate-600 text-[10px] uppercase font-bold flex items-center gap-1 transition-colors" title="Kembalikan ke Draft">
-                <span className="material-symbols-outlined text-[12px]">undo</span> Undo
+              <button onClick={() => handleUpdateStatus('rejected')} className="text-red-500 hover:text-red-700 text-xs font-bold flex items-center gap-1 transition-colors" title="Tandai Ditolak">
+                <span className="material-symbols-outlined text-[14px]">cancel</span> Batal
               </button>
-            )}
-          </div>
-        )}
-        
+            </>
+          )}
+
+          {(q.status === 'accepted' || q.status === 'rejected') && (
+            <button onClick={() => handleUpdateStatus('draft')} className="text-slate-400 hover:text-slate-600 text-[10px] uppercase font-bold flex items-center gap-1 transition-colors" title="Kembalikan ke Draft">
+              <span className="material-symbols-outlined text-[12px]">undo</span> Undo
+            </button>
+          )}
+        </div>
+
         <div className="bg-white rounded-full px-3 py-2 shadow-lg flex items-center gap-2 border border-slate-200">
           <span className="material-symbols-outlined text-[16px] text-slate-500">article</span>
-          <select 
-            value={paperSize} 
+          <select
+            value={paperSize}
             onChange={(e) => setPaperSize(e.target.value)}
             className="bg-transparent font-bold text-sm text-slate-700 outline-none cursor-pointer"
           >
-            <option value="A4">A4 (21x29.7cm)</option>
-            <option value="F4">F4 (21x33.0cm)</option>
+            {Object.entries(PAPER_SIZES).map(([key, p]) => (
+              <option key={key} value={key}>{p.label}</option>
+            ))}
           </select>
         </div>
         <button onClick={() => navigate(-1)} className="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-2">
@@ -529,470 +482,70 @@ const RabDocumentPreview = () => {
         </button>
       </div>
 
-      {/* PAGES 1+: Technical & Value Profile (Cover Pages) */}
-      {coverChunks.map((chunk, chunkIndex) => {
-        const isFirstCover = chunkIndex === 0;
-        const isLastCover = chunkIndex === coverChunks.length - 1;
-        let startCoverIdx = 0;
-        if (chunkIndex > 0) {
-           startCoverIdx = FIRST_COVER_LIMIT + ((chunkIndex - 1) * NEXT_COVER_LIMIT);
-        }
-
-        return (
-          <div key={`cover-${chunkIndex}`} className="a4-page bg-white w-[210mm] mx-auto mb-8 shadow-xl relative overflow-hidden page-break flex flex-col" style={{ minHeight: paperHeight }}>
-            {isFirstCover ? HeaderKop : SimpleHeaderKop}
-            
-            <div className="px-10 pb-10 flex-1">
-              {isFirstCover && (
-                <>
-
-          {/* Info Surat */}
-          <div className="flex justify-between text-xs mb-8 border border-slate-200 p-3 rounded bg-slate-50">
-            <div className="space-y-1">
-              <div className="flex"><span className="w-20 font-bold">No. Surat</span>: {quotationDetails.quotation_number}</div>
-              <div className="flex"><span className="w-20 font-bold">Perihal</span>: Penawaran Harga Mesin</div>
-              <div className="flex"><span className="w-20 font-bold">Produk</span>: {quotationDetails.title}</div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex"><span className="w-24 font-bold">Tanggal</span>: {quotationDetails.quotation_date_fmt}</div>
-              <div className="flex"><span className="w-24 font-bold">Masa Berlaku</span>: {quotationDetails.valid_until_fmt}</div>
-              <div className="flex"><span className="w-24 font-bold">Kepada Yth.</span>: <b className="text-blue-900 ml-1">{quotationDetails.customer.customer_name === 'Kepada Yth.' ? '-' : quotationDetails.customer.customer_name}</b></div>
-            </div>
-          </div>
-
-          <div className="text-center mb-6">
-            {editStates.title ? (
-              <div 
-                className="flex flex-col items-center gap-2"
-                onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) cancelEdit('title'); }}
-              >
-                <input 
-                  type="text"
-                  className="w-full max-w-md text-lg font-black text-blue-950 uppercase border-2 border-blue-400 p-1 text-center outline-none rounded"
-                  value={editValues.title}
-                  onChange={(e) => setEditValues(prev => ({ ...prev, title: e.target.value }))}
-                  autoFocus
-                />
-                <div className="flex justify-center gap-2">
-                  <button onClick={() => saveEdit('title', 'title')} className="no-print bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-3 py-1 rounded">Simpan</button>
-                </div>
-              </div>
-            ) : (
-              <h2 
-                onDoubleClick={() => startEdit('title', quotationDetails.title)}
-                className="text-lg font-black text-blue-950 uppercase border-b-2 border-slate-200 inline-block pb-1 transition-colors hover:bg-slate-50 cursor-pointer rounded px-2"
-                title="Klik 2x untuk edit teks"
-              >
-                {quotationDetails.title}
-              </h2>
-            )}
-          </div>
-
-          {/* Visualisasi Utama (Split Layout) */}
-          <div className="flex gap-6 mb-8 items-stretch">
-            {/* Left: Image */}
-            <div className="w-1/3 shrink-0">
-              <div className="w-full h-full min-h-[200px] bg-white border-2 border-slate-200 p-2 shadow-sm flex items-center justify-center">
-                {quotationDetails.coverImage ? (
-                  <img src={quotationDetails.coverImage} alt="Cover" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-center text-slate-300">
-                    <span className="material-symbols-outlined text-6xl">precision_manufacturing</span>
-                    <p className="text-[10px] mt-2 uppercase tracking-widest font-bold">Image Placeholder</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right: Description & Advantages */}
-            <div className="w-2/3 flex flex-col justify-center text-slate-700">
-              
-              {editStates.coverTitle ? (
-                <div 
-                  className="mb-2"
-                  onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) cancelEdit('coverTitle'); }}
-                >
-                  <input 
-                    type="text"
-                    className="w-full text-xl font-bold text-blue-950 border-2 border-blue-400 p-1 outline-none rounded mb-1"
-                    value={editValues.coverTitle}
-                    onChange={(e) => setEditValues(prev => ({ ...prev, coverTitle: e.target.value }))}
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={() => saveEdit('coverTitle', 'coverTitle')} className="no-print bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-3 py-1 rounded">Simpan</button>
-                  </div>
-                </div>
-              ) : (
-                <h3 
-                  onDoubleClick={() => startEdit('coverTitle', quotationDetails.coverTitle)}
-                  className="text-xl font-bold text-blue-950 mb-2 border-b border-slate-200 pb-1 inline-block transition-colors hover:bg-slate-50 cursor-pointer rounded px-1"
-                  title="Klik 2x untuk edit teks"
-                >
-                  {quotationDetails.coverTitle}
-                </h3>
-              )}
-
-              {editStates.coverDescription ? (
-                <div 
-                  className="mb-4"
-                  onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) cancelEdit('coverDescription'); }}
-                >
-                  <textarea 
-                    className="w-full text-sm p-2 border-2 border-blue-400 rounded outline-none min-h-[100px] leading-relaxed resize-y font-sans mb-1"
-                    value={editValues.coverDescription}
-                    onChange={(e) => setEditValues(prev => ({ ...prev, coverDescription: e.target.value }))}
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={() => saveEdit('coverDescription', 'coverDescription')} className="no-print bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-3 py-1 rounded">Simpan</button>
-                  </div>
-                </div>
-              ) : (
-                <p 
-                  onDoubleClick={() => startEdit('coverDescription', quotationDetails.coverDescription)}
-                  className="text-sm whitespace-pre-line mb-4 transition-colors hover:bg-slate-50 cursor-pointer rounded p-1"
-                  title="Klik 2x untuk edit teks"
-                >
-                  {quotationDetails.coverDescription}
-                </p>
-              )}
-
-              {editStates.coverAdvantages ? (
-                <div 
-                  className="bg-blue-50/50 border border-blue-200 p-2 rounded-sm"
-                  onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) cancelEdit('coverAdvantages'); }}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-bold text-blue-950 text-xs">Kelebihan Utama:</h4>
-                    <button
-                      onClick={() => setEditValues(prev => ({ ...prev, coverAdvantagesArray: [...prev.coverAdvantagesArray, ''] }))}
-                      className="text-[10px] font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded flex items-center gap-1 transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-[12px]">add</span> Tambah
-                    </button>
-                  </div>
-                  <div className="space-y-1 mb-2">
-                    {editValues.coverAdvantagesArray.map((adv, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-blue-300 text-xs shrink-0">check_circle</span>
-                        <input
-                          type="text"
-                          placeholder="Masukkan poin kelebihan..."
-                          className="flex-1 border border-blue-300 rounded text-xs focus:ring-blue-500 focus:border-blue-500 py-1 px-2 outline-none"
-                          value={adv}
-                          onChange={(e) => {
-                            const newArr = [...editValues.coverAdvantagesArray];
-                            newArr[index] = e.target.value;
-                            setEditValues(prev => ({ ...prev, coverAdvantagesArray: newArr }));
-                          }}
-                          autoFocus={index === editValues.coverAdvantagesArray.length - 1}
-                        />
-                        <button
-                          onClick={() => {
-                            const newArr = [...editValues.coverAdvantagesArray];
-                            newArr.splice(index, 1);
-                            setEditValues(prev => ({ ...prev, coverAdvantagesArray: newArr }));
-                          }}
-                          className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors flex items-center justify-center shrink-0"
-                          title="Hapus"
-                        >
-                          <span className="material-symbols-outlined text-[14px]">delete</span>
-                        </button>
-                      </div>
-                    ))}
-                    {editValues.coverAdvantagesArray.length === 0 && (
-                      <div className="text-center text-[10px] text-slate-400 py-2 border border-dashed border-slate-300 rounded">
-                        Belum ada poin. Klik "Tambah".
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => saveEdit('coverAdvantages', 'coverAdvantages')} className="no-print bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-3 py-1 rounded">Simpan</button>
-                  </div>
-                </div>
-              ) : (
-                <div 
-                  onDoubleClick={() => startEdit('coverAdvantages', quotationDetails.coverAdvantages)}
-                  className="bg-blue-50/50 border border-blue-200 p-2 rounded-sm transition-colors hover:bg-blue-100/50 cursor-pointer"
-                  title="Klik 2x untuk edit teks"
-                >
-                  <h4 className="font-bold text-blue-950 mb-1 text-xs">Kelebihan Utama:</h4>
-                  {quotationDetails.coverAdvantages && quotationDetails.coverAdvantages.length > 0 && quotationDetails.coverAdvantages.some(adv => adv.trim() !== '') ? (
-                    <ul className="list-disc pl-4 text-xs text-blue-900/80 leading-tight space-y-0.5">
-                      {quotationDetails.coverAdvantages.map((adv, idx) => (
-                        adv.trim() && <li key={idx}>{adv.trim()}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[10px] text-blue-800/50 italic">Klik 2x untuk menambah list kelebihan...</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          
-                </>
-              )}
-
-              {chunk.length > 0 && (
-                <div className={`mb-6 ${!isFirstCover ? 'mt-6' : ''}`}>
-                  {isFirstCover ? (
-                    <h3 className="bg-blue-950 text-white font-bold text-xs uppercase px-3 py-1.5 inline-block mb-3 rounded-sm">Komponen Utama Sistem</h3>
-                  ) : (
-                    <h3 className="bg-blue-950 text-white font-bold text-xs uppercase px-3 py-1.5 inline-block mb-3 rounded-sm">Komponen Utama Sistem (Lanjutan)</h3>
-                  )}
-                  <div className="grid grid-cols-2 gap-4">
-                    {chunk.map((item, localIdx) => {
-                      const absoluteIdx = startCoverIdx + localIdx + 1;
-                      return (
-                        <div key={item.id} className="flex gap-3 border border-slate-100 p-2 rounded bg-slate-50 break-inside-avoid">
-                          <div className="w-16 h-16 bg-slate-200 rounded shrink-0 overflow-hidden">
-                            {item.image_url ? (
-                              <img src={item.image_url} alt="" className="w-full h-full object-contain" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400">
-                                <span className="material-symbols-outlined text-2xl">settings</span>
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-xs text-blue-900 mb-0.5">{absoluteIdx}. {item.name}</h4>
-                            <p className="text-[10px] text-slate-600 leading-tight">{item.desc}</p>
-                            {item.specifications && (
-                              <p className="text-[9px] text-slate-500 mt-1 italic leading-tight">{item.specifications}</p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {isLastCover && (
-                <>
-{/* Value Propositions */}
-          <div 
-            onDoubleClick={() => setIsEditingAdvantages(true)}
-            className={`transition-colors rounded-sm ${isEditingAdvantages ? '' : 'hover:bg-slate-50 cursor-pointer'}`}
-            title={isEditingAdvantages ? '' : 'Klik 2x untuk edit teks'}
-          >
-            <h3 className="bg-orange-500 text-white font-bold text-xs uppercase px-3 py-1.5 inline-block mb-2 rounded-sm">Keunggulan Investasi</h3>
-            
-            {isEditingAdvantages ? (
-              <div className="flex flex-col gap-2">
-                <textarea 
-                  className="w-full text-[11px] text-slate-700 p-2 border border-blue-400 rounded outline-none min-h-[100px] leading-relaxed resize-y font-sans"
-                  value={advantagesText}
-                  onChange={(e) => setAdvantagesText(e.target.value)}
-                  autoFocus
-                  onBlur={handleSaveAdvantages}
-                />
-                <div className="flex justify-end">
-                  <button 
-                    onClick={handleSaveAdvantages}
-                    className="no-print text-[10px] bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                  >
-                    Simpan
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <ul className="list-disc pl-5 text-[11px] text-slate-700 space-y-1">
-                {advantagesText.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
-                  <li key={idx}>{line}</li>
+      {/* Hidden measure layer: renders every block once (display mode) to read its real height */}
+      <div className="no-print" aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, width: 0, height: 0, overflow: 'hidden' }}>
+        <div ref={measureRef} style={{ width: `${paper.widthMm}mm`, visibility: 'hidden', pointerEvents: 'none' }}>
+          <div className="flow-root" data-measure="hdr-full"><HeaderKop companyProfile={companyProfile} /></div>
+          <div className="flow-root" data-measure="hdr-simple"><SimpleHeaderKop companyProfile={companyProfile} /></div>
+          <div className="px-10">
+            <Block measureId="cover-intro"><CoverIntro q={q} edit={null} /></Block>
+            {coverRows.length > 0 && (
+              <CoverSection measureId="cover-section">
+                {coverRows.map((items, i) => (
+                  <Block key={i} measureId={`cover-row-${i}`} className="pb-4">
+                    <CoverItemRow items={items} startNumber={i * 2 + 1} />
+                  </Block>
                 ))}
-              </ul>
+              </CoverSection>
             )}
+            <Block measureId="invest"><InvestAdvantages text={advantagesText} editable={false} /></Block>
+
+            <Block measureId="rab-header"><RabHeader quotationNumber={q.quotation_number} /></Block>
+            {q.items.length > 0 && (
+              <RabTable measureId="rab-table">
+                {q.items.map((item, i) => (
+                  <RabTableRow key={i} measureId={`rab-row-${i}`} item={item} number={i + 1} />
+                ))}
+              </RabTable>
+            )}
+            <Block measureId="summary"><SummaryBlock {...summaryProps} /></Block>
+            <Block measureId="terms"><TermsSignatureBlock q={q} companyProfile={companyProfile} edit={null} /></Block>
           </div>
-        
-                </>
-              )}
-            </div>
+        </div>
+      </div>
 
-            {/* Footer Halaman */}
-            <div className="absolute bottom-5 right-10 text-[9px] text-slate-400 page-number-dynamic"></div>
-          </div>
-        );
-      })}
+      {/* Pages */}
+      <div className="rab-pages">
+        {coverPages.map((pageBlocks, pageIdx) => (
+          <PageFrame
+            key={`cover-${pageIdx}`}
+            header={pageIdx === 0 ? <HeaderKop companyProfile={companyProfile} /> : <SimpleHeaderKop companyProfile={companyProfile} />}
+            paperHeight={paperHeight}
+            pageNumber={pageIdx + 1}
+            totalPages={totalPages}
+            quotationNumber={q.quotation_number}
+          >
+            {groupRuns(pageBlocks).map(renderRun)}
+          </PageFrame>
+        ))}
 
-      {/* PAGES 2+: DETAILS (Chunked) */}
-      {chunksMetadata.map((chunkMeta, chunkIndex) => {
-        const isFirstDetail = chunkIndex === 0;
-        const chunk = chunkMeta.items;
-        
-        let startRowIdx = 0;
-        if (chunkIndex > 0) {
-           startRowIdx = FIRST_PAGE_LIMIT + ((chunkIndex - 1) * NEXT_PAGE_LIMIT);
-        }
-
-        return (
-          <div key={chunkIndex} className="a4-page bg-white w-[210mm] mx-auto mb-8 shadow-xl relative overflow-hidden page-break flex flex-col" style={{ minHeight: paperHeight }}>
-            {SimpleHeaderKop}
-
-            <div className="px-10 flex-1">
-              {isFirstDetail && (
-                <div className="flex justify-between items-center border-b-2 border-slate-200 pb-3 mb-3">
-                  <div>
-                    <h2 className="font-black text-blue-950 uppercase">Rincian Anggaran Biaya (RAB)</h2>
-                    <p className="text-xs text-slate-500">Lampiran Penawaran No: {quotationDetails.quotation_number}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-black text-slate-200 opacity-50 uppercase tracking-tighter">Ateka Tehnik</span>
-                  </div>
-                </div>
-              )}
-
-              {chunk.length > 0 && (
-                <table className="w-full text-xs text-left border border-slate-800 mb-4">
-                  <thead>
-                    <tr className="bg-slate-800 text-white font-bold break-inside-avoid">
-                      <th className="p-2 border-r border-slate-700 w-8 text-center">NO</th>
-                      <th className="p-2 border-r border-slate-700">URAIAN / SPESIFIKASI</th>
-                      <th className="p-2 border-r border-slate-700 w-12 text-center">QTY</th>
-                      <th className="p-2 border-r border-slate-700 w-16 text-center">SATUAN</th>
-                      <th className="p-2 border-r border-slate-700 w-28 text-right">HARGA SATUAN</th>
-                      <th className="p-2 w-32 text-right">JUMLAH (Rp)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chunk.map((item, localIdx) => (
-                      <tr key={item.id} className="border-b border-slate-300 break-inside-avoid">
-                        <td className="p-2 border-r border-slate-300 text-center">{startRowIdx + localIdx + 1}</td>
-                        <td className="p-2 border-r border-slate-300 font-medium">{item.name}</td>
-                        <td className="p-2 border-r border-slate-300 text-center">{item.qty}</td>
-                        <td className="p-2 border-r border-slate-300 text-center">{item.unit}</td>
-                        <td className="p-2 border-r border-slate-300 text-right">{formatRupiah(item.price).replace('Rp', '').trim()}</td>
-                        <td className="p-2 text-right font-bold bg-slate-50">{formatRupiah(item.qty * item.price).replace('Rp', '').trim()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-
-              {chunkMeta.hasSubtotal && (
-                <div className="break-inside-avoid">
-                  {/* Subtotals & Grand Total */}
-                  <div className="flex justify-end mb-8">
-                    <div className="w-72 space-y-1 text-xs">
-                      <div className="flex justify-between border-b border-dashed border-slate-300 pb-1">
-                        <span>Subtotal Biaya Mesin:</span>
-                        <span className="font-bold">{formatRupiah(subtotalItems)}</span>
-                      </div>
-                      {quotationDetails.install_fee > 0 && (
-                        <div className="flex justify-between border-b border-dashed border-slate-300 pb-1">
-                          <span>Biaya Instalasi & Jasa:</span>
-                          <span className="font-bold">{formatRupiah(quotationDetails.install_fee)}</span>
-                        </div>
-                      )}
-                      {quotationDetails.shipping_fee > 0 && (
-                        <div className="flex justify-between border-b border-dashed border-slate-300 pb-1">
-                          <span>Biaya Ekspedisi:</span>
-                          <span className="font-bold">{formatRupiah(quotationDetails.shipping_fee)}</span>
-                        </div>
-                      )}
-                      {quotationDetails.discount > 0 && (
-                        <div className="flex justify-between border-b border-dashed border-slate-300 pb-1 text-red-600">
-                          <span>Diskon Khusus:</span>
-                          <span className="font-bold">({formatRupiah(quotationDetails.discount)})</span>
-                        </div>
-                      )}
-
-                      <div className="flex justify-between pt-1">
-                        <span>Dasar Pengenaan Pajak:</span>
-                        <span className="font-bold">{formatRupiah(dpp)}</span>
-                      </div>
-                      {quotationDetails.use_tax && (
-                        <div className="flex justify-between border-b border-slate-800 pb-1">
-                          <span>PPN (11%):</span>
-                          <span className="font-bold">{formatRupiah(tax)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between pt-2 text-sm text-blue-900">
-                        <span className="font-black">GRAND TOTAL:</span>
-                        <span className="font-black">{formatRupiah(grandTotal)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Terbilang */}
-                  <div className="bg-slate-100 p-2 text-xs italic font-semibold text-slate-700 text-center mb-8 border border-slate-200">
-                    Terbilang: {terbilang(grandTotal).trim()} Rupiah
-                  </div>
-                </div>
-              )}
-
-              {chunkMeta.hasTnc && (
-                <div className="break-inside-avoid">
-                  {/* T&C */}
-                  <div className="mb-8">
-                    <h3 className="font-bold text-xs uppercase border-b border-slate-800 pb-1 mb-2">Syarat & Ketentuan (Terms & Conditions)</h3>
-                    {editStates.terms ? (
-                      <div onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) cancelEdit('terms'); }}>
-                        <textarea 
-                          className="w-full text-[10px] text-slate-700 p-2 border-2 border-blue-400 rounded outline-none min-h-[150px] leading-relaxed resize-y font-mono mb-1"
-                          value={editValues.terms}
-                          onChange={(e) => setEditValues(prev => ({ ...prev, terms: e.target.value }))}
-                          autoFocus
-                        />
-                        <div className="flex gap-2">
-                          <button onClick={() => saveEdit('terms', 'terms')} className="no-print bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-3 py-1 rounded">Simpan</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div 
-                        onDoubleClick={() => startEdit('terms', quotationDetails.terms)}
-                        className="text-[10px] text-slate-700 whitespace-pre-wrap font-mono transition-colors hover:bg-slate-50 cursor-pointer rounded p-1"
-                        title="Klik 2x untuk edit teks"
-                      >
-                        {quotationDetails.terms || <span className="text-slate-400 italic">Klik 2x untuk menambah Syarat & Ketentuan...</span>}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Pengesahan */}
-                  <div className="flex justify-between mt-12 text-sm">
-                    <div className="text-center w-48">
-                      <p className="mb-16">Menyetujui / Pemesan,</p>
-                      <p className="font-bold border-b border-slate-800 pb-1">{quotationDetails.customer.customer_name}</p>
-                      <p className="text-xs text-slate-500">Pimpinan {quotationDetails.customer.company_name}</p>
-                    </div>
-                    <div className="text-center w-48 relative">
-                      <p className="mb-1">Karanganyar, {quotationDetails.quotation_date_fmt}</p>
-                      <p className="font-bold mb-1">{companyProfile?.company_name || 'CV. ATEKA TEHNIK'}</p>
-
-                      <div className="h-16 relative flex items-center justify-center">
-                        {companyProfile?.stamp_image_url && (
-                          <img
-                            src={companyProfile.stamp_image_url}
-                            alt="Stamp"
-                            className="h-28 max-w-none absolute opacity-75 z-0 mix-blend-multiply pointer-events-none"
-                            style={{ top: '-1.25rem' }}
-                          />
-                        )}
-                        {!companyProfile?.stamp_image_url && (
-                          <div className="h-16"></div>
-                        )}
-                      </div>
-
-                      <p className="font-bold border-b border-slate-800 pb-1 mt-1">{companyProfile?.signatory_name || 'WARSITO'}</p>
-                      <p className="text-xs text-slate-500">{companyProfile?.signatory_title || 'Pimpinan'}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            <div className="absolute bottom-5 right-10 text-[9px] text-slate-400 page-number-dynamic"></div>
-          </div>
-        );
-      })}
-
+        {detailPages.map((pageBlocks, pageIdx) => (
+          <PageFrame
+            key={`detail-${pageIdx}`}
+            header={<SimpleHeaderKop companyProfile={companyProfile} />}
+            paperHeight={paperHeight}
+            pageNumber={coverPages.length + pageIdx + 1}
+            totalPages={totalPages}
+            quotationNumber={q.quotation_number}
+          >
+            {groupRuns(pageBlocks).map(renderRun)}
+          </PageFrame>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default RabDocumentPreview;
+
+

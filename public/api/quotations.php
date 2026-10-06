@@ -114,10 +114,17 @@ elseif ($method === 'POST' || $method === 'PUT') {
             
             $suffix = "/ATK.S.PN/{$romanMonth}/{$year}";
             
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM quotations WHERE quotation_number LIKE ?");
+            $stmt = $pdo->prepare("SELECT quotation_number FROM quotations WHERE quotation_number LIKE ? ORDER BY id DESC LIMIT 1");
             $stmt->execute(['%' . $suffix]);
-            $count = $stmt->fetchColumn();
-            $nextNum = str_pad($count + 1, 2, '0', STR_PAD_LEFT);
+            $lastQuotation = $stmt->fetchColumn();
+            
+            if ($lastQuotation) {
+                $parts = explode('/', $lastQuotation);
+                $lastNum = (int)$parts[0];
+                $nextNum = str_pad($lastNum + 1, 2, '0', STR_PAD_LEFT);
+            } else {
+                $nextNum = '01';
+            }
             $quotation_number = $nextNum . $suffix;
         }
 
