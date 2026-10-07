@@ -119,15 +119,8 @@ const DashboardHome = () => {
           <p className="text-sm md:text-base text-on-surface-variant font-body">Operational performance and engagement metrics.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button className="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-outline-variant transition-colors">
-            Generate Report
-          </button>
-          <button className="px-4 py-2 bg-primary-container text-on-primary text-xs font-bold uppercase tracking-widest rounded-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">calendar_today</span>
-            Overview
-          </button>
           {user?.role === 'superadmin' && (
-            <button 
+            <button
               onClick={() => setShowSyncModal(true)}
               className="px-4 py-2 bg-error-container text-on-error-container text-xs font-bold uppercase tracking-widest rounded-sm flex items-center gap-2 hover:bg-error hover:text-white transition-colors"
             >
@@ -155,7 +148,7 @@ const DashboardHome = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Total Products */}
         <div className="bg-surface-container-lowest border border-surface-container-low p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5 rounded-sm">
           <div className="flex justify-between items-start">
@@ -168,11 +161,11 @@ const DashboardHome = () => {
             <h3 className="text-4xl font-headline font-extrabold text-primary tracking-tighter">{kpis.totalProducts}</h3>
             <p className="text-[11px] text-on-surface-variant font-medium mt-1 flex items-center gap-1">
               <span className="material-symbols-outlined text-[13px]">visibility</span>
-              {kpis.productViews || 0} Views ({(kpis.productUniqueIps || 0)} Unique — {kpis.productViews > 0 ? Math.round((kpis.productUniqueIps/kpis.productViews)*100) : 0}%)
+              {kpis.productViews || 0} Views ({(kpis.productUniqueIps || 0)} Unique — {kpis.productViews > 0 ? Math.round((kpis.productUniqueIps / kpis.productViews) * 100) : 0}%)
             </p>
           </div>
         </div>
-        
+
         {/* Total Posts */}
         <div className="bg-primary-container p-6 flex flex-col justify-between h-40 text-on-primary group transition-all hover:shadow-xl hover:shadow-primary/20 rounded-sm">
           <div className="flex justify-between items-start">
@@ -185,11 +178,11 @@ const DashboardHome = () => {
             <h3 className="text-4xl font-headline font-extrabold tracking-tighter">{kpis.totalPosts}</h3>
             <p className="text-[11px] text-secondary-container font-medium mt-1 flex items-center gap-1">
               <span className="material-symbols-outlined text-[13px]">visibility</span>
-              {kpis.postViews || 0} Views ({(kpis.postUniqueIps || 0)} Unique — {kpis.postViews > 0 ? Math.round((kpis.postUniqueIps/kpis.postViews)*100) : 0}%)
+              {kpis.postViews || 0} Views ({(kpis.postUniqueIps || 0)} Unique — {kpis.postViews > 0 ? Math.round((kpis.postUniqueIps / kpis.postViews) * 100) : 0}%)
             </p>
           </div>
         </div>
-        
+
         {/* Total WA Clicks */}
         <div className="bg-surface-container-lowest border border-surface-container-low p-6 flex flex-col justify-between h-40 group transition-all hover:shadow-xl hover:shadow-primary/5 rounded-sm">
           <div className="flex justify-between items-start">
@@ -202,7 +195,7 @@ const DashboardHome = () => {
             <h3 className="text-4xl font-headline font-extrabold text-[#25D366] tracking-tighter">{kpis.totalWaClicks}</h3>
             <p className="text-[11px] text-secondary font-medium mt-1 flex items-center gap-1">
               <span className="material-symbols-outlined text-[13px]">person</span>
-              {kpis.waUniqueIps || 0} Unique IPs ({kpis.totalWaClicks > 0 ? Math.round((kpis.waUniqueIps/kpis.totalWaClicks)*100) : 0}% unique rate)
+              {kpis.waUniqueIps || 0} Unique IPs ({kpis.totalWaClicks > 0 ? Math.round((kpis.waUniqueIps / kpis.totalWaClicks) * 100) : 0}% unique rate)
             </p>
           </div>
         </div>
@@ -210,7 +203,7 @@ const DashboardHome = () => {
 
       {/* Main Analytics Row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
-        
+
         {/* Page Views Chart */}
         <div className="xl:col-span-2 bg-surface-container-lowest border border-surface-container-low rounded-sm p-4 md:p-8 shadow-sm">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10 gap-4">
@@ -222,28 +215,28 @@ const DashboardHome = () => {
               <span className="flex items-center gap-2"><span className="w-2 h-2 bg-primary-container rounded-full"></span> VIEWS</span>
             </div>
           </div>
-          
+
           <div className="h-64 flex items-end justify-between gap-2 md:gap-4 px-2 md:px-4 mt-8">
             {chart.map((c, i) => {
               const val = c.views || c.total || 0;
               const bgHeight = Math.max((val / maxChartVal) * 100, 0);
               const isZero = val === 0;
-              
+
               return (
                 <div key={i} className="w-full h-full flex flex-col items-center gap-2 group relative">
                   {/* Tooltip (moved outside overflow-hidden) */}
                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none z-20 font-bold whitespace-nowrap transition-opacity shadow-lg">
                     Views: {val}
                   </div>
-                  
+
                   {/* Container for the Bar */}
                   <div className="w-full bg-surface-container px-1 md:px-0 relative flex flex-col justify-end flex-1 rounded-t-sm group-hover:bg-surface-container-high transition-colors overflow-hidden pb-1 items-center">
-                    
+
                     {/* Explicit Number Label Always Visible */}
                     <span className={`text-[10px] font-bold z-10 mb-1 transition-all ${isZero ? 'text-outline/50' : 'text-orange-600'}`}>
                       {val}
                     </span>
-                    
+
                     {/* The Bar */}
                     <div className={`absolute bottom-0 w-full ${isZero ? 'bg-surface-container-high h-1' : 'bg-primary-container'} rounded-t-sm transition-all duration-1000 ease-out`} style={{ height: isZero ? '4px' : `${bgHeight}%` }}></div>
                   </div>
@@ -255,7 +248,7 @@ const DashboardHome = () => {
             })}
           </div>
         </div>
-        
+
         {/* Recent Activity */}
         <div className="bg-surface-container-lowest border border-surface-container-low rounded-sm p-4 md:p-6 flex flex-col shadow-sm max-h-[420px]">
           <h4 className="text-base md:text-lg font-bold text-primary mb-6 flex items-center justify-between">
@@ -264,11 +257,11 @@ const DashboardHome = () => {
           </h4>
           <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
             {activities.length === 0 ? (
-               <div className="text-center py-6 text-on-surface-variant">No recent activity</div>
+              <div className="text-center py-6 text-on-surface-variant">No recent activity</div>
             ) : (
-               activities.map((act, i) => {
-                 const ui = getIconForAction(act.action, act.entity_type);
-                 return (
+              activities.map((act, i) => {
+                const ui = getIconForAction(act.action, act.entity_type);
+                return (
                   <div className="flex gap-4 group" key={i}>
                     <div className="relative">
                       <div className={`w-10 h-10 ${ui.bg} rounded-full flex items-center justify-center shrink-0`}>
@@ -282,8 +275,8 @@ const DashboardHome = () => {
                       <span className="text-[10px] text-outline font-label uppercase mt-2 block">{timeAgo(act.created_at)}</span>
                     </div>
                   </div>
-                 );
-               })
+                );
+              })
             )}
           </div>
           <a href="/admin/logs" className="w-full mt-6 text-xs font-bold text-primary-container hover:text-secondary transition-colors uppercase tracking-widest text-center border-t border-outline-variant/20 pt-4 block">
@@ -297,7 +290,7 @@ const DashboardHome = () => {
 
       {/* Featured Slots (Products & Posts) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
-        
+
         {/* Featured Equipment Slot */}
         {featured && featured.nama && (
           <div className="bg-primary-container relative overflow-hidden rounded-sm min-h-[300px] flex items-center shadow-md">
@@ -312,7 +305,7 @@ const DashboardHome = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/60 to-transparent border border-primary/20"></div>
               </div>
             )}
-            
+
             <div className="relative z-10 p-6 md:p-8 space-y-6">
               <div className="inline-flex items-center w-max gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">
                 Latest Product
@@ -398,13 +391,13 @@ const DashboardHome = () => {
                 Apakah Anda yakin ingin mensinkronisasi database utama ke cadangan? Proses ini akan menimpa data cadangan yang ada saat ini.
               </p>
               <div className="flex justify-end gap-3">
-                <button 
+                <button
                   onClick={() => setShowSyncModal(false)}
                   className="px-4 py-2 text-sm font-bold text-primary hover:bg-surface-container-high rounded-sm transition-colors"
                 >
                   BATAL
                 </button>
-                <button 
+                <button
                   onClick={handleSync}
                   className="px-4 py-2 bg-error text-white text-sm font-bold rounded-sm shadow-md hover:bg-error/90 transition-colors flex items-center gap-2"
                 >

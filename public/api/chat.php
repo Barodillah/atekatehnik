@@ -26,8 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ── Configuration ────────────────────────────────────────────────────
-// PENTING: Ganti dengan API key Anda
-$OPENROUTER_API_KEY = 'sk';
+require_once __DIR__ . '/db.php';
 $OPENROUTER_MODEL = 'google/gemini-2.5-flash-lite';
 $MAX_TOKENS = 1024;
 $TEMPERATURE = 0.7;
@@ -90,7 +89,7 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $payload,
     CURLOPT_HTTPHEADER => [
-        'Authorization: Bearer ' . $OPENROUTER_API_KEY,
+        'Authorization: Bearer ' . OPENROUTER_API_KEY,
         'Content-Type: application/json',
         'HTTP-Referer: ' . ($_SERVER['HTTP_ORIGIN'] ?? $_SERVER['HTTP_HOST'] ?? 'https://atekateknik.com'),
         'X-Title: Ateka Tehnik AI Assistant',
@@ -125,7 +124,6 @@ echo $response;
 // Save the latest user message and assistant reply to the database
 if ($sessionKey && $httpCode === 200) {
     try {
-        require_once __DIR__ . '/db.php';
         $db = getDB();
 
         // Find or create chat_session

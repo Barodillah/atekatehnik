@@ -33,7 +33,6 @@ const CatalogSetting = () => {
     
     setIsAiLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
       const model = import.meta.env.VITE_OPENROUTER_MODEL || 'google/gemini-2.5-flash-lite';
       
       const prompt = `Anda adalah asisten ahli mesin pertanian, khususnya pada sistem pabrik penggilingan padi (Rice Milling Unit).
@@ -49,12 +48,8 @@ PENTING:
 - DILARANG menggunakan format bullet atau list.
 - Fokus langsung pada fungsi utamanya atau efisiensi/keuntungan bagi operasional pabrik.`;
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await authFetch("/api/proxy_or.php", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           model: model,
           messages: [{ role: "user", content: prompt }]

@@ -272,7 +272,6 @@ const RabBuilder = () => {
         console.error("Gagal ambil katalog untuk AI:", e);
       }
 
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
       const model = import.meta.env.VITE_OPENROUTER_MODEL || "google/gemini-2.5-flash-lite";
 
       const systemPrompt = `Anda adalah estimator proyek profesional. Buatlah list RAB dan informasi penawaran berdasarkan teks pengguna.
@@ -306,14 +305,8 @@ Sebagai referensi, ini adalah Syarat & Ketentuan (T&C) standar kami. Anda bisa m
 ${defaultTerms}
 """`;
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await authFetch("/api/proxy_or.php", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": window.location.href,
-          "X-Title": "Ateka Tehnik RAB Builder"
-        },
         body: JSON.stringify({
           model: model,
           messages: [

@@ -61,7 +61,6 @@ if ($action === 'translate_preview' && $method === 'POST') {
     $prompt = "Translate the following Indonesian rice milling industry article content to professional English. Keep technical terms accurate. Return ONLY a valid JSON object with the exact same keys and structure.\n\n";
     $prompt .= json_encode($input, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-    $OPENROUTER_API_KEY = 'sk';
     $payload = json_encode([
         'model' => 'google/gemini-2.5-flash-lite',
         'messages' => [
@@ -78,7 +77,7 @@ if ($action === 'translate_preview' && $method === 'POST') {
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => $payload,
         CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $OPENROUTER_API_KEY,
+            'Authorization: Bearer ' . OPENROUTER_API_KEY,
             'Content-Type: application/json',
             'HTTP-Referer: https://atekatehnik.com',
             'X-Title: Ateka Tehnik Post Translator',

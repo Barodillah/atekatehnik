@@ -353,8 +353,7 @@ const PostForm = () => {
     setAiError('');
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      if (!apiKey) throw new Error('VITE_OPENROUTER_API_KEY tidak ditemukan di .env');
+
 
       let systemPrompt = '';
       if (aiTab === 'news') {
@@ -392,12 +391,8 @@ Kembalikan output DALAM FORMAT JSON SAJA dengan struktur:
 }`;
       }
 
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await authFetch('/api/proxy_or.php', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
         body: JSON.stringify({
           model: 'google/gemma-3-27b-it',
           max_tokens: 8192,

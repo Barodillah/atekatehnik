@@ -17,6 +17,9 @@ define('DB_NAME_FALLBACK', 'atekatehnik_backup');
 define('DB_USER_FALLBACK', 'root');
 define('DB_PASS_FALLBACK', '');
 
+// API Keys
+define('OPENROUTER_API_KEY', 'sk-o.....');
+
 $GLOBALS['db_status_info'] = [
     'active_db' => 'primary',
     'primary_error' => null
@@ -40,7 +43,7 @@ function getDB(): PDO
         } catch (PDOException $e) {
             $GLOBALS['db_status_info']['active_db'] = 'fallback';
             $GLOBALS['db_status_info']['primary_error'] = $e->getMessage();
-            
+
             // Log the error (e.g., Too many connections)
             error_log("Primary DB Error: " . $e->getMessage() . ". Trying fallback...");
 

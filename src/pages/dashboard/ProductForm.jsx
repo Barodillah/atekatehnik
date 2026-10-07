@@ -38,12 +38,7 @@ const ProductForm = () => {
     setSubmitError('');
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      const model = import.meta.env.VITE_OPENROUTER_MODEL;
-
-      if (!apiKey) {
-        throw new Error("API Key OpenRouter tidak ditemukan. Harap pastikan variable di setting .env frontend.");
-      }
+      const model = import.meta.env.VITE_OPENROUTER_MODEL || "google/gemini-2.5-flash-lite";
 
       const specsText = spesifikasi.filter(s => s.trim() !== '').join(', ');
       
@@ -66,14 +61,10 @@ PENTING: Kembalikan respon HANYA dalam format JSON valid tanpa awalan atau akhir
   "spesifikasi": ["Komponen 1: Nilai", "Komponen 2: Nilai"]
 }`;
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const res = await authFetch("/api/proxy_or.php", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
-          model: model || "google/gemini-2.5-flash-lite",
+          model: model,
           messages: [
             { role: "user", content: prompt }
           ]

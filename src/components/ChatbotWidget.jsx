@@ -54,6 +54,16 @@ const parseAIResponse = (text) => {
     if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
       try { return JSON.parse(text.substring(startIdx, endIdx + 1)); } catch (e3) { }
     }
+    
+    // Attempt to salvage just the 'answer' field if JSON was truncated
+    const matchAnswer = text.match(/"answer"\s*:\s*"((?:\\.|[^"\\])*)"/);
+    if (matchAnswer) {
+      return { 
+        answer: matchAnswer[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'), 
+        quick_questions: [], 
+        related_links: [] 
+      };
+    }
   }
   // Fallback for non-JSON or older text messages
   return { answer: text, quick_questions: [], related_links: [] };
@@ -83,7 +93,7 @@ Kamu **HARUS SELALU** merespons dalam format JSON murni. Jangan tambahkan teks a
   "quick_questions": ["Pertanyaan lanjutan 1 terkait page/jawaban", "Pertanyaan lanjutan 2"],
   "related_links": [
     {
-       "type": "product",
+       "type": "product|news|portfolio",
        "title": "Nama Produk / Post Terkait",
        "subtitle": "Penjelasan sangat singkat (1 kalimat max)",
        "image": "URL gambar persis dari daftar referensi",
@@ -93,7 +103,7 @@ Kamu **HARUS SELALU** merespons dalam format JSON murni. Jangan tambahkan teks a
 }
 \`\`\`
 
-Jika kamu perlu menyertakan referensi link/produk, KAMU HANYA BOLEH menggunakan URL dan gambar dari daftar "Katalog Referensi" yang diberikan di konteks tambahan di bawah. Jangan pernah mengarang URL sendiri!`;
+Jika kamu perlu menyertakan referensi link/produk, KAMU HANYA BOLEH menggunakan URL dan gambar dari daftar "Katalog Referensi" yang diberikan di konteks tambahan di bawah. DILARANG KERAS mengarang/menebak URL gambar dan URL link sendiri! Semuanya harus copy-paste dari konteks.`;
 
 // ── Session Key Helpers ─────────────────────────────────────────────
 const SESSION_STORAGE_KEY = 'ateka_chat_session';
@@ -122,16 +132,15 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [processStatus, setProcessStatus] = useState('');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isGeneratingInit, setIsGeneratingInit] = useState(false);
-  const [catalogRefList, setCatalogRefList] = useState('');
   const [contextualQuickQuestions, setContextualQuickQuestions] = useState([]);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const sessionKeyRef = useRef(getOrCreateSessionKey());
   const historyLoadedRef = useRef(false);
-  const catalogLoadedRef = useRef(false);
   const location = useLocation();
   const { t } = useLanguage();
 
@@ -180,46 +189,8 @@ Konten/Topik Terlihat: ${headings || 'Halaman Landing/General'}`;
         historyLoadedRef.current = true;
         loadChatHistory();
       }
-      if (!catalogLoadedRef.current) {
-        catalogLoadedRef.current = true;
-        fetchCatalogReferences();
-      }
     }
   }, [isOpen]);
-
-  // Fetch true catalog to prevent hallucinations
-  const fetchCatalogReferences = async () => {
-    try {
-      const [prodRes, postRes] = await Promise.all([
-        fetch('/api/products.php?limit=30'), // Top 30 products
-        fetch('/api/posts.php?limit=15')     // 15 recent posts
-      ]);
-      const prodData = await prodRes.json();
-      const postData = await postRes.json();
-
-      let refList = '## Katalog Referensi (Link & Gambar Wajib dari sini jika relevan!)\n\n### PRODUK:\n';
-      if (prodData.success) {
-        prodData.data?.products?.forEach(p => {
-          refList += `- TITLE: "${p.nama}", KATEGORI: "${p.kategori}", IMAGE: "${p.gambar}", LINK: "/product/${p.slug}"\n`;
-        }) || prodData.products?.forEach(p => {
-          refList += `- TITLE: "${p.nama}", KATEGORI: "${p.kategori}", IMAGE: "${p.gambar}", LINK: "/product/${p.slug}"\n`;
-        });
-      }
-
-      refList += '\n### ARTIKEL/POST:\n';
-      if (postData.success) {
-        postData.data?.posts?.forEach(p => {
-          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "${p.category === 'Industrial Installations' ? '/portfolio' : '/news'}/${p.slug}"\n`;
-        }) || postData.posts?.forEach(p => {
-          refList += `- TITLE: "${p.title}", IMAGE: "${p.cover_image}", LINK: "${p.category === 'Industrial Installations' ? '/portfolio' : '/news'}/${p.slug}"\n`;
-        });
-      }
-
-      setCatalogRefList(refList);
-    } catch (err) {
-      console.warn('Failed to load catalog references for chatbot context');
-    }
-  };
 
   // Generate background initial questions
   const generateInitialPageQuestions = async (contextStr) => {
@@ -228,13 +199,24 @@ Konten/Topik Terlihat: ${headings || 'Halaman Landing/General'}`;
 
     setIsGeneratingInit(true);
     try {
-      const prompt = `User baru saja membuka chat di halaman ini:
-${contextStr}
+      const prompt = `User baru saja membuka chat di halaman ini:\n${contextStr}\n\nBerikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halaman HANYA dalam format JSON: { "answer": "", "quick_questions": ["q1", "q2", "q3"], "related_links": [] }`;
 
-Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halaman HANYA dalam format JSON: { "answer": "", "quick_questions": ["q1", "q2", "q3"], "related_links": [] }`;
-
-      // We pass skipSession = true so it doesn't pollute the DB with empty answers
-      const rawResponse = await sendToOpenRouter(prompt, null, true, true);
+      const payload = {
+        intent: 'static',
+        keywords: '',
+        messages: [{ role: 'user', content: prompt }],
+        page_url: window.location.href,
+        session_key: null // skip session saving for background init
+      };
+      
+      const synthRes = await fetch('/api/ai_synthesizer.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const synthData = await synthRes.json();
+      const rawResponse = synthData.choices?.[0]?.message?.content || '{}';
+      
       const parsed = parseAIResponse(rawResponse);
       if (parsed && parsed.quick_questions?.length > 0) {
         setContextualQuickQuestions(parsed.quick_questions);
@@ -299,45 +281,6 @@ Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halama
     generateInitialPageQuestions(getPageContextText());
   };
 
-  // ── Call OpenRouter API ────────────────────────────────────────────
-  const sendToOpenRouter = async (userMessage, overrideMessages = null, skipSession = false, isBackgroundInit = false) => {
-    const pageCtx = getPageContextText();
-    const systemContent = `${BASE_SYSTEM_PROMPT}\n\n${catalogRefList}\n\nKonteks Halaman Saat Ini:\n${pageCtx}`;
-
-    // Construct conversation history for context, ensuring AI sees its own history as raw JSON
-    const conversationHistory = isBackgroundInit ? [] : messages.map((msg) => ({
-      role: msg.role,
-      content: msg.rawText || msg.content // keep it JSON so AI remembers its format!
-    }));
-
-    const requestMessages = overrideMessages || [
-      { role: 'system', content: systemContent },
-      ...conversationHistory,
-      { role: 'user', content: userMessage },
-    ];
-
-    // Always use backend call so that chats are saved in the DB
-    const payload = {
-      messages: requestMessages,
-      page_url: window.location.href,
-      session_key: skipSession ? null : sessionKeyRef.current
-    };
-
-    const response = await fetch('/api/chat.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || '{ "answer": "Maaf, terjadi kesalahan. Silakan coba lagi.", "quick_questions": [], "related_links": [] }';
-  };
-
-  // ── Handle Send Message ────────────────────────────────────────────
   const handleSend = async (messageText) => {
     const text = (messageText || inputValue).trim();
     if (!text || isLoading) return;
@@ -346,9 +289,39 @@ Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halama
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
     setIsLoading(true);
+    setProcessStatus('Memahami pertanyaan...');
 
     try {
-      const reply = await sendToOpenRouter(text);
+      // 1. Router API
+      const routerRes = await fetch('/api/ai_router.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: text })
+      });
+      const routerData = await routerRes.json();
+      
+      setProcessStatus(routerData.ui_message || 'Mencari informasi...');
+
+      // 2. Synthesizer API
+      const synthPayload = {
+        intent: routerData.intent || 'static',
+        keywords: routerData.keywords || '',
+        messages: [...messages.map(m => ({ role: m.role, content: m.rawText || m.content })), { role: 'user', content: text }],
+        page_url: window.location.href,
+        session_key: sessionKeyRef.current
+      };
+
+      const synthRes = await fetch('/api/ai_synthesizer.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(synthPayload)
+      });
+
+      if (!synthRes.ok) throw new Error("Synthesis failed");
+      const synthData = await synthRes.json();
+      
+      const reply = synthData.choices?.[0]?.message?.content || '{ "answer": "Maaf, terjadi kesalahan.", "quick_questions": [], "related_links": [] }';
+      
       const assistantMsg = { role: 'assistant', content: reply, rawText: reply, timestamp: new Date() };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (error) {
@@ -363,6 +336,7 @@ Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halama
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
+      setProcessStatus('');
     }
   };
 
@@ -588,10 +562,13 @@ Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halama
                 <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-sm">smart_toy</span>
                 </div>
-                <div className="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_4px_rgba(0,0,0,0.04)] border border-outline-variant/10 flex items-center gap-1.5">
-                  <div className="chatbot-typing-dot w-1.5 h-1.5 rounded-full bg-primary" style={{ animationDelay: '0ms' }}></div>
-                  <div className="chatbot-typing-dot w-1.5 h-1.5 rounded-full bg-primary" style={{ animationDelay: '150ms' }}></div>
-                  <div className="chatbot-typing-dot w-1.5 h-1.5 rounded-full bg-primary" style={{ animationDelay: '300ms' }}></div>
+                <div className="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_4px_rgba(0,0,0,0.04)] border border-outline-variant/10 flex flex-col gap-2">
+                  {processStatus && (
+                    <div className="text-[10px] font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[12px] animate-spin">sync</span>
+                      {processStatus}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -631,11 +608,6 @@ Berikan 3 pertanyaan (quick_questions) yang paling relevan dengan konteks halama
         .chatbot-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .chatbot-scroll::-webkit-scrollbar-track { background: transparent; }
         .chatbot-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 99px; }
-        .chatbot-typing-dot { animation: chatbot-bounce 1s infinite ease-in-out alternate; }
-        @keyframes chatbot-bounce {
-          0% { transform: translateY(0); opacity: 0.5; }
-          100% { transform: translateY(-4px); opacity: 1; }
-        }
         .chatbot-markdown strong { font-weight: 700; }
         .chatbot-markdown em { font-style: italic; }
         .chatbot-markdown del { text-decoration: line-through; opacity: 0.6; }
