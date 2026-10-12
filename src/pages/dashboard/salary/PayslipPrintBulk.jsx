@@ -50,7 +50,6 @@ const PayslipPrintBulk = () => {
             className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             <span className="material-symbols-outlined text-base">arrow_back</span>
-            <span>Kembali ke Detail</span>
           </button>
           <div className="text-left">
             <h1 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
@@ -64,14 +63,14 @@ const PayslipPrintBulk = () => {
 
         <div className="flex items-center gap-3">
           <p className="text-xs text-slate-500 hidden sm:block">
-            * Setiap slip gaji otomatis terbagi ke halaman baru (Page Break)
+            * Setiap slip gaji otomatis terbagi ke halaman baru
           </p>
           <button
             onClick={handlePrint}
             className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-xs uppercase tracking-wider shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95"
           >
             <span className="material-symbols-outlined text-lg">print</span>
-            <span>Cetak Semua ({records.length} Slip)</span>
+            <span>Cetak ({records.length} Slip)</span>
           </button>
         </div>
       </div>

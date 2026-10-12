@@ -5,25 +5,29 @@ import {
   getEmployees,
   saveEmployee,
   deleteEmployee,
-  DEPARTMENTS,
+  getDepartments,
   formatNumberComma,
 } from '../../../services/salaryStorage';
 import EmployeeModal from '../../../components/dashboard/salary/EmployeeModal';
+import DepartmentModal from '../../../components/dashboard/salary/DepartmentModal';
 
 const Employees = () => {
   const { addToast } = useToast();
   const { confirmDialog } = useConfirm();
 
   const [employees, setEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-  // Load employees from storage
+  // Load employees & departments from storage
   const loadEmployees = () => {
     const data = getEmployees();
     setEmployees(data);
+    setDepartments(getDepartments());
   };
 
   useEffect(() => {
@@ -82,6 +86,11 @@ const Employees = () => {
     const matchesDept = selectedDept === 'ALL' || emp.department === selectedDept;
     return matchesSearch && matchesDept;
   });
+
+  // Department options for filter dropdown
+  const filterDeptOptions = Array.from(
+    new Set([...departments, ...employees.map((e) => e.department).filter(Boolean)])
+  );
 
   // Summary statistics
   const activeCount = employees.filter((e) => e.is_active !== false).length;
@@ -152,16 +161,28 @@ const Employees = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center">
-            <span className="material-symbols-outlined text-2xl">domain</span>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-2xl">domain</span>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Departemen</p>
+              <p className="text-xl font-bold text-purple-600 mt-0.5">
+                {departments.length} Divisi
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Departemen</p>
-            <p className="text-xl font-bold text-purple-600 mt-0.5">
-              {new Set(employees.map((e) => e.department)).size} Divisi
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsDeptModalOpen(true)}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-purple-600 hover:bg-purple-50 border border-slate-200 hover:border-purple-200 transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 group"
+            title="Kelola Kategori / Departemen"
+          >
+            <span className="material-symbols-outlined text-xl transition-transform group-hover:rotate-45">
+              settings
+            </span>
+          </button>
         </div>
       </div>
 
@@ -196,7 +217,7 @@ const Employees = () => {
               className="bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-8 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-orange-500 appearance-none cursor-pointer"
             >
               <option value="ALL">Semua Departemen</option>
-              {DEPARTMENTS.map((dept) => (
+              {filterDeptOptions.map((dept) => (
                 <option key={dept} value={dept}>
                   {dept}
                 </option>
@@ -303,6 +324,18 @@ const Employees = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
         employee={editingEmployee}
+        departments={departments}
+      />
+
+      {/* Department & Category Modal */}
+      <DepartmentModal
+        isOpen={isDeptModalOpen}
+        onClose={() => setIsDeptModalOpen(false)}
+        onDepartmentsChange={(newDepts) => {
+          setDepartments(newDepts);
+          loadEmployees();
+        }}
+        employees={employees}
       />
     </div>
   );

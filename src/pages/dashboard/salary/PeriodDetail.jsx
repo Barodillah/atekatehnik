@@ -5,6 +5,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
 import {
   getPeriodById,
+  savePeriod,
   getPeriodRecords,
   saveRecord,
   deleteRecord,
@@ -240,6 +241,22 @@ const PeriodDetail = () => {
     }
   };
 
+  // Handle status change for period (Draft, Published, Paid)
+  const handleStatusChange = (newStatus) => {
+    if (!period || !period.id) return;
+    try {
+      const updated = savePeriod({
+        ...period,
+        status: newStatus,
+      });
+      setPeriod(updated);
+      addToast(`Status periode berhasil diubah menjadi "${newStatus}"`, 'success');
+    } catch (err) {
+      console.error(err);
+      addToast('Gagal mengubah status periode', 'error');
+    }
+  };
+
   // Sync / add active employees
   const handleSyncEmployees = () => {
     const updated = initPeriodRecordsFromEmployees(id, period?.work_days || 6);
@@ -291,6 +308,10 @@ const PeriodDetail = () => {
   // Summary Metrics
   const totalEmployees = records.length;
   const totalWorkshopDays = records.reduce((acc, curr) => acc + (Number(curr.workshop_days) || 0), 0);
+  const avgWorkshopDays =
+    totalEmployees > 0
+      ? Math.round((totalWorkshopDays / totalEmployees) * 10) / 10
+      : 0;
   const totalTripDays = records.reduce((acc, curr) => acc + (Number(curr.business_trip_days) || 0), 0);
   const totalNetSalary = records.reduce((acc, curr) => acc + (Number(curr.net_income) || 0), 0);
 
@@ -318,16 +339,27 @@ const PeriodDetail = () => {
               <h1 className="text-xl sm:text-2xl font-bold text-blue-950 uppercase tracking-tight font-manrope">
                 {period.period_name}
               </h1>
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${period.status === 'Paid'
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  : period.status === 'Published'
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+              <div className="relative inline-flex items-center">
+                <select
+                  value={period.status || 'Draft'}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className={`pl-2.5 pr-6 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border appearance-none transition-all cursor-pointer focus:outline-none shadow-2xs ${
+                    period.status === 'Paid'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                      : period.status === 'Published'
+                      ? 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
+                      : 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
                   }`}
-              >
-                {period.status || 'Draft'}
-              </span>
+                  title="Klik untuk ubah status periode"
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                  <option value="Paid">Paid</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-1.5 text-xs pointer-events-none opacity-60">
+                  expand_more
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2 font-mono">
               <span className="flex items-center gap-1">
@@ -349,7 +381,6 @@ const PeriodDetail = () => {
             className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-base">person_add</span>
-            <span>Tambah</span>
           </button>
 
           <button
@@ -358,7 +389,6 @@ const PeriodDetail = () => {
             title="Sinkronkan seluruh karyawan aktif"
           >
             <span className="material-symbols-outlined text-base">sync</span>
-            <span>Sinkronkan</span>
           </button>
 
           <Link
@@ -366,7 +396,7 @@ const PeriodDetail = () => {
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95"
           >
             <span className="material-symbols-outlined text-base">print</span>
-            <span>Cetak Slip Gaji Masal</span>
+            <span>Cetak Slip</span>
           </Link>
         </div>
       </div>
@@ -384,10 +414,10 @@ const PeriodDetail = () => {
 
         <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
           <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-            Total Hadir Bengkel
+            Avg. Hadir Bengkel
           </p>
           <p className="text-xl sm:text-2xl font-black text-blue-600 mt-1">
-            {totalWorkshopDays} <span className="text-xs font-normal text-slate-500">Hari</span>
+            {avgWorkshopDays} <span className="text-xs font-normal text-slate-500">Hari</span>
           </p>
         </div>
 

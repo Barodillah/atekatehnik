@@ -8,6 +8,7 @@ import {
   deletePeriod,
   getPeriodRecords,
   formatNumberComma,
+  applyAttendanceToPeriod,
 } from '../../../services/salaryStorage';
 import PeriodModal from '../../../components/dashboard/salary/PeriodModal';
 
@@ -40,13 +41,21 @@ const Periods = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (periodData) => {
+  const handleSave = (periodData, attendanceRows = []) => {
     try {
       const saved = savePeriod(periodData);
+      if (attendanceRows && attendanceRows.length > 0) {
+        applyAttendanceToPeriod(saved.id, attendanceRows);
+      }
       setIsModalOpen(false);
       loadPeriods();
       if (!periodData.id) {
-        addToast('Periode berhasil dibuat. Silakan periksa data absensi karyawan.', 'success');
+        addToast(
+          attendanceRows && attendanceRows.length > 0
+            ? `Periode berhasil dibuat & ${attendanceRows.length} data absen terimpor!`
+            : 'Periode berhasil dibuat. Silakan periksa data absensi karyawan.',
+          'success'
+        );
         navigate(`/admin/salary/periods/${saved.id}`);
       } else {
         addToast('Data periode berhasil diperbarui', 'success');
@@ -167,7 +176,11 @@ const Periods = () => {
                 filteredPeriods.map((p, idx) => {
                   const stats = getPeriodStats(p.id);
                   return (
-                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors group">
+                    <tr
+                      key={p.id}
+                      onClick={() => navigate(`/admin/salary/periods/${p.id}`)}
+                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                    >
                       <td className="py-3.5 px-4 text-center text-slate-500">{idx + 1}</td>
                       <td className="py-3.5 px-4 font-bold text-slate-900 tracking-wide">
                         <Link
@@ -180,7 +193,6 @@ const Periods = () => {
                             arrow_forward
                           </span>
                         </Link>
-                        {p.notes && <p className="text-[11px] text-slate-500 font-normal mt-0.5">{p.notes}</p>}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-slate-600">
                         {p.start_date || '-'} s/d {p.end_date || '-'}
@@ -211,7 +223,10 @@ const Periods = () => {
                           {p.status || 'Draft'}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
+                      <td
+                        className="py-3.5 px-4 text-center cursor-default"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="flex items-center justify-center gap-1">
                           <Link
                             to={`/admin/salary/periods/${p.id}`}

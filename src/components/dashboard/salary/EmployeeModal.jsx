@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { DEPARTMENTS, formatNumberComma } from '../../../services/salaryStorage';
+import { getDepartments, formatNumberComma } from '../../../services/salaryStorage';
 
-const EmployeeModal = ({ isOpen, onClose, onSave, employee = null }) => {
+const EmployeeModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  employee = null,
+  departments: propDepartments = null,
+}) => {
   const [formData, setFormData] = useState({
     id_absen: '',
     name: '',
@@ -14,13 +20,17 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee = null }) => {
 
   const [errors, setErrors] = useState({});
 
+  const availableDepartments =
+    propDepartments && propDepartments.length > 0 ? propDepartments : getDepartments();
+
   useEffect(() => {
+    const defaultDept = availableDepartments[0] || 'PRODUKSI';
     if (employee) {
       setFormData({
         id: employee.id,
         id_absen: employee.id_absen || '',
         name: employee.name || '',
-        department: employee.department || 'PRODUKSI',
+        department: employee.department || defaultDept,
         daily_salary: employee.daily_salary !== undefined ? employee.daily_salary : 150000,
         trip_allowance: employee.trip_allowance !== undefined ? employee.trip_allowance : 250000,
         is_active: employee.is_active !== undefined ? employee.is_active : true,
@@ -29,14 +39,14 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee = null }) => {
       setFormData({
         id_absen: '',
         name: '',
-        department: 'PRODUKSI',
+        department: defaultDept,
         daily_salary: 150000,
         trip_allowance: 250000,
         is_active: true,
       });
     }
     setErrors({});
-  }, [employee, isOpen]);
+  }, [employee, isOpen, propDepartments]);
 
   if (!isOpen) return null;
 
@@ -154,7 +164,10 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee = null }) => {
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all appearance-none cursor-pointer"
               >
-                {DEPARTMENTS.map((dept) => (
+                {formData.department && !availableDepartments.includes(formData.department) && (
+                  <option value={formData.department}>{formData.department}</option>
+                )}
+                {availableDepartments.map((dept) => (
                   <option key={dept} value={dept}>
                     {dept}
                   </option>

@@ -7,7 +7,7 @@
  */
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'ateka_bu');
+define('DB_NAME', 'ateka_local');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 

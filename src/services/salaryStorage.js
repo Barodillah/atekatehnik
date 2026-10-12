@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   EMPLOYEES: 'ateka_salary_employees',
   PERIODS: 'ateka_salary_periods',
   RECORDS: 'ateka_salary_records',
+  DEPARTMENTS: 'ateka_salary_departments',
 };
 
 // Initial Employees seed
@@ -134,8 +135,8 @@ const DEFAULT_RECORDS = [
   },
 ];
 
-// Standard departments in Ateka Tehnik
-export const DEPARTMENTS = [
+// Standard default departments in Ateka Tehnik
+export const DEFAULT_DEPARTMENTS = [
   'PRODUKSI',
   'PENGELASAN',
   'BUBUT & CNC',
@@ -144,6 +145,117 @@ export const DEPARTMENTS = [
   'FINANCE',
   'QUALITY CONTROL',
 ];
+
+// Backwards compatibility export
+export const DEPARTMENTS = DEFAULT_DEPARTMENTS;
+
+// Get departments from localStorage or default
+export const getDepartments = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(DEFAULT_DEPARTMENTS));
+      return DEFAULT_DEPARTMENTS;
+    }
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_DEPARTMENTS;
+  } catch (e) {
+    console.error('Failed to get departments', e);
+    return DEFAULT_DEPARTMENTS;
+  }
+};
+
+// Save departments to localStorage
+export const saveDepartments = (depts) => {
+  localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(depts));
+  return depts;
+};
+
+// Add new department
+export const addDepartment = (name) => {
+  const trimmed = (name || '').trim().toUpperCase();
+  if (!trimmed) {
+    throw new Error('Nama kategori / departemen tidak boleh kosong');
+  }
+  const current = getDepartments();
+  if (current.some((d) => d.toUpperCase() === trimmed)) {
+    throw new Error(`Departemen "${trimmed}" sudah terdaftar`);
+  }
+  const updated = [...current, trimmed];
+  saveDepartments(updated);
+  return updated;
+};
+
+// Update department name with cascade update to employees and records
+export const updateDepartment = (oldName, newName) => {
+  const trimmedOld = (oldName || '').trim();
+  const trimmedNew = (newName || '').trim().toUpperCase();
+  if (!trimmedNew) {
+    throw new Error('Nama kategori baru tidak boleh kosong');
+  }
+  const current = getDepartments();
+  if (
+    trimmedOld.toUpperCase() !== trimmedNew &&
+    current.some((d) => d.toUpperCase() === trimmedNew)
+  ) {
+    throw new Error(`Kategori "${trimmedNew}" sudah terdaftar`);
+  }
+  const updated = current.map((d) => (d === trimmedOld ? trimmedNew : d));
+  saveDepartments(updated);
+
+  // Cascade rename to employees in storage
+  try {
+    const employees = getEmployees();
+    let empChanged = false;
+    const updatedEmployees = employees.map((emp) => {
+      if (emp.department === trimmedOld) {
+        empChanged = true;
+        return { ...emp, department: trimmedNew };
+      }
+      return emp;
+    });
+    if (empChanged) {
+      localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(updatedEmployees));
+    }
+  } catch (e) {
+    console.error('Error cascading department update to employees', e);
+  }
+
+  // Cascade rename to records in storage
+  try {
+    const records = getAllRecords();
+    let recChanged = false;
+    const updatedRecords = records.map((rec) => {
+      if (rec.department === trimmedOld) {
+        recChanged = true;
+        return { ...rec, department: trimmedNew };
+      }
+      return rec;
+    });
+    if (recChanged) {
+      localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(updatedRecords));
+    }
+  } catch (e) {
+    console.error('Error cascading department update to records', e);
+  }
+
+  return updated;
+};
+
+// Delete department
+export const deleteDepartment = (name) => {
+  const trimmed = (name || '').trim();
+  const current = getDepartments();
+  const updated = current.filter((d) => d !== trimmed);
+  saveDepartments(updated);
+  return updated;
+};
+
+// Reset departments to default
+export const resetDepartments = () => {
+  saveDepartments(DEFAULT_DEPARTMENTS);
+  return DEFAULT_DEPARTMENTS;
+};
 
 // Helper: Format Rupiah number with commas (e.g. 825000 -> "825,000")
 export const formatNumberComma = (val) => {
@@ -385,4 +497,44 @@ export const initPeriodRecordsFromEmployees = (periodId, defaultWorkDays = 6) =>
     return [...existingRecords, ...newRows];
   }
   return existingRecords;
+};
+
+export const applyAttendanceToPeriod = (periodId, attendanceRows = []) => {
+  if (!periodId || !attendanceRows || attendanceRows.length === 0) return [];
+  const records = getPeriodRecords(periodId);
+  const period = getPeriodById(periodId);
+  const standardDays = period?.work_days || 6;
+
+  // Build lookup map by id_absen and normalized name
+  const byIdAbsen = {};
+  const byName = {};
+  attendanceRows.forEach((row) => {
+    if (row.id_absen) byIdAbsen[row.id_absen.toString().trim()] = row;
+    if (row.name) byName[row.name.toString().trim().toLowerCase()] = row;
+  });
+
+  const updatedRecords = records.map((rec) => {
+    const match =
+      (rec.id_absen && byIdAbsen[rec.id_absen.toString().trim()]) ||
+      (rec.name && byName[rec.name.toString().trim().toLowerCase()]);
+
+    if (match) {
+      const workshopDays = Number(match.days) || 0;
+      return calculateSalaryRow(
+        {
+          ...rec,
+          workshop_days: workshopDays,
+        },
+        standardDays
+      );
+    }
+    return rec;
+  });
+
+  const allRecords = getAllRecords();
+  const otherRecords = allRecords.filter((r) => r.period_id !== periodId);
+  const combined = [...otherRecords, ...updatedRecords];
+  localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(combined));
+
+  return updatedRecords;
 };
