@@ -33,7 +33,7 @@ Gunakan panduan ini sebagai input utama pada alat desain Google Stitch untuk men
 * [cite_start]**CTA 2 (Secondary):** **Lihat Katalog E-LKPP** (Direct ke Portal LKPP)[cite: 65].
 
 ### B. Trust Bar (Kredibilitas)
-[cite_start]Menampilkan logo monokrom mitra strategis: `LKPP E-Katalog`, `Yanmar`, `Satake`, dan `Verified Diamond Supplier Indotrading`[cite: 24, 28, 65, 71].
+[cite_start]Menampilkan logo monokrom mitra strategis: `LKPP E-Katalog`, `Yanmar`, `Satake`, dan `Verified Diamond Manufaktur Indotrading`[cite: 24, 28, 65, 71].
 
 ### C. Katalog Produk (Tiered Solutions)
 | Paket Produk | Narasi Copywriting | Komponen Utama |

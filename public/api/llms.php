@@ -28,6 +28,7 @@ define('CACHE_DIR', sys_get_temp_dir() . '/atekatehnik_llms_cache_v2');
 define('SUMMARY_PRODUCT_LIMIT', 10);
 define('SUMMARY_POST_LIMIT', 5);
 define('MAX_DESCRIPTION_LENGTH', 120);
+define('YEARS_EXPERIENCE', (int)date('Y') - 2004);
 
 // ── Determine Mode ───────────────────────────────────────────────────
 $mode = $_GET['mode'] ?? 'summary';
@@ -212,10 +213,10 @@ function generateSummary(PDO $db): string
     $md = [];
 
     // ── Header ───────────────────────────────────────────────────────
-    $md[] = '# ' . SITE_NAME . ' — Supplier & Produsen Mesin Penggilingan Padi Indonesia';
+    $md[] = '# ' . SITE_NAME . ' — Manufaktur & Produsen Mesin Penggilingan Padi Indonesia';
     $md[] = '';
-    $md[] = '> CV Ateka Tehnik adalah produsen dan supplier mesin penggilingan padi';
-    $md[] = '> (Rice Milling Unit / RMU) berpengalaman lebih dari 20 tahun. Menyediakan solusi';
+    $md[] = '> CV Ateka Tehnik adalah produsen dan manufaktur mesin penggilingan padi';
+    $md[] = '> (Rice Milling Unit / RMU) berpengalaman lebih dari ' . YEARS_EXPERIENCE . ' tahun. Menyediakan solusi';
     $md[] = '> lengkap: konsultasi, instalasi profesional, pelatihan operator, dan garansi';
     $md[] = '> purnajual untuk seluruh wilayah Indonesia. Terdaftar di E-Katalog LKPP dan';
     $md[] = '> terverifikasi sebagai Diamond Member di Indotrading.';
@@ -379,7 +380,7 @@ function generateSummary(PDO $db): string
     $md[] = '- **Lokasi:** Dusun Gondang, RT 02 RW 01, Desa Kedungjeruk, Kec. Mojogedang, Kab. Karanganyar, Jawa Tengah, Indonesia';
     $md[] = '- **WhatsApp:** [' . formatPhone(WHATSAPP_NUMBER) . '](https://wa.me/' . WHATSAPP_NUMBER . ')';
     $md[] = '- **Website:** ' . SITE_URL;
-    $md[] = '- **Pengalaman:** 20+ tahun dalam manufaktur & instalasi Rice Milling Unit';
+    $md[] = '- **Pengalaman:** ' . YEARS_EXPERIENCE . '+ tahun dalam manufaktur & instalasi Rice Milling Unit';
     $md[] = '- **Cakupan Layanan:** Seluruh Indonesia (Jawa, Sumatera, dan wilayah lainnya)';
     $md[] = '';
     $md[] = '---';
@@ -405,8 +406,8 @@ function generateFull(PDO $db): string
     $md[] = '> teknis, panduan pemasangan, dan artikel dari CV Ateka Tehnik.';
     $md[] = '> Disusun untuk konsumsi AI dan sistem RAG (Retrieval-Augmented Generation).';
     $md[] = '>';
-    $md[] = '> **Tentang Perusahaan:** CV Ateka Tehnik adalah produsen dan supplier Rice';
-    $md[] = '> Milling Unit (RMU) berpengalaman 20+ tahun, berlokasi di Karanganyar, Jawa';
+    $md[] = '> **Tentang Perusahaan:** CV Ateka Tehnik adalah produsen dan manufaktur Rice';
+    $md[] = '> Milling Unit (RMU) berpengalaman ' . YEARS_EXPERIENCE . '+ tahun, berlokasi di Karanganyar, Jawa';
     $md[] = '> Tengah. Menyediakan solusi lengkap mulai dari konsultasi, manufaktur, instalasi,';
     $md[] = '> pelatihan operator, hingga layanan purnajual bergaransi. Produk terdaftar di';
     $md[] = '> E-Katalog LKPP dan perusahaan terverifikasi sebagai Diamond Member Indotrading.';
@@ -690,7 +691,7 @@ function generateFull(PDO $db): string
     $md[] = '| **Alamat** | Dusun Gondang, RT 02 RW 01, Desa Kedungjeruk, Kec. Mojogedang, Kab. Karanganyar, Jawa Tengah, Indonesia |';
     $md[] = '| **WhatsApp** | [' . formatPhone(WHATSAPP_NUMBER) . '](https://wa.me/' . WHATSAPP_NUMBER . ') |';
     $md[] = '| **Website** | [' . SITE_URL . '](' . SITE_URL . ') |';
-    $md[] = '| **Pengalaman** | 20+ tahun (sejak tahun 2000) |';
+    $md[] = '| **Pengalaman** | ' . YEARS_EXPERIENCE . '+ tahun (sejak tahun 2004) |';
     $md[] = '| **Cakupan** | Seluruh Indonesia |';
     $md[] = '| **Legalitas** | SIUP, NPWP, NIB (Terverifikasi Indotrading) |';
     $md[] = '| **E-Katalog** | Terdaftar di LKPP untuk pengadaan pemerintah |';
@@ -1057,7 +1058,7 @@ function generateAbout(): string
     $md = [];
     $md[] = '# Tentang Kami (About Us) — ' . SITE_NAME;
     $md[] = '';
-    $md[] = 'CV Ateka Tehnik adalah perusahaan manufaktur dan supplier mesin penggilingan padi (Rice Milling Unit - RMU) berpengalaman lebih dari 20 tahun. Berbasis di Karanganyar, Jawa Tengah, perusahaan ini menyediakan solusi komprehensif mulai dari desain, manufaktur, instalasi, dan layanan purnajual untuk pelanggan di seluruh Indonesia.';
+    $md[] = 'CV Ateka Tehnik adalah perusahaan manufaktur mesin penggilingan padi (Rice Milling Unit - RMU) berpengalaman lebih dari ' . YEARS_EXPERIENCE . ' tahun. Berbasis di Karanganyar, Jawa Tengah, perusahaan ini menyediakan solusi komprehensif mulai dari desain, manufaktur, instalasi, dan layanan purnajual untuk pelanggan di seluruh Indonesia.';
     $md[] = '';
     $md[] = '## Nilai Utama (Core Directives)';
     $md[] = '';
@@ -1066,7 +1067,7 @@ function generateAbout(): string
     $md[] = '3. **Kemitraan Jangka Panjang**: Lebih dari sekadar transaksi, kami memberikan jaminan pendampingan dari tahap konsultasi hingga dukungan teknis pasca-instalasi.';
     $md[] = '';
     $md[] = '## Pencapaian & Sertifikasi';
-    $md[] = '- Pengalaman 20+ tahun';
+    $md[] = '- Pengalaman ' . YEARS_EXPERIENCE . '+ tahun';
     $md[] = '- Ratusan instalasi di 34 Provinsi di Indonesia';
     $md[] = '- Tersertifikasi SNI ISO 9001';
     $md[] = '- Terdaftar di E-Katalog INAPROC / LKPP untuk proyek pemerintah';

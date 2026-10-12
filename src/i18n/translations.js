@@ -1,3 +1,5 @@
+const YEARS_OF_EXPERIENCE = new Date().getFullYear() - 2004;
+
 const translations = {
   id: {
     // Navbar
@@ -13,7 +15,7 @@ const translations = {
     "hero.title": "Manufaktur Mesin RMU Presisi: ",
     "hero.titleHighlight": "Hasilkan Beras Premium",
     "hero.titleSuffix": "",
-    "hero.subtitle": "Solusi Rice Milling Unit terintegrasi langsung dari pabrikasi berpengalaman 20+ tahun. Dirancang minim beras patah, hemat energi, dan didukung teknisi ahli purnajual di seluruh Indonesia.",
+    "hero.subtitle": `Solusi Rice Milling Unit terintegrasi langsung dari pabrikasi berpengalaman ${YEARS_OF_EXPERIENCE}+ tahun. Dirancang minim beras patah, hemat energi, dan didukung teknisi ahli purnajual di seluruh Indonesia.`,
     "hero.cta1": "Konsultasi Rencana Usaha",
     "hero.cta2": "Lihat Katalog INAPROC",
     "hero.ctaWa": "Hubungi Langsung Kami",
@@ -41,7 +43,7 @@ const translations = {
 
     // Portfolio (component)
     "portfolio.title": "Instalasi & Proyek Kami",
-    "portfolio.subtitle": "Lebih dari 20 tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.",
+    "portfolio.subtitle": `Lebih dari ${YEARS_OF_EXPERIENCE} tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.`,
     "portfolio.viewMore": "Lihat Lebih Banyak",
 
     // ContactMe / Contact Home
@@ -110,7 +112,7 @@ const translations = {
     "about.heroSub": "Dua dekade penguasaan teknis dalam rekayasa pertanian, didedikasikan untuk ketahanan pangan Indonesia dan keunggulan industri.",
     "about.storyTitle": "Warisan Presisi Industri",
     "about.storyP1": "Didirikan pada tahun 2004, CV Ateka Tehnik bermula dari satu visi: menjembatani kesenjangan antara praktik pertanian tradisional dan efisiensi industri modern. Selama lebih dari ",
-    "about.storyP1Bold": "20 tahun",
+    "about.storyP1Bold": `${YEARS_OF_EXPERIENCE} tahun`,
     "about.storyP1End": ", kami telah berevolusi dari bengkel lokal menjadi pemimpin nasional yang diakui dalam teknologi penggilingan padi.",
     "about.storyP2Start": "Sebagai ",
     "about.storyP2Bold": "vendor resmi LKPP",
@@ -200,7 +202,7 @@ const translations = {
 
     // Portfolio Page
     "portfolioPage.heroTitle": "Instalasi &\nProyek Kami",
-    "portfolioPage.heroSub": "Lebih dari 20 tahun menghadirkan Rice Milling Unit presisi di seluruh nusantara Indonesia.",
+    "portfolioPage.heroSub": `Lebih dari ${YEARS_OF_EXPERIENCE} tahun menghadirkan Rice Milling Unit presisi di seluruh nusantara Indonesia.`,
     "portfolioPage.featuredLabel": "Studi Kasus Unggulan",
     "portfolioPage.featuredTitle": "Pemasangan RMU 2–3 Ton/Jam",
     "portfolioPage.featuredDesc": "Proyek pemasangan Rice Milling Unit berkapasitas 2–3 ton per jam di Palembang, Sumatera Selatan. Unit ini dirancang untuk memenuhi kebutuhan penggilingan padi skala Industri dengan efisiensi tinggi, menghasilkan beras berkualitas premium siap distribusi.",
@@ -389,7 +391,7 @@ const translations = {
     "faq.title": "Pertanyaan yang Sering Diajukan",
     "faq.subtitle": "Temukan jawaban singkat tentang layanan, ketersediaan suku cadang, dan nilai unggulan kami.",
     "faq.q1": "Mengapa harus membeli mesin penggilingan padi di CV Ateka Tehnik?",
-    "faq.a1": "Kami memiliki pengalaman lebih dari 20 tahun dalam manufaktur Rice Milling Unit (RMU) berstandar nasional. Kami memastikan setiap unit dipasang dengan tingkat presisi tinggi untuk meminimalisir persentase beras patah dan meningkatkan rendemen panen Anda.",
+    "faq.a1": `Kami memiliki pengalaman lebih dari ${YEARS_OF_EXPERIENCE} tahun dalam manufaktur Rice Milling Unit (RMU) berstandar nasional. Kami memastikan setiap unit dipasang dengan tingkat presisi tinggi untuk meminimalisir persentase beras patah dan meningkatkan rendemen panen Anda.`,
     "faq.q2": "Apakah Ateka Tehnik menyediakan layanan purna jual (after-sales) dan suku cadang?",
     "faq.a2": "Ya, kami memberikan garansi fungsi dan ketersediaan suku cadang asli di seluruh wilayah Indonesia. Teknisi kami juga siap dipanggil langsung ke lokasi Anda apabila terdapat kendala operasional, memastikan bisnis penggilingan padi Anda tidak terhenti.",
     "faq.q3": "Bagaimana sistem pemesanan mesin untuk pemerintahan / dinas?",
@@ -445,7 +447,7 @@ const translations = {
     "hero.title": "Precision RMU Machine Manufacturing: ",
     "hero.titleHighlight": "Produce Premium Rice",
     "hero.titleSuffix": "",
-    "hero.subtitle": "Integrated Rice Milling Unit solutions direct from a fabricator with 20+ years of experience. Designed for minimal broken rice, energy efficiency, and supported by expert after-sales technicians throughout Indonesia.",
+    "hero.subtitle": `Integrated Rice Milling Unit solutions direct from a fabricator with ${YEARS_OF_EXPERIENCE}+ years of experience. Designed for minimal broken rice, energy efficiency, and supported by expert after-sales technicians throughout Indonesia.`,
     "hero.cta1": "Business Plan Consultation",
     "hero.cta2": "View INAPROC Catalog",
     "hero.ctaWa": "Contact Us Directly",
@@ -473,7 +475,7 @@ const translations = {
 
     // Portfolio (component)
     "portfolio.title": "Our Installations & Projects",
-    "portfolio.subtitle": "Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.",
+    "portfolio.subtitle": `Over ${YEARS_OF_EXPERIENCE} years of delivering precision engineering and reliable Rice Milling Units across Indonesia.`,
     "portfolio.viewMore": "View More",
 
     // ContactMe / Contact Home
@@ -542,7 +544,7 @@ const translations = {
     "about.heroSub": "Two decades of technical mastery in agricultural engineering, dedicated to Indonesian food security and industrial excellence.",
     "about.storyTitle": "A Legacy of Industrial Precision",
     "about.storyP1": "Founded in 2004, CV Ateka Tehnik began with a singular vision: to bridge the gap between traditional agricultural practices and modern industrial efficiency. Over the past ",
-    "about.storyP1Bold": "20 years",
+    "about.storyP1Bold": `${YEARS_OF_EXPERIENCE} years`,
     "about.storyP1End": ", we have evolved from a local workshop into a nationally recognized leader in rice milling technology.",
     "about.storyP2Start": "As an ",
     "about.storyP2Bold": "official LKPP vendor",
@@ -632,7 +634,7 @@ const translations = {
 
     // Portfolio Page
     "portfolioPage.heroTitle": "Our Installations\n& Projects",
-    "portfolioPage.heroSub": "Over 20 years of delivering precision-engineered Rice Milling Units across the Indonesian archipelago.",
+    "portfolioPage.heroSub": `Over ${YEARS_OF_EXPERIENCE} years of delivering precision-engineered Rice Milling Units across the Indonesian archipelago.`,
     "portfolioPage.featuredLabel": "Featured Case Study",
     "portfolioPage.featuredTitle": "RMU Installation 2–3 Ton/Hour",
     "portfolioPage.featuredDesc": "A Rice Milling Unit installation project with a capacity of 2–3 tons per hour in Palembang, South Sumatera. This unit is designed to meet Industrial-scale rice milling needs with high efficiency, producing premium-quality rice ready for distribution.",
@@ -821,7 +823,7 @@ const translations = {
     "faq.title": "Frequently Asked Questions",
     "faq.subtitle": "Find quick answers about our services, spare parts availability, and our core value propositions.",
     "faq.q1": "Why should I buy a rice milling machine at CV Ateka Tehnik?",
-    "faq.a1": "We have over 20 years of experience in manufacturing national-standard Rice Milling Units (RMU). We ensure every unit is installed with high precision to minimize broken rice percentages and boost your harvest yield.",
+    "faq.a1": `We have over ${YEARS_OF_EXPERIENCE} years of experience in manufacturing national-standard Rice Milling Units (RMU). We ensure every unit is installed with high precision to minimize broken rice percentages and boost your harvest yield.`,
     "faq.q2": "Does Ateka Tehnik provide after-sales service and spare parts?",
     "faq.a2": "Yes, we provide functional warranties and genuine spare parts availability across all regions in Indonesia. Our technicians are also ready to be deployed directly to your location if operational issues occur, ensuring your business never stops.",
     "faq.q3": "How does the machine ordering system work for government agencies?",

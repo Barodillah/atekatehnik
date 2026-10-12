@@ -640,7 +640,7 @@ const Gallery = () => {
                         className="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition-transform bg-white/90 text-slate-800 border border-white/20"
                       >
                         <span className="material-symbols-outlined text-lg">layers</span>
-                        <span>{selectedItem.links.length} Link Terkait</span>
+                        <span>{selectedItem.links.length} {lang === 'id' ? 'Link Terkait' : 'Related Links'}</span>
                         <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${showLinksDropup ? 'rotate-180' : ''}`}>expand_more</span>
                       </button>
                     </div>

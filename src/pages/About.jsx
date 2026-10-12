@@ -43,7 +43,7 @@ const About = () => {
                         <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <div className="text-3xl md:text-4xl font-headline font-black text-secondary mb-1">
-                                    <AnimatedCounter end={20} suffix="+" />
+                                    <AnimatedCounter end={new Date().getFullYear() - 2004} suffix="+" />
                                 </div>
                                 <div className="text-xs md:text-sm font-label uppercase tracking-widest text-outline leading-tight">{t('about.statYears')}</div>
                             </div>

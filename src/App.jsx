@@ -51,6 +51,12 @@ import RabDocumentPreview from './pages/dashboard/rab/RabDocumentPreview';
 import CompanySetting from './pages/dashboard/rab/CompanySetting';
 import CatalogSetting from './pages/dashboard/rab/CatalogSetting';
 
+// Salary Management
+import SalaryEmployees from './pages/dashboard/salary/Employees';
+import SalaryPeriods from './pages/dashboard/salary/Periods';
+import SalaryPeriodDetail from './pages/dashboard/salary/PeriodDetail';
+import PayslipPrintBulk from './pages/dashboard/salary/PayslipPrintBulk';
+
 const PublicLayout = () => {
   return (
     <div className="relative flex flex-col min-h-screen">
@@ -132,6 +138,10 @@ function App() {
                 <Route path="rab/preview/:id" element={<RabDocumentPreview />} />
                 <Route path="rab/company" element={<CompanySetting />} />
                 <Route path="rab/catalog" element={<CatalogSetting />} />
+                <Route path="salary/employees" element={<SalaryEmployees />} />
+                <Route path="salary/periods" element={<SalaryPeriods />} />
+                <Route path="salary/periods/:id" element={<SalaryPeriodDetail />} />
+                <Route path="salary/periods/:id/print" element={<PayslipPrintBulk />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products/new" element={<AdminProductForm />} />
                 <Route path="products/edit/:id" element={<AdminProductForm />} />

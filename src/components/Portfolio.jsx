@@ -132,7 +132,7 @@ const Portfolio = () => {
                   {lang === 'id' ? 'Pemasangan Proyek Industrial' : 'Industrial Installations Projects'}
                 </h2>
                 <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
-                  {lang === 'id' ? 'Lebih dari 20 tahun menghadirkan rekayasa presisi dan Rice Milling Unit handal di seluruh Indonesia.' : 'Over 20 years of delivering precision engineering and reliable Rice Milling Units across Indonesia.'}
+                  {t('portfolio.subtitle')}
                 </p>
               </div>
 

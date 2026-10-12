@@ -78,7 +78,7 @@ CV Ateka Tehnik telah berhasil memperluas jangkauan pasarnya dari wilayah lokal 
 Partisipasi dalam E-Katalog LKPP
 Kehadiran produk CV Ateka Tehnik dalam Katalog Elektronik Lembaga Kebijakan Pengadaan Barang/Jasa Pemerintah (LKPP) merupakan pencapaian strategis yang signifikan.1 Hal ini memungkinkan instansi pemerintah, seperti Dinas Pertanian di berbagai daerah atau Badan Usaha Milik Desa (BUMDes), untuk melakukan pengadaan unit penggilingan padi secara langsung tanpa melalui proses lelang konvensional yang rumit. Produk yang masuk ke e-katalog telah melalui proses verifikasi yang ketat, yang memberikan validasi tambahan terhadap kredibilitas dan kualitas teknis perusahaan.7
 Ekosistem Digital B2B dan Verifikasi Pihak Ketiga
-Perusahaan sangat aktif dalam platform Business-to-Business (B2B) seperti Indotrading, di mana mereka memegang status sebagai "Verified Supplier" dengan kategori keanggotaan Diamond atau Platinum.7 Status verifikasi ini mencakup pemeriksaan fisik terhadap alamat kantor dan workshop, serta validasi dokumen legalitas seperti SIUP dan NPWP.4 Melalui platform ini, CV Ateka Tehnik mampu menjangkau pasar di luar pulau Jawa, dengan respon rate yang tinggi (mencapai 100% pada beberapa profil), yang menunjukkan profesionalisme dalam menangani permintaan pelanggan secara daring.7
+Perusahaan sangat aktif dalam platform Business-to-Business (B2B) seperti Indotrading, di mana mereka memegang status sebagai "Verified Manufaktur" dengan kategori keanggotaan Diamond atau Platinum.7 Status verifikasi ini mencakup pemeriksaan fisik terhadap alamat kantor dan workshop, serta validasi dokumen legalitas seperti SIUP dan NPWP.4 Melalui platform ini, CV Ateka Tehnik mampu menjangkau pasar di luar pulau Jawa, dengan respon rate yang tinggi (mencapai 100% pada beberapa profil), yang menunjukkan profesionalisme dalam menangani permintaan pelanggan secara daring.7
 
 Indikator Kepercayaan
 Status / Detail
@@ -128,7 +128,7 @@ TENTANG KAMI - ATEKA TEKNIK, diakses Maret 30, 2026, https://atekateknik.com/ten
 Tentang Kami - CV Ateka Tehnik - Indotrading.com, diakses Maret 30, 2026, https://atekatehnik.web.indotrading.com/about
 CV Ateka Tehnik Kab. Karanganyar , Jawa Tengah Profil , Telepon, Alamat, diakses Maret 30, 2026, https://www.indotrading.com/atekatehnik
 PT Aneka Teknik Konstruksi Profil & Karir terbaru Maret 2026 | Loker.id, diakses Maret 30, 2026, https://www.loker.id/profile/pt-aneka-teknik-konstruksi
-CV Ateka Tehnik: Supplier Penggilingan padi | Kab. Karanganyar, diakses Maret 30, 2026, https://atekatehnik.web.indotrading.com/
-Daftar Importir, Toko, Distributor, Pabrik, Supplier Mesin Giling Padi Indonesia Maret 2026, diakses Maret 30, 2026, https://www.indotrading.com/company_mesin-giling-padi_17552/
+CV Ateka Tehnik: Manufaktur Penggilingan padi | Kab. Karanganyar, diakses Maret 30, 2026, https://atekatehnik.web.indotrading.com/
+Daftar Importir, Toko, Distributor, Pabrik, Manufaktur Mesin Giling Padi Indonesia Maret 2026, diakses Maret 30, 2026, https://www.indotrading.com/company_mesin-giling-padi_17552/
 Rice Milling Dan Elevator mesin pengolah padi - CV Ateka Tehnik - Kab. Karanganyar , Jawa Tengah | Indotrading, diakses Maret 30, 2026, https://www.indotrading.com/atekatehnik/rice-milling-dan-elevator-p833386.aspx
 Mesin Penggilingan Padi (mesin pengolah padi) - CV Ateka Tehnik - Kab. Karanganyar , Jawa Tengah | Indotrading, diakses Maret 30, 2026, https://www.indotrading.com/atekatehnik/mesin-penggilingan-padi-rice-milling-p833380.aspx

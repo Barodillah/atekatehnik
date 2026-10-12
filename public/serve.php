@@ -16,7 +16,7 @@ if ($html === false) {
     die('Frontend not ready. Please run build or check index.html');
 }
 
-$title = "ATEKA TEHNIK | Supplier Penggilingan Padi Terbaik di Indonesia";
+$title = "ATEKA TEHNIK | Manufaktur Penggilingan Padi Terbaik di Indonesia";
 $description = "ATEKA TEHNIK menyediakan solusi modernisasi penggilingan padi dengan teknologi terbaru untuk meningkatkan efisiensi, kualitas beras, dan hasil produksi.";
 $image = "https://atekatehnik.com/preview.jpg";
 
@@ -29,7 +29,7 @@ $pageSchemaType = 'WebPage'; // Default fallback
 
 switch ($baseUri) {
     case '/':
-        $title = "ATEKA TEHNIK | Supplier Penggilingan Padi Terbaik di Indonesia";
+        $title = "ATEKA TEHNIK | Manufaktur Penggilingan Padi Terbaik di Indonesia";
         $pageSchemaType = 'WebSite';
         break;
     case '/products':

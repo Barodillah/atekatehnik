@@ -9,7 +9,23 @@ const DashboardLayout = () => {
 
   const [isEntryModalOpen, setEntryModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(() => {
+    try {
+      return localStorage.getItem('admin_sidebar_minimized') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Salary Dropdown State
+  const [isSalaryOpen, setIsSalaryOpen] = useState(() => location.pathname.startsWith('/admin/salary'));
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin/salary')) {
+      setIsSalaryOpen(true);
+    }
+  }, [location.pathname]);
+
   // Database Lockdown State
   const [dbLockdown, setDbLockdown] = useState(null);
 
@@ -208,7 +224,13 @@ const DashboardLayout = () => {
   };
 
   const getLinkClasses = (path) => {
-    return isActive(path)
+    const active = isActive(path);
+    if (isSidebarMinimized) {
+      return active
+        ? "flex items-center justify-start lg:justify-center gap-3 lg:gap-0 px-4 lg:px-0 py-3 bg-blue-900 text-orange-400 rounded-sm border-l-4 border-orange-400 transition-all duration-150 cursor-pointer"
+        : "flex items-center justify-start lg:justify-center gap-3 lg:gap-0 px-4 lg:px-0 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 rounded-sm transition-all duration-200 cursor-pointer";
+    }
+    return active
       ? "flex items-center gap-3 px-4 py-3 bg-blue-900 text-orange-400 rounded-sm border-l-4 border-orange-400 scale-95 duration-150 cursor-pointer"
       : "flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-blue-900/50 transition-all duration-200 cursor-pointer";
   };
@@ -232,94 +254,225 @@ const DashboardLayout = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`print:hidden h-screen w-64 fixed left-0 top-0 z-50 bg-blue-950 border-r border-blue-900/50 shadow-2xl flex flex-col py-6 font-inter text-sm font-medium tracking-wide transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="px-6 mb-8 mt-2 lg:mt-0 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase hidden lg:block">Industrial Admin</h1>
-            <p className="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1 hidden lg:block">Engineering Precision</p>
-            <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase block lg:hidden">Ateka Tehnik</h1>
-            <p className="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1 block lg:hidden">Industrial Admin</p>
-          </div>
+      {/* Sidebar */}
+      <aside className={`print:hidden h-screen fixed left-0 top-0 z-50 bg-blue-950 border-r border-blue-900/50 shadow-2xl flex flex-col py-6 font-inter text-sm font-medium tracking-wide transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${isSidebarMinimized ? 'w-64 lg:w-20' : 'w-64'}`}>
+        <div className={`mb-8 mt-2 lg:mt-0 flex items-center transition-all duration-300 ${isSidebarMinimized ? 'px-6 lg:px-0 lg:justify-center' : 'px-6 justify-between'}`}>
+          {isSidebarMinimized ? (
+            <>
+              <div className="hidden lg:flex flex-col items-center justify-center" title="Ateka Tehnik - Industrial Admin">
+                <span className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 font-black text-sm tracking-tighter shadow-inner">
+                  AT
+                </span>
+              </div>
+              <div className="block lg:hidden">
+                <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase">Ateka Tehnik</h1>
+                <p className="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1">Industrial Admin</p>
+              </div>
+            </>
+          ) : (
+            <div>
+              <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase hidden lg:block">Industrial Admin</h1>
+              <p className="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1 hidden lg:block">Engineering Precision</p>
+              <h1 className="text-lg font-extrabold text-white tracking-tighter uppercase block lg:hidden">Ateka Tehnik</h1>
+              <p className="text-[10px] text-orange-400/80 uppercase tracking-widest mt-1 block lg:hidden">Industrial Admin</p>
+            </div>
+          )}
           <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-slate-400 hover:text-white cursor-pointer p-1">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
-        <div className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin')} to="/admin">
-            <span className="material-symbols-outlined">dashboard</span>
-            <span>Dashboard</span>
+
+        <div className={`flex-1 space-y-1 overflow-y-auto custom-scrollbar transition-all duration-300 ${isSidebarMinimized ? 'px-4 lg:px-2' : 'px-4'}`}>
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin')} to="/admin" title="Dashboard">
+            <span className="material-symbols-outlined shrink-0 text-xl">dashboard</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Dashboard</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/leads')} to="/admin/leads">
-            <span className="material-symbols-outlined">person_search</span>
-            <span>Customer Leads</span>
-            {counts.leads > 0 && <span className="ml-auto bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{counts.leads}</span>}
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/leads')} to="/admin/leads" title="Customer Leads">
+            <div className="relative flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-xl">person_search</span>
+              {counts.leads > 0 && isSidebarMinimized && (
+                <span className="hidden lg:flex absolute -top-1.5 -right-2 bg-orange-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full items-center justify-center ring-2 ring-blue-950">
+                  {counts.leads > 9 ? '9+' : counts.leads}
+                </span>
+              )}
+            </div>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Customer Leads</span>
+            {counts.leads > 0 && (
+              <span className={`ml-auto bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${isSidebarMinimized ? 'block lg:hidden' : 'block'}`}>
+                {counts.leads}
+              </span>
+            )}
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/rab')} to="/admin/rab">
-            <span className="material-symbols-outlined">request_quote</span>
-            <span>RAB Maker</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/rab')} to="/admin/rab" title="RAB Maker">
+            <span className="material-symbols-outlined shrink-0 text-xl">request_quote</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>RAB Maker</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/products')} to="/admin/products">
-            <span className="material-symbols-outlined">precision_manufacturing</span>
-            <span>Product Management</span>
+
+          {/* Salary Dropdown Menu */}
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setIsSalaryOpen((prev) => !prev)}
+              className={`w-full ${getLinkClasses('/admin/salary')} justify-between`}
+              title="Salary"
+            >
+              <div className={`flex items-center ${isSidebarMinimized ? 'gap-3 lg:gap-0' : 'gap-3'}`}>
+                <span className="material-symbols-outlined shrink-0 text-xl">payments</span>
+                <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Salary</span>
+              </div>
+              <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${isSalaryOpen ? 'rotate-180' : ''} ${isSidebarMinimized ? "block lg:hidden" : "block"}`}>
+                expand_more
+              </span>
+            </button>
+
+            {isSalaryOpen && (
+              <div className={`space-y-1 ${isSidebarMinimized ? 'pl-2 lg:pl-0' : 'pl-2'}`}>
+                <Link
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  to="/admin/salary/periods"
+                  className={
+                    isActive('/admin/salary/periods')
+                      ? `flex items-center ${isSidebarMinimized ? 'gap-2.5 pl-6 lg:pl-0 lg:justify-center' : 'gap-2.5 pl-6'} pr-3 lg:pr-0 py-2 text-xs font-semibold text-orange-400 bg-blue-900/60 border-l-2 border-orange-400 rounded-sm transition-all`
+                      : `flex items-center ${isSidebarMinimized ? 'gap-2.5 pl-6 lg:pl-0 lg:justify-center' : 'gap-2.5 pl-6'} pr-3 lg:pr-0 py-2 text-xs text-slate-300 hover:text-white hover:bg-blue-900/40 rounded-sm transition-all`
+                  }
+                  title="Period"
+                >
+                  <span className="material-symbols-outlined text-base shrink-0">date_range</span>
+                  <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Period</span>
+                </Link>
+
+                <Link
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  to="/admin/salary/employees"
+                  className={
+                    isActive('/admin/salary/employees')
+                      ? `flex items-center ${isSidebarMinimized ? 'gap-2.5 pl-6 lg:pl-0 lg:justify-center' : 'gap-2.5 pl-6'} pr-3 lg:pr-0 py-2 text-xs font-semibold text-orange-400 bg-blue-900/60 border-l-2 border-orange-400 rounded-sm transition-all`
+                      : `flex items-center ${isSidebarMinimized ? 'gap-2.5 pl-6 lg:pl-0 lg:justify-center' : 'gap-2.5 pl-6'} pr-3 lg:pr-0 py-2 text-xs text-slate-300 hover:text-white hover:bg-blue-900/40 rounded-sm transition-all`
+                  }
+                  title="Employee"
+                >
+                  <span className="material-symbols-outlined text-base shrink-0">badge</span>
+                  <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Employee</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/products')} to="/admin/products" title="Product Management">
+            <span className="material-symbols-outlined shrink-0 text-xl">precision_manufacturing</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Product Management</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/posts')} to="/admin/posts">
-            <span className="material-symbols-outlined">edit_note</span>
-            <span>Blog Posts</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/posts')} to="/admin/posts" title="Blog Posts">
+            <span className="material-symbols-outlined shrink-0 text-xl">edit_note</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Blog Posts</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/gallery')} to="/admin/gallery">
-            <span className="material-symbols-outlined">collections</span>
-            <span>Gallery</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/gallery')} to="/admin/gallery" title="Gallery">
+            <span className="material-symbols-outlined shrink-0 text-xl">collections</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Gallery</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/comments')} to="/admin/comments">
-            <span className="material-symbols-outlined">forum</span>
-            <span>Comments</span>
-            {counts.comments > 0 && <span className="ml-auto bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{counts.comments}</span>}
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/comments')} to="/admin/comments" title="Comments">
+            <div className="relative flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-xl">forum</span>
+              {counts.comments > 0 && isSidebarMinimized && (
+                <span className="hidden lg:flex absolute -top-1.5 -right-2 bg-amber-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full items-center justify-center ring-2 ring-blue-950">
+                  {counts.comments > 9 ? '9+' : counts.comments}
+                </span>
+              )}
+            </div>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Comments</span>
+            {counts.comments > 0 && (
+              <span className={`ml-auto bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${isSidebarMinimized ? 'block lg:hidden' : 'block'}`}>
+                {counts.comments}
+              </span>
+            )}
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/chat-history')} to="/admin/chat-history">
-            <span className="material-symbols-outlined">smart_toy</span>
-            <span>Chat History</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/chat-history')} to="/admin/chat-history" title="Chat History">
+            <span className="material-symbols-outlined shrink-0 text-xl">smart_toy</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Chat History</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/analytics')} to="/admin/analytics">
-            <span className="material-symbols-outlined">monitoring</span>
-            <span>Analytics</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/analytics')} to="/admin/analytics" title="Analytics">
+            <span className="material-symbols-outlined shrink-0 text-xl">monitoring</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Analytics</span>
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/wa-clicks')} to="/admin/wa-clicks">
-            <span className="material-symbols-outlined">ads_click</span>
-            <span>WA Clicks</span>
-            {counts.waClicks > 0 && <span className="ml-auto bg-green-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{counts.waClicks}</span>}
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/wa-clicks')} to="/admin/wa-clicks" title="WA Clicks">
+            <div className="relative flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-xl">ads_click</span>
+              {counts.waClicks > 0 && isSidebarMinimized && (
+                <span className="hidden lg:flex absolute -top-1.5 -right-2 bg-green-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full items-center justify-center ring-2 ring-blue-950">
+                  {counts.waClicks > 9 ? '9+' : counts.waClicks}
+                </span>
+              )}
+            </div>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>WA Clicks</span>
+            {counts.waClicks > 0 && (
+              <span className={`ml-auto bg-green-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${isSidebarMinimized ? 'block lg:hidden' : 'block'}`}>
+                {counts.waClicks}
+              </span>
+            )}
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/logs')} to="/admin/logs">
-            <span className="material-symbols-outlined">history</span>
-            <span>Activity Logs</span>
+
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/logs')} to="/admin/logs" title="Activity Logs">
+            <span className="material-symbols-outlined shrink-0 text-xl">history</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Activity Logs</span>
           </Link>
         </div>
-        <div className="mt-auto px-4 pt-4 border-t border-blue-900/30">
+
+        <div className={`mt-auto pt-4 border-t border-blue-900/30 transition-all duration-300 ${isSidebarMinimized ? 'px-4 lg:px-2' : 'px-4'}`}>
           <button
             onClick={() => { setIsMobileMenuOpen(false); setEntryModalOpen(true); }}
-            className="w-full bg-orange-400 text-blue-950 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-colors mb-4 cursor-pointer"
+            className={`w-full bg-orange-400 text-blue-950 rounded-sm font-bold transition-colors mb-4 cursor-pointer flex items-center justify-center hover:bg-orange-500 ${isSidebarMinimized ? 'py-2 lg:h-10 lg:w-10 lg:mx-auto lg:p-0' : 'py-2 text-xs uppercase tracking-widest'}`}
+            title="New Entry"
           >
-            New Entry
+            <span className="material-symbols-outlined text-lg">add</span>
+            <span className={isSidebarMinimized ? 'block lg:hidden ml-1 uppercase text-xs tracking-widest' : 'ml-1 uppercase text-xs tracking-widest'}>
+              New Entry
+            </span>
           </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white text-xs transition-colors cursor-pointer"
+            className={`w-full flex items-center text-slate-400 hover:text-white text-xs transition-colors cursor-pointer ${isSidebarMinimized ? 'px-4 py-2 lg:px-0 lg:justify-center' : 'gap-3 px-4 py-2'}`}
+            title="Sign Out"
           >
-            <span className="material-symbols-outlined text-sm">logout</span>
-            <span>Sign Out</span>
+            <span className="material-symbols-outlined text-base">logout</span>
+            <span className={isSidebarMinimized ? 'block lg:hidden ml-3' : ''}>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Wrapper */}
-      <main className="ml-0 lg:ml-64 print:ml-0 print:p-0 flex-1 flex flex-col min-h-screen transition-all duration-300">
+      <main className={`ml-0 print:ml-0 print:p-0 flex-1 min-w-0 flex flex-col min-h-screen transition-all duration-300 ${isSidebarMinimized ? 'lg:ml-20' : 'lg:ml-64'}`}>
         {/* Topbar */}
         <header className="print:hidden w-full h-16 sticky top-0 z-30 bg-slate-50 shadow-sm flex justify-between items-center px-4 lg:px-6 font-manrope tracking-tight">
           <div className="flex items-center gap-2 lg:gap-4 flex-1 min-w-0">
             <button 
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1 lg:hidden text-slate-500 hover:text-primary transition-colors cursor-pointer shrink-0"
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  setIsMobileMenuOpen(prev => !prev);
+                } else {
+                  setIsSidebarMinimized(prev => {
+                    const next = !prev;
+                    try {
+                      localStorage.setItem('admin_sidebar_minimized', String(next));
+                    } catch { /* silent */ }
+                    return next;
+                  });
+                }
+              }}
+              className="p-1.5 text-slate-500 hover:text-blue-900 hover:bg-slate-200/60 rounded-lg transition-colors cursor-pointer shrink-0 flex items-center justify-center"
+              title={isSidebarMinimized ? "Perluas Sidebar" : "Perkecil Sidebar"}
+              aria-label="Toggle Sidebar"
             >
-              <span className="material-symbols-outlined text-2xl">menu</span>
+              <span className="material-symbols-outlined text-2xl">
+                {isSidebarMinimized ? 'menu_open' : 'menu'}
+              </span>
             </button>
             <span className="text-xl font-bold text-blue-900 uppercase hidden lg:block shrink-0">Ateka Tehnik</span>
             <div className="hidden lg:block h-8 w-px bg-slate-200 mx-2 shrink-0"></div>

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 const BASE_TITLE = 'ATEKA TEHNIK';
-const DEFAULT_SUFFIX = 'Supplier Penggilingan Padi Terbaik di Indonesia';
+const DEFAULT_SUFFIX = 'Manufaktur Penggilingan Padi Terbaik di Indonesia';
 
 /**
  * Sets document.title dynamically for SEO.

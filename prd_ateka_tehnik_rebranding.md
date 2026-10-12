@@ -24,7 +24,7 @@ Secondary CTA (Button): Lihat Katalog E-LKPP (White/Outline)
 
 B. Section 2: Trust Bar (Logos)
 Teks Pengantar: Didukung oleh Mitra Strategis & Bersertifikasi Nasional
-Elemen: LKPP E-Katalog, Yanmar, Satake, Verified Diamond Supplier Indotrading.
+Elemen: LKPP E-Katalog, Yanmar, Satake, Verified Diamond Manufaktur Indotrading.
 
 C. Section 3: Tiered Solutions (Product Grid)
 Card 1: Paket Industri Menengah (1-2 Ton/Jam) - Optimalkan Produksi Harian Anda.
