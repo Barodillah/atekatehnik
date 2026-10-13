@@ -1,155 +1,89 @@
 /**
- * Salary Storage & Service
- * Handles localStorage persistence, initial mock seeding, calculations,
- * and data manipulation for Employees, Periods, and Salary Attendance Records.
+ * Salary Storage & Service — Connected to ateka_internal
+ * Handles local caching, background synchronization with isolated MySQL backend,
+ * calculation engines, and data operations for Departments, Employees, Periods, and Records.
  */
 
+import salaryApi, {
+  formatNumberComma,
+  formatCurrencyRp,
+  calculateSalaryRow,
+} from './salaryApi';
+
+export { formatNumberComma, formatCurrencyRp, calculateSalaryRow };
+
 const STORAGE_KEYS = {
-  EMPLOYEES: 'ateka_salary_employees',
-  PERIODS: 'ateka_salary_periods',
-  RECORDS: 'ateka_salary_records',
-  DEPARTMENTS: 'ateka_salary_departments',
+  EMPLOYEES: 'ateka_salary_employees_v2',
+  PERIODS: 'ateka_salary_periods_v2',
+  RECORDS: 'ateka_salary_records_v2',
+  DEPARTMENTS: 'ateka_salary_departments_v2',
 };
 
-// Initial Employees seed
-const DEFAULT_EMPLOYEES = [
-  {
-    id: 'EMP-001',
-    id_absen: '101',
-    name: 'ERWIN SASONGKO',
-    department: 'PRODUKSI',
-    daily_salary: 150000,
-    trip_allowance: 250000,
-    is_active: true,
-  },
-  {
-    id: 'EMP-002',
-    id_absen: '102',
-    name: 'BAMBANG SUTRISNO',
-    department: 'PENGELASAN',
-    daily_salary: 150000,
-    trip_allowance: 250000,
-    is_active: true,
-  },
-  {
-    id: 'EMP-003',
-    id_absen: '103',
-    name: 'AGUS SETIAWAN',
-    department: 'BUBUT & CNC',
-    daily_salary: 160000,
-    trip_allowance: 250000,
-    is_active: true,
-  },
-  {
-    id: 'EMP-004',
-    id_absen: '104',
-    name: 'TRI WAHYUDI',
-    department: 'PRODUKSI',
-    daily_salary: 140000,
-    trip_allowance: 200000,
-    is_active: true,
-  },
-  {
-    id: 'EMP-005',
-    id_absen: '105',
-    name: 'DEDI KURNIAWAN',
-    department: 'LOGISTIK & TEKNISI',
-    daily_salary: 150000,
-    trip_allowance: 250000,
-    is_active: true,
-  },
-];
-
-// Initial Period seed
-const DEFAULT_PERIODS = [
-  {
-    id: 'PER-202610-W2',
-    period_name: 'OKTOBER 2026 - Minggu ke 2',
-    start_date: '2026-10-05',
-    end_date: '2026-10-10',
-    work_days: 6,
-    status: 'Draft',
-    notes: 'Periode penggajian reguler minggu ke-2 Oktober 2026',
-    created_at: new Date().toISOString(),
-  },
-];
-
-// Initial Attendance & Salary Records seed (matches reference screenshot!)
-const DEFAULT_RECORDS = [
-  {
-    id: 'REC-PER-202610-W2-EMP-001',
-    period_id: 'PER-202610-W2',
-    employee_id: 'EMP-001',
-    id_absen: '101',
-    name: 'ERWIN SASONGKO',
-    department: 'PRODUKSI',
-    business_trip_days: 0,
-    workshop_days: 5.5,
-    leave_days: 0.5,
-    rate_daily_salary: 150000,
-    rate_trip_allowance: 250000,
-    base_salary: 825000,
-    trip_allowance_total: 0,
-    salary_subtotal: 825000,
-    extra_income_notes: 'EVI',
-    extra_income_amount: 50000,
-    net_income: 875000,
-  },
-  {
-    id: 'REC-PER-202610-W2-EMP-002',
-    period_id: 'PER-202610-W2',
-    employee_id: 'EMP-002',
-    id_absen: '102',
-    name: 'BAMBANG SUTRISNO',
-    department: 'PENGELASAN',
-    business_trip_days: 2,
-    workshop_days: 4,
-    leave_days: 0,
-    rate_daily_salary: 150000,
-    rate_trip_allowance: 250000,
-    base_salary: 600000,
-    trip_allowance_total: 500000,
-    salary_subtotal: 1100000,
-    extra_income_notes: 'Lembur Perakitan',
-    extra_income_amount: 75000,
-    net_income: 1175000,
-  },
-  {
-    id: 'REC-PER-202610-W2-EMP-003',
-    period_id: 'PER-202610-W2',
-    employee_id: 'EMP-003',
-    id_absen: '103',
-    name: 'AGUS SETIAWAN',
-    department: 'BUBUT & CNC',
-    business_trip_days: 0,
-    workshop_days: 6,
-    leave_days: 0,
-    rate_daily_salary: 160000,
-    rate_trip_allowance: 250000,
-    base_salary: 960000,
-    trip_allowance_total: 0,
-    salary_subtotal: 960000,
-    extra_income_notes: '',
-    extra_income_amount: 0,
-    net_income: 960000,
-  },
-];
-
-// Standard default departments in Ateka Tehnik
+// 8 Departemen Resmi CV Ateka Tehnik
 export const DEFAULT_DEPARTMENTS = [
+  'KEUANGAN',
+  'DIREKTUR',
+  'ADMIN',
   'PRODUKSI',
-  'PENGELASAN',
-  'BUBUT & CNC',
-  'LOGISTIK & TEKNISI',
-  'ADMINISTRASI',
-  'FINANCE',
-  'QUALITY CONTROL',
+  'HELPER',
+  'CHEF',
+  'PENJUALAN',
+  'PKL',
 ];
 
-// Backwards compatibility export
 export const DEPARTMENTS = DEFAULT_DEPARTMENTS;
 
-// Get departments from localStorage or default
+// 24 Master Karyawan Awal (ATK-001 s/d ATK-024)
+export const DEFAULT_EMPLOYEES = [
+  { id: 1, employee_code: 'ATK-001', id_absen: '1', name: 'BARRONSAVE', department: 'KEUANGAN', daily_salary: 100000, trip_allowance: 0, is_active: true },
+  { id: 2, employee_code: 'ATK-002', id_absen: '2', name: 'WARSITO', department: 'DIREKTUR', daily_salary: 0, trip_allowance: 0, is_active: true },
+  { id: 3, employee_code: 'ATK-003', id_absen: '3', name: 'INSANI', department: 'ADMIN', daily_salary: 100000, trip_allowance: 0, is_active: true },
+  { id: 4, employee_code: 'ATK-004', id_absen: '4', name: 'WARSITO', department: 'PRODUKSI', daily_salary: 165000, trip_allowance: 0, is_active: true },
+  { id: 5, employee_code: 'ATK-005', id_absen: '5', name: 'MULYOTO', department: 'PRODUKSI', daily_salary: 175000, trip_allowance: 300000, is_active: true },
+  { id: 6, employee_code: 'ATK-006', id_absen: '6', name: 'SAMSUNRUDIN', department: 'PRODUKSI', daily_salary: 155000, trip_allowance: 250000, is_active: true },
+  { id: 7, employee_code: 'ATK-007', id_absen: '7', name: 'DIKI PURWOKO', department: 'PRODUKSI', daily_salary: 155000, trip_allowance: 250000, is_active: true },
+  { id: 8, employee_code: 'ATK-008', id_absen: '8', name: 'WINARNO', department: 'PRODUKSI', daily_salary: 155000, trip_allowance: 250000, is_active: true },
+  { id: 9, employee_code: 'ATK-009', id_absen: '9', name: 'ERWIN SASONGKO', department: 'PRODUKSI', daily_salary: 150000, trip_allowance: 250000, is_active: true },
+  { id: 10, employee_code: 'ATK-010', id_absen: '10', name: 'REBO MURYANTO', department: 'HELPER', daily_salary: 100000, trip_allowance: 0, is_active: true },
+  { id: 11, employee_code: 'ATK-011', id_absen: '11', name: 'KRISTIANTO', department: 'PRODUKSI', daily_salary: 130000, trip_allowance: 225000, is_active: true },
+  { id: 12, employee_code: 'ATK-012', id_absen: '12', name: 'SAMIDI', department: 'PRODUKSI', daily_salary: 110000, trip_allowance: 0, is_active: true },
+  { id: 13, employee_code: 'ATK-013', id_absen: '13', name: 'AMIR ROSYID', department: 'PRODUKSI', daily_salary: 110000, trip_allowance: 200000, is_active: true },
+  { id: 14, employee_code: 'ATK-014', id_absen: '14', name: 'ANJAS', department: 'PRODUKSI', daily_salary: 100000, trip_allowance: 0, is_active: true },
+  { id: 15, employee_code: 'ATK-015', id_absen: '15', name: 'RISKI FAJAR S', department: 'PRODUKSI', daily_salary: 100000, trip_allowance: 200000, is_active: true },
+  { id: 16, employee_code: 'ATK-016', id_absen: '16', name: 'SURADI', department: 'PRODUKSI', daily_salary: 130000, trip_allowance: 225000, is_active: true },
+  { id: 17, employee_code: 'ATK-017', id_absen: '17', name: 'SOLIKHUL ANAM', department: 'HELPER', daily_salary: 150000, trip_allowance: 300000, is_active: true },
+  { id: 18, employee_code: 'ATK-018', id_absen: '18', name: 'SUKISMAN', department: 'PRODUKSI', daily_salary: 130000, trip_allowance: 0, is_active: true },
+  { id: 19, employee_code: 'ATK-019', id_absen: '19', name: 'DANI  S', department: 'PRODUKSI', daily_salary: 100000, trip_allowance: 200000, is_active: true },
+  { id: 20, employee_code: 'ATK-020', id_absen: '20', name: 'NAFI N H', department: 'PRODUKSI', daily_salary: 150000, trip_allowance: 300000, is_active: true },
+  { id: 21, employee_code: 'ATK-021', id_absen: '21', name: 'RISKI KINTIL', department: 'PRODUKSI', daily_salary: 80000, trip_allowance: 150000, is_active: true },
+  { id: 22, employee_code: 'ATK-022', id_absen: '22', name: 'LESTARI', department: 'CHEF', daily_salary: 41666, trip_allowance: 0, is_active: true },
+  { id: 23, employee_code: 'ATK-023', id_absen: '23', name: 'KUNTUM INDAH', department: 'PENJUALAN', daily_salary: 100000, trip_allowance: 0, is_active: true },
+  { id: 24, employee_code: 'ATK-024', id_absen: '24', name: 'SHENDI', department: 'PRODUKSI', daily_salary: 80000, trip_allowance: 0, is_active: true },
+];
+
+export const DEFAULT_PERIODS = [];
+export const DEFAULT_RECORDS = [];
+
+// Inisialisasi sinkronisasi otomatis dari database `ateka_internal`
+try {
+  salaryApi.getDepartments().then((depts) => {
+    if (depts && depts.length > 0) {
+      const names = depts.map((d) => d.name);
+      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(names));
+    }
+  }).catch(() => {});
+
+  salaryApi.getEmployees().then((emps) => {
+    if (emps && emps.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(emps));
+    }
+  }).catch(() => {});
+} catch (e) {
+  // Silent catch
+}
+
+/* ---------------- DEPARTEMEN CRUD ---------------- */
+
 export const getDepartments = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
@@ -158,41 +92,45 @@ export const getDepartments = () => {
       return DEFAULT_DEPARTMENTS;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_DEPARTMENTS;
+    if (!Array.isArray(parsed) || parsed.length === 0 || parsed.includes('PENGELASAN')) {
+      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(DEFAULT_DEPARTMENTS));
+      return DEFAULT_DEPARTMENTS;
+    }
+    return parsed;
   } catch (e) {
     console.error('Failed to get departments', e);
     return DEFAULT_DEPARTMENTS;
   }
 };
 
-// Save departments to localStorage
 export const saveDepartments = (depts) => {
   localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(depts));
   return depts;
 };
 
-// Add new department
 export const addDepartment = (name) => {
   const trimmed = (name || '').trim().toUpperCase();
-  if (!trimmed) {
-    throw new Error('Nama kategori / departemen tidak boleh kosong');
-  }
+  if (!trimmed) throw new Error('Nama kategori / departemen tidak boleh kosong');
   const current = getDepartments();
   if (current.some((d) => d.toUpperCase() === trimmed)) {
     throw new Error(`Departemen "${trimmed}" sudah terdaftar`);
   }
   const updated = [...current, trimmed];
   saveDepartments(updated);
+
+  // Sync ke MySQL backend
+  salaryApi.addDepartment(trimmed).catch((err) => {
+    console.error('Error syncing addDepartment to backend:', err);
+  });
+
   return updated;
 };
 
-// Update department name with cascade update to employees and records
 export const updateDepartment = (oldName, newName) => {
   const trimmedOld = (oldName || '').trim();
   const trimmedNew = (newName || '').trim().toUpperCase();
-  if (!trimmedNew) {
-    throw new Error('Nama kategori baru tidak boleh kosong');
-  }
+  if (!trimmedNew) throw new Error('Nama kategori baru tidak boleh kosong');
+
   const current = getDepartments();
   if (
     trimmedOld.toUpperCase() !== trimmedNew &&
@@ -200,115 +138,45 @@ export const updateDepartment = (oldName, newName) => {
   ) {
     throw new Error(`Kategori "${trimmedNew}" sudah terdaftar`);
   }
+
   const updated = current.map((d) => (d === trimmedOld ? trimmedNew : d));
   saveDepartments(updated);
 
-  // Cascade rename to employees in storage
-  try {
-    const employees = getEmployees();
-    let empChanged = false;
-    const updatedEmployees = employees.map((emp) => {
-      if (emp.department === trimmedOld) {
-        empChanged = true;
-        return { ...emp, department: trimmedNew };
-      }
-      return emp;
-    });
-    if (empChanged) {
-      localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(updatedEmployees));
+  // Sync ke MySQL backend
+  salaryApi.getDepartments().then((list) => {
+    const target = list.find((d) => d.name === trimmedOld);
+    if (target) {
+      salaryApi.updateDepartment(target.id, trimmedNew);
     }
-  } catch (e) {
-    console.error('Error cascading department update to employees', e);
-  }
-
-  // Cascade rename to records in storage
-  try {
-    const records = getAllRecords();
-    let recChanged = false;
-    const updatedRecords = records.map((rec) => {
-      if (rec.department === trimmedOld) {
-        recChanged = true;
-        return { ...rec, department: trimmedNew };
-      }
-      return rec;
-    });
-    if (recChanged) {
-      localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(updatedRecords));
-    }
-  } catch (e) {
-    console.error('Error cascading department update to records', e);
-  }
+  }).catch((err) => {
+    console.error('Error syncing updateDepartment to backend:', err);
+  });
 
   return updated;
 };
 
-// Delete department
 export const deleteDepartment = (name) => {
   const trimmed = (name || '').trim();
   const current = getDepartments();
   const updated = current.filter((d) => d !== trimmed);
   saveDepartments(updated);
+
+  // Sync ke MySQL backend
+  salaryApi.getDepartments().then((list) => {
+    const target = list.find((d) => d.name === trimmed);
+    if (target) {
+      salaryApi.deleteDepartment(target.id);
+    }
+  }).catch((err) => {
+    console.error('Error syncing deleteDepartment to backend:', err);
+  });
+
   return updated;
 };
 
-// Reset departments to default
 export const resetDepartments = () => {
   saveDepartments(DEFAULT_DEPARTMENTS);
   return DEFAULT_DEPARTMENTS;
-};
-
-// Helper: Format Rupiah number with commas (e.g. 825000 -> "825,000")
-export const formatNumberComma = (val) => {
-  if (val === null || val === undefined || isNaN(val)) return '0';
-  return Number(val).toLocaleString('en-US');
-};
-
-// Helper: Format Rupiah with prefix (e.g. 875000 -> "Rp875,000")
-export const formatCurrencyRp = (val) => {
-  return `Rp${formatNumberComma(val)}`;
-};
-
-// Calculation engine for a salary record
-export const calculateSalaryRow = (row, totalPeriodDays = null) => {
-  const workshopDays = parseFloat(row.workshop_days) || 0;
-  const businessTripDays = parseFloat(row.business_trip_days) || 0;
-
-  // Total hari standar (default 6, diambil dari setting periode) - (hari perjalanan + hadir bengkel)
-  let standardWorkDays = 6;
-  if (totalPeriodDays !== null && totalPeriodDays !== undefined) {
-    standardWorkDays = parseFloat(totalPeriodDays) || 6;
-  } else if (row.standard_work_days !== undefined && row.standard_work_days !== null) {
-    standardWorkDays = parseFloat(row.standard_work_days) || 6;
-  } else if (row.period_work_days !== undefined && row.period_work_days !== null) {
-    standardWorkDays = parseFloat(row.period_work_days) || 6;
-  }
-
-  // Cuti otomatis: Total hari - (Perjalanan bisnis + Hadir bengkel)
-  const autoLeaveDays = Math.max(0, Math.round((standardWorkDays - (businessTripDays + workshopDays)) * 100) / 100);
-
-  const rateDaily = parseFloat(row.rate_daily_salary) || 0;
-  const rateTrip = parseFloat(row.rate_trip_allowance) || 0;
-  const extraIncome = parseFloat(row.extra_income_amount) || 0;
-
-  const baseSalary = Math.round(workshopDays * rateDaily);
-  const tripAllowanceTotal = Math.round(businessTripDays * rateTrip);
-  const salarySubtotal = baseSalary + tripAllowanceTotal;
-  const netIncome = salarySubtotal + extraIncome;
-
-  return {
-    ...row,
-    standard_work_days: standardWorkDays,
-    workshop_days: row.workshop_days !== undefined ? row.workshop_days : workshopDays,
-    business_trip_days: row.business_trip_days !== undefined ? row.business_trip_days : businessTripDays,
-    leave_days: autoLeaveDays,
-    rate_daily_salary: rateDaily,
-    rate_trip_allowance: rateTrip,
-    base_salary: baseSalary,
-    trip_allowance_total: tripAllowanceTotal,
-    salary_subtotal: salarySubtotal,
-    extra_income_amount: row.extra_income_amount !== undefined ? row.extra_income_amount : extraIncome,
-    net_income: netIncome,
-  };
 };
 
 /* ---------------- EMPLOYEE CRUD ---------------- */
@@ -320,7 +188,12 @@ export const getEmployees = () => {
       localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(DEFAULT_EMPLOYEES));
       return DEFAULT_EMPLOYEES;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length < 10 || parsed.some((e) => String(e.employee_code || e.id).startsWith('EMP-'))) {
+      localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(DEFAULT_EMPLOYEES));
+      return DEFAULT_EMPLOYEES;
+    }
+    return parsed;
   } catch (e) {
     console.error('Failed to get employees', e);
     return DEFAULT_EMPLOYEES;
@@ -333,14 +206,26 @@ export const saveEmployee = (employee) => {
   if (employee.id) {
     updated = employees.map((e) => (e.id === employee.id ? { ...e, ...employee } : e));
   } else {
+    const nextCode = `ATK-${String(employees.length + 1).padStart(3, '0')}`;
     const newEmp = {
       ...employee,
-      id: `EMP-${Date.now().toString().slice(-4)}`,
+      id: Date.now(),
+      employee_code: employee.employee_code || nextCode,
       is_active: employee.is_active !== undefined ? employee.is_active : true,
     };
     updated = [...employees, newEmp];
   }
   localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(updated));
+
+  // Sync ke MySQL backend
+  salaryApi.saveEmployee(employee).then(() => {
+    salaryApi.getEmployees().then((fresh) => {
+      localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(fresh));
+    });
+  }).catch((err) => {
+    console.error('Error syncing saveEmployee to backend:', err);
+  });
+
   return updated;
 };
 
@@ -348,6 +233,12 @@ export const deleteEmployee = (id) => {
   const employees = getEmployees();
   const filtered = employees.filter((e) => e.id !== id);
   localStorage.setItem(STORAGE_KEYS.EMPLOYEES, JSON.stringify(filtered));
+
+  // Sync ke MySQL backend
+  salaryApi.deleteEmployee(id).catch((err) => {
+    console.error('Error syncing deleteEmployee to backend:', err);
+  });
+
   return filtered;
 };
 
@@ -357,7 +248,6 @@ export const getPeriods = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.PERIODS);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.PERIODS, JSON.stringify(DEFAULT_PERIODS));
       return DEFAULT_PERIODS;
     }
     return JSON.parse(raw);
@@ -369,7 +259,7 @@ export const getPeriods = () => {
 
 export const getPeriodById = (id) => {
   const periods = getPeriods();
-  return periods.find((p) => p.id === id) || null;
+  return periods.find((p) => String(p.id) === String(id)) || null;
 };
 
 export const savePeriod = (period) => {
@@ -377,46 +267,51 @@ export const savePeriod = (period) => {
   let updated;
   let savedPeriod;
   if (period.id) {
-    updated = periods.map((p) => (p.id === period.id ? { ...p, ...period } : p));
-    savedPeriod = updated.find((p) => p.id === period.id);
+    updated = periods.map((p) => (String(p.id) === String(period.id) ? { ...p, ...period } : p));
+    savedPeriod = updated.find((p) => String(p.id) === String(period.id));
   } else {
     savedPeriod = {
       ...period,
-      id: `PER-${Date.now().toString().slice(-6)}`,
+      id: period.id || Date.now(),
+      period_code: period.period_code || `PER-${new Date().toISOString().slice(0, 7).replace('-', '')}-01`,
       status: period.status || 'Draft',
       created_at: new Date().toISOString(),
     };
     updated = [savedPeriod, ...periods];
-
-    // Automatically initialize records for all active employees
-    initPeriodRecordsFromEmployees(savedPeriod.id, savedPeriod.work_days || 6);
   }
   localStorage.setItem(STORAGE_KEYS.PERIODS, JSON.stringify(updated));
+
+  // Sync ke MySQL backend
+  salaryApi.savePeriod(period).then((resp) => {
+    salaryApi.getPeriods().then((fresh) => {
+      localStorage.setItem(STORAGE_KEYS.PERIODS, JSON.stringify(fresh));
+    });
+  }).catch((err) => {
+    console.error('Error syncing savePeriod to backend:', err);
+  });
+
   return savedPeriod;
 };
 
 export const deletePeriod = (id) => {
   const periods = getPeriods();
-  const filteredPeriods = periods.filter((p) => p.id !== id);
+  const filteredPeriods = periods.filter((p) => String(p.id) !== String(id));
   localStorage.setItem(STORAGE_KEYS.PERIODS, JSON.stringify(filteredPeriods));
 
-  // Also remove records belonging to this period
-  const records = getAllRecords();
-  const filteredRecords = records.filter((r) => r.period_id !== id);
-  localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(filteredRecords));
+  // Sync ke MySQL backend
+  salaryApi.deletePeriod(id).catch((err) => {
+    console.error('Error syncing deletePeriod to backend:', err);
+  });
 
   return filteredPeriods;
 };
 
-/* ---------------- PERIOD ATTENDANCE & SALARY RECORDS ---------------- */
+/* ---------------- PERIOD RECORDS ---------------- */
 
 export const getAllRecords = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.RECORDS);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(DEFAULT_RECORDS));
-      return DEFAULT_RECORDS;
-    }
+    if (!raw) return DEFAULT_RECORDS;
     return JSON.parse(raw);
   } catch (e) {
     console.error('Failed to get records', e);
@@ -426,7 +321,7 @@ export const getAllRecords = () => {
 
 export const getPeriodRecords = (periodId) => {
   const records = getAllRecords();
-  return records.filter((r) => r.period_id === periodId);
+  return records.filter((r) => String(r.period_id) === String(periodId));
 };
 
 export const saveRecord = (record) => {
@@ -434,107 +329,82 @@ export const saveRecord = (record) => {
   const calculated = calculateSalaryRow(record);
   let updated;
   if (calculated.id) {
-    updated = records.map((r) => (r.id === calculated.id ? calculated : r));
+    updated = records.map((r) => (String(r.id) === String(calculated.id) ? calculated : r));
   } else {
-    const newRecord = {
-      ...calculated,
-      id: `REC-${calculated.period_id}-${calculated.employee_id || Date.now().toString().slice(-4)}`,
-    };
-    updated = [...records, newRecord];
+    updated = [...records, calculated];
   }
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(updated));
-  return updated.filter((r) => r.period_id === record.period_id);
+
+  // Sync ke MySQL backend
+  salaryApi.saveRecord(calculated).catch((err) => {
+    console.error('Error syncing saveRecord to backend:', err);
+  });
+
+  return updated.filter((r) => String(r.period_id) === String(record.period_id));
 };
 
 export const deleteRecord = (id) => {
   const records = getAllRecords();
-  const target = records.find((r) => r.id === id);
-  const filtered = records.filter((r) => r.id !== id);
+  const target = records.find((r) => String(r.id) === String(id));
+  const filtered = records.filter((r) => String(r.id) !== String(id));
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(filtered));
-  return target ? filtered.filter((r) => r.period_id === target.period_id) : filtered;
+  return target ? filtered.filter((r) => String(r.period_id) === String(target.period_id)) : filtered;
 };
 
 export const batchSaveRecords = (periodId, rows) => {
   const allRecords = getAllRecords();
-  const otherRecords = allRecords.filter((r) => r.period_id !== periodId);
+  const otherRecords = allRecords.filter((r) => String(r.period_id) !== String(periodId));
   const calculatedRows = rows.map((r) => calculateSalaryRow(r));
   const combined = [...otherRecords, ...calculatedRows];
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(combined));
+
+  // Sync ke MySQL backend
+  salaryApi.batchSaveRecords(periodId, calculatedRows).catch((err) => {
+    console.error('Error syncing batchSaveRecords to backend:', err);
+  });
+
   return calculatedRows;
 };
 
 export const initPeriodRecordsFromEmployees = (periodId, defaultWorkDays = 6) => {
-  const employees = getEmployees().filter((e) => e.is_active !== false);
-  const existingRecords = getPeriodRecords(periodId);
-  const existingEmpIds = new Set(existingRecords.map((r) => r.employee_id));
-
-  const newRows = [];
-  employees.forEach((emp) => {
-    if (!existingEmpIds.has(emp.id)) {
-      const row = calculateSalaryRow({
-        id: `REC-${periodId}-${emp.id}`,
-        period_id: periodId,
-        employee_id: emp.id,
-        id_absen: emp.id_absen || '',
-        name: emp.name,
-        department: emp.department,
-        business_trip_days: 0,
-        workshop_days: defaultWorkDays,
-        leave_days: 0,
-        rate_daily_salary: emp.daily_salary || 150000,
-        rate_trip_allowance: emp.trip_allowance || 250000,
-        extra_income_notes: '',
-        extra_income_amount: 0,
-      });
-      newRows.push(row);
-    }
-  });
-
-  if (newRows.length > 0) {
-    const allRecords = getAllRecords();
-    const updated = [...allRecords, ...newRows];
-    localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(updated));
-    return [...existingRecords, ...newRows];
-  }
-  return existingRecords;
+  // Sync via backend
+  salaryApi.syncNewEmployees(periodId).catch(() => {});
+  return getPeriodRecords(periodId);
 };
 
-export const applyAttendanceToPeriod = (periodId, attendanceRows = []) => {
+export const applyAttendanceToPeriod = (periodId, attendanceRows = [], fileName = 'Import_Absensi.xlsx') => {
   if (!periodId || !attendanceRows || attendanceRows.length === 0) return [];
+  
+  // Kirim ke backend database
+  salaryApi.applyAttendanceToPeriod(periodId, attendanceRows, fileName).catch((err) => {
+    console.error('Error applying attendance to backend:', err);
+  });
+
   const records = getPeriodRecords(periodId);
-  const period = getPeriodById(periodId);
-  const standardDays = period?.work_days || 6;
+  return records;
+};
 
-  // Build lookup map by id_absen and normalized name
-  const byIdAbsen = {};
-  const byName = {};
-  attendanceRows.forEach((row) => {
-    if (row.id_absen) byIdAbsen[row.id_absen.toString().trim()] = row;
-    if (row.name) byName[row.name.toString().trim().toLowerCase()] = row;
-  });
-
-  const updatedRecords = records.map((rec) => {
-    const match =
-      (rec.id_absen && byIdAbsen[rec.id_absen.toString().trim()]) ||
-      (rec.name && byName[rec.name.toString().trim().toLowerCase()]);
-
-    if (match) {
-      const workshopDays = Number(match.days) || 0;
-      return calculateSalaryRow(
-        {
-          ...rec,
-          workshop_days: workshopDays,
-        },
-        standardDays
-      );
-    }
-    return rec;
-  });
-
-  const allRecords = getAllRecords();
-  const otherRecords = allRecords.filter((r) => r.period_id !== periodId);
-  const combined = [...otherRecords, ...updatedRecords];
-  localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(combined));
-
-  return updatedRecords;
+export default {
+  getDepartments,
+  saveDepartments,
+  addDepartment,
+  updateDepartment,
+  deleteDepartment,
+  resetDepartments,
+  getEmployees,
+  saveEmployee,
+  deleteEmployee,
+  getPeriods,
+  getPeriodById,
+  savePeriod,
+  deletePeriod,
+  getPeriodRecords,
+  saveRecord,
+  deleteRecord,
+  batchSaveRecords,
+  initPeriodRecordsFromEmployees,
+  applyAttendanceToPeriod,
+  formatNumberComma,
+  formatCurrencyRp,
+  calculateSalaryRow,
 };

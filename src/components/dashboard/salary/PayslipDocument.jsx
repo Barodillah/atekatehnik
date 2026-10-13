@@ -46,6 +46,12 @@ const PayslipDocument = ({
   const extraIncomeAmount = Number(record.extra_income_amount) || 0;
   const netIncome = Number(record.net_income) || 0;
 
+  const todayStr = new Date().toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
     <div
       className={`relative overflow-hidden bg-white text-slate-900 font-sans p-6 sm:p-8 max-w-[850px] mx-auto shadow-md border border-slate-200 select-none print:shadow-none print:border-none print:p-6 print:m-0 print:max-w-none ${className}`}
@@ -231,6 +237,7 @@ const PayslipDocument = ({
         <div className="grid grid-cols-2 gap-8 text-xs sm:text-sm mt-6 mb-8">
           {/* Left: Dibuat oleh */}
           <div>
+            <p className="text-slate-700 font-medium mb-1">Karanganyar, {todayStr}</p>
             <p className="font-semibold text-slate-800 mb-1">Dibuat oleh,</p>
             <div className="h-20 flex items-center">
               {/* Signature of Director */}
@@ -245,6 +252,7 @@ const PayslipDocument = ({
 
           {/* Right: Diterima oleh */}
           <div className="text-right">
+            <p className="text-transparent mb-1 select-none pointer-events-none">&nbsp;</p>
             <p className="font-semibold text-slate-800 mb-1">Diterima oleh,</p>
             <div className="h-20"></div>
             <p className="font-bold text-slate-950 uppercase tracking-wide">{empName}</p>

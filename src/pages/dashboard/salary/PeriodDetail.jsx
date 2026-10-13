@@ -17,6 +17,9 @@ import {
 } from '../../../services/salaryStorage';
 import PayslipSingleModal from '../../../components/dashboard/salary/PayslipSingleModal';
 import SalaryAdjustModal from '../../../components/dashboard/salary/SalaryAdjustModal';
+import SalaryReportModal from '../../../components/dashboard/salary/SalaryReportModal';
+import AttendanceImportModal from '../../../components/dashboard/salary/AttendanceImportModal';
+import salaryApi from '../../../services/salaryApi';
 
 const PeriodDetail = () => {
   const { id } = useParams();
@@ -34,6 +37,12 @@ const PeriodDetail = () => {
   const [adjustingRecord, setAdjustingRecord] = useState(null);
   const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
   const [selectedEmpToAdd, setSelectedEmpToAdd] = useState('');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('saved'); // 'saved' | 'saving' | 'error'
+  const saveTimeoutRef = useRef(null);
+
+  const isDraft = (period?.status || 'Draft').toLowerCase() === 'draft';
 
   // Top & Table Horizontal Scroll Sync States & Refs
   const topScrollRef = useRef(null);
@@ -113,29 +122,50 @@ const PeriodDetail = () => {
     };
   }, [records, searchTerm, selectedDept]);
 
-  // Load period & records
-  const loadData = () => {
+  // Load period & records with live MySQL sync
+  const loadData = async () => {
+    // 1. Render from cache immediately
     const p = getPeriodById(id);
-    if (!p) {
-      navigate('/admin/salary/periods');
-      return;
+    if (p) {
+      setPeriod(p);
+      let recs = getPeriodRecords(id);
+      if (recs.length === 0) {
+        recs = initPeriodRecordsFromEmployees(id, p.work_days || 6);
+      } else {
+        recs = recs.map((r) => calculateSalaryRow(r, p.work_days || 6));
+      }
+      setRecords(recs);
     }
-    setPeriod(p);
-    let recs = getPeriodRecords(id);
-    if (recs.length === 0) {
-      recs = initPeriodRecordsFromEmployees(id, p.work_days || 6);
-    } else {
-      recs = recs.map((r) => calculateSalaryRow(r, p.work_days || 6));
+
+    // 2. Fetch fresh data from ateka_internal MySQL
+    try {
+      const [freshPeriod, freshRecords] = await Promise.all([
+        salaryApi.getPeriodById(id),
+        salaryApi.getPeriodRecords(id),
+      ]);
+      if (freshPeriod) {
+        setPeriod(freshPeriod);
+        if (freshRecords && freshRecords.length > 0) {
+          setRecords(freshRecords);
+        }
+      } else if (!p) {
+        navigate('/admin/salary/periods');
+      }
+    } catch (e) {
+      console.warn('Backend sync failed, using cached period detail:', e);
+      if (!p) {
+        navigate('/admin/salary/periods');
+      }
     }
-    setRecords(recs);
   };
 
   useEffect(() => {
     loadData();
   }, [id]);
 
-  // Handle direct inline change on a record cell
+  // Handle direct inline change on a record cell with debounced autosave
   const handleInlineChange = (recordId, field, value) => {
+    if (!isDraft) return;
     const stdDays = period?.work_days || 6;
     const updated = records.map((r) => {
       if (r.id === recordId) {
@@ -145,7 +175,22 @@ const PeriodDetail = () => {
       return r;
     });
     setRecords(updated);
-    batchSaveRecords(id, updated);
+    setSaveStatus('saving');
+
+    // Debounce batchSaveRecords ke backend MySQL ateka_internal
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await salaryApi.batchSaveRecords(period.id, updated);
+        batchSaveRecords(id, updated);
+        setSaveStatus('saved');
+      } catch (err) {
+        console.error('Autosave error:', err);
+        setSaveStatus('error');
+      }
+    }, 600);
   };
 
   // Helper to restrict keyboard input to numeric keys only
@@ -210,20 +255,26 @@ const PeriodDetail = () => {
   };
 
   // Handle save from Adjust Modal
-  const handleSaveAdjust = (adjustedRecord) => {
+  const handleSaveAdjust = async (adjustedRecord) => {
+    if (!isDraft) return;
     try {
+      await salaryApi.saveRecord(adjustedRecord);
       const updatedList = saveRecord(adjustedRecord);
       setRecords(updatedList);
       setAdjustingRecord(null);
-      addToast(`Penyesuaian gaji ${adjustedRecord.name} berhasil disimpan`, 'success');
+      addToast(`Penyesuaian gaji ${adjustedRecord.name} berhasil disimpan di database`, 'success');
     } catch (e) {
       console.error(e);
-      addToast('Gagal menyimpan penyesuaian gaji', 'error');
+      const updatedList = saveRecord(adjustedRecord);
+      setRecords(updatedList);
+      setAdjustingRecord(null);
+      addToast('Penyesuaian gaji disimpan secara lokal', 'warning');
     }
   };
 
   // Handle delete a record from period
   const handleDeleteRecord = async (rec) => {
+    if (!isDraft) return;
     const confirmed = await confirmDialog(
       `Hapus karyawan "${rec.name}" dari periode ${period?.period_name}?`,
       'Hapus Karyawan dari Periode',
@@ -231,20 +282,27 @@ const PeriodDetail = () => {
     );
     if (confirmed) {
       try {
-        const remaining = deleteRecord(rec.id);
-        setRecords(remaining);
-        addToast(`Karyawan ${rec.name} dihapus dari periode ini`, 'success');
+        await salaryApi.deleteRecord(rec.id);
+        deleteRecord(rec.id);
+        setRecords((prev) => prev.filter((r) => r.id !== rec.id));
+        addToast(`Karyawan ${rec.name} berhasil dihapus dari periode ini`, 'success');
       } catch (e) {
         console.error(e);
-        addToast('Gagal menghapus karyawan dari periode', 'error');
+        deleteRecord(rec.id);
+        setRecords((prev) => prev.filter((r) => r.id !== rec.id));
+        addToast('Karyawan dihapus secara lokal', 'warning');
       }
     }
   };
 
   // Handle status change for period (Draft, Published, Paid)
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
     if (!period || !period.id) return;
     try {
+      await salaryApi.savePeriod({
+        id: period.id,
+        status: newStatus,
+      });
       const updated = savePeriod({
         ...period,
         status: newStatus,
@@ -253,43 +311,90 @@ const PeriodDetail = () => {
       addToast(`Status periode berhasil diubah menjadi "${newStatus}"`, 'success');
     } catch (err) {
       console.error(err);
-      addToast('Gagal mengubah status periode', 'error');
+      const updated = savePeriod({
+        ...period,
+        status: newStatus,
+      });
+      setPeriod(updated);
+      addToast('Status periode diubah secara lokal', 'warning');
     }
   };
 
-  // Sync / add active employees
-  const handleSyncEmployees = () => {
-    const updated = initPeriodRecordsFromEmployees(id, period?.work_days || 6);
-    setRecords(updated);
-    addToast('Daftar karyawan berhasil disinkronkan', 'success');
+  // Sync / add active employees from database
+  const handleSyncEmployees = async () => {
+    if (!isDraft) return;
+    try {
+      const res = await salaryApi.syncNewEmployees(period?.id || id);
+      await loadData();
+      addToast(
+        res?.message || 'Daftar karyawan aktif berhasil disinkronkan dari database',
+        'success'
+      );
+    } catch (e) {
+      console.error(e);
+      const updated = initPeriodRecordsFromEmployees(id, period?.work_days || 6);
+      setRecords(updated);
+      addToast('Daftar karyawan disinkronkan secara lokal: ' + (e.message || ''), 'warning');
+    }
   };
 
   // Add individual employee to this period
-  const handleAddEmployeeSubmit = (e) => {
+  const handleAddEmployeeSubmit = async (e) => {
     e.preventDefault();
+    if (!isDraft) return;
     if (!selectedEmpToAdd) return;
-    const allEmps = getEmployees();
-    const emp = allEmps.find((e) => e.id === selectedEmpToAdd);
-    if (emp) {
-      const newRow = calculateSalaryRow({
-        period_id: id,
-        employee_id: emp.id,
-        id_absen: emp.id_absen || '',
-        name: emp.name,
-        department: emp.department,
-        business_trip_days: 0,
-        workshop_days: period?.work_days || 6,
-        leave_days: 0,
-        rate_daily_salary: emp.daily_salary || 150000,
-        rate_trip_allowance: emp.trip_allowance || 250000,
-        extra_income_notes: '',
-        extra_income_amount: 0,
-      });
-      const updated = saveRecord(newRow);
-      setRecords(updated);
+    try {
+      await salaryApi.addEmployeeToPeriod(period?.id || id, Number(selectedEmpToAdd));
+      await loadData();
       setSelectedEmpToAdd('');
       setIsAddEmployeeOpen(false);
-      addToast(`Karyawan ${emp.name} ditambahkan ke periode ini`, 'success');
+      addToast('Karyawan berhasil ditambahkan ke periode ini', 'success');
+    } catch (err) {
+      console.error(err);
+      const allEmps = getEmployees();
+      const emp = allEmps.find((e) => String(e.id) === String(selectedEmpToAdd));
+      if (emp) {
+        const newRow = calculateSalaryRow({
+          period_id: id,
+          employee_id: emp.id,
+          id_absen: emp.id_absen || '',
+          name: emp.name,
+          department: emp.department,
+          business_trip_days: 0,
+          workshop_days: period?.work_days || 6,
+          leave_days: 0,
+          rate_daily_salary: emp.daily_salary || 150000,
+          rate_trip_allowance: emp.trip_allowance || 250000,
+          extra_income_notes: '',
+          extra_income_amount: 0,
+        });
+        const updated = saveRecord(newRow);
+        setRecords(updated);
+      }
+      setSelectedEmpToAdd('');
+      setIsAddEmployeeOpen(false);
+      addToast('Karyawan ditambahkan secara lokal: ' + err.message, 'warning');
+    }
+  };
+
+  // Handler for single payslip preview & print
+  const handleSinglePrintClick = (r) => {
+    if (isDraft) {
+      addToast(
+        'Status periode masih Draft! Ubah status periode ke "Published" atau "Paid" terlebih dahulu untuk dapat mencetak resmi. Menampilkan mode preview.',
+        'warning'
+      );
+    }
+    setSinglePrintRecord(r);
+  };
+
+  // Handler for bulk payslip print navigation
+  const handleBulkPrintClick = () => {
+    if (isDraft) {
+      addToast(
+        'Status periode masih Draft! Ubah status periode ke "Published" atau "Paid" terlebih dahulu untuk dapat mencetak resmi. Menampilkan mode preview.',
+        'warning'
+      );
     }
   };
 
@@ -316,8 +421,8 @@ const PeriodDetail = () => {
   const totalNetSalary = records.reduce((acc, curr) => acc + (Number(curr.net_income) || 0), 0);
 
   // Available employees not yet in this period
-  const existingEmpIds = new Set(records.map((r) => r.employee_id));
-  const availableEmployees = getEmployees().filter((e) => !existingEmpIds.has(e.id));
+  const existingEmpIds = new Set(records.map((r) => String(r.employee_id)));
+  const availableEmployees = getEmployees().filter((e) => !existingEmpIds.has(String(e.id)));
 
   return (
     <div className="p-4 sm:p-6 space-y-6 w-full max-w-full min-w-0 text-left">
@@ -343,13 +448,12 @@ const PeriodDetail = () => {
                 <select
                   value={period.status || 'Draft'}
                   onChange={(e) => handleStatusChange(e.target.value)}
-                  className={`pl-2.5 pr-6 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border appearance-none transition-all cursor-pointer focus:outline-none shadow-2xs ${
-                    period.status === 'Paid'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                      : period.status === 'Published'
+                  className={`pl-2.5 pr-6 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border appearance-none transition-all cursor-pointer focus:outline-none shadow-2xs ${period.status === 'Paid'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                    : period.status === 'Published'
                       ? 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
                       : 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-                  }`}
+                    }`}
                   title="Klik untuk ubah status periode"
                 >
                   <option value="Draft">Draft</option>
@@ -360,6 +464,12 @@ const PeriodDetail = () => {
                   expand_more
                 </span>
               </div>
+              {!isDraft && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full" title="Periode terkunci (Read Only)">
+                  <span className="material-symbols-outlined text-xs">lock</span>
+                  Terkunci (Hanya Baca)
+                </span>
+              )}
             </div>
             <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2 font-mono">
               <span className="flex items-center gap-1">
@@ -376,27 +486,81 @@ const PeriodDetail = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => setIsAddEmployeeOpen(true)}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-base">person_add</span>
-          </button>
+          {saveStatus === 'saving' && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg animate-pulse">
+              <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+              Menyimpan...
+            </span>
+          )}
+          {saveStatus === 'saved' && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+              <span className="material-symbols-outlined text-sm">cloud_done</span>
+            </span>
+          )}
+          {saveStatus === 'error' && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">
+              <span className="material-symbols-outlined text-sm">warning</span>
+            </span>
+          )}
+
+          {isDraft && (
+            <>
+              <button
+                onClick={() => setIsImportModalOpen(true)}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                title="Import Kehadiran & Jam dari Excel / CSV"
+              >
+                <span className="material-symbols-outlined text-base">upload_file</span>
+              </button>
+
+              <button
+                onClick={() => setIsAddEmployeeOpen(true)}
+                className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Tambah Karyawan ke Periode"
+              >
+                <span className="material-symbols-outlined text-base">person_add</span>
+              </button>
+
+              <button
+                onClick={handleSyncEmployees}
+                className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Sinkronkan seluruh karyawan aktif"
+              >
+                <span className="material-symbols-outlined text-base">sync</span>
+              </button>
+            </>
+          )}
 
           <button
-            onClick={handleSyncEmployees}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-            title="Sinkronkan seluruh karyawan aktif"
+            onClick={() => setIsReportModalOpen(true)}
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-md shadow-slate-800/20 flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            title="Preview & Cetak Rekapitulasi Laporan Gaji"
           >
-            <span className="material-symbols-outlined text-base">sync</span>
+            <span className="material-symbols-outlined text-base">summarize</span>
           </button>
 
           <Link
             to={`/admin/salary/periods/${id}/print`}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            onClick={handleBulkPrintClick}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95 ${isDraft
+              ? 'bg-slate-200 hover:bg-slate-300 text-slate-600 border border-slate-300 shadow-none'
+              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20'
+              }`}
+            title={
+              isDraft
+                ? 'Periode masih Draft (Klik untuk preview saja, cetak terkunci)'
+                : 'Cetak Slip Masal'
+            }
           >
-            <span className="material-symbols-outlined text-base">print</span>
-            <span>Cetak Slip</span>
+            <span className="material-symbols-outlined text-base">
+              {isDraft ? 'visibility' : 'print'}
+            </span>
+            <span>{isDraft ? 'Preview' : 'Cetak Slip'}</span>
+            {isDraft && (
+              <span className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-1.5 py-0.5 rounded font-semibold lowercase">
+                draft
+              </span>
+            )}
           </Link>
         </div>
       </div>
@@ -504,11 +668,15 @@ const PeriodDetail = () => {
                 {/* Kolom lainnya - Align Atas & Maksimal 2 Baris */}
                 <th className="py-3 px-2 text-center bg-blue-50/70 border-l border-r border-blue-100 align-top">
                   <span className="whitespace-nowrap">Perjalanan</span>
-                  <span className="block whitespace-nowrap text-[10px] text-blue-900/70 font-semibold">Bisnis (hari)*</span>
+                  <span className="block whitespace-nowrap text-[10px] text-blue-900/70 font-semibold">
+                    Bisnis (hari){isDraft ? '*' : ''}
+                  </span>
                 </th>
                 <th className="py-3 px-2 text-center bg-blue-50/70 border-r border-blue-100 align-top">
                   <span className="whitespace-nowrap">Hadir Bengkel</span>
-                  <span className="block whitespace-nowrap text-[10px] text-blue-900/70 font-semibold">(hari)*</span>
+                  <span className="block whitespace-nowrap text-[10px] text-blue-900/70 font-semibold">
+                    (hari){isDraft ? '*' : ''}
+                  </span>
                 </th>
                 <th className="py-3 px-2 text-center bg-blue-50/70 border-r border-blue-100 align-top">
                   <span className="whitespace-nowrap">Cuti</span>
@@ -536,11 +704,15 @@ const PeriodDetail = () => {
                 </th>
                 <th className="py-3 px-2.5 text-left bg-amber-50/50 border-l border-amber-100 align-top">
                   <span className="whitespace-nowrap">Catatan</span>
-                  <span className="block whitespace-nowrap text-[10px] text-amber-800 font-semibold">Tambahan*</span>
+                  <span className="block whitespace-nowrap text-[10px] text-amber-800 font-semibold">
+                    Tambahan{isDraft ? '*' : ''}
+                  </span>
                 </th>
                 <th className="py-3 px-2 text-right bg-amber-50/50 border-r border-amber-100 align-top">
                   <span className="whitespace-nowrap">Nominal</span>
-                  <span className="block whitespace-nowrap text-[10px] text-amber-800 font-semibold">Tambahan (Rp)*</span>
+                  <span className="block whitespace-nowrap text-[10px] text-amber-800 font-semibold">
+                    Tambahan (Rp){isDraft ? '*' : ''}
+                  </span>
                 </th>
                 <th className="py-3 px-2.5 text-right bg-emerald-50/80 font-black text-emerald-700 align-top">
                   <span className="whitespace-nowrap">Penghasilan</span>
@@ -585,6 +757,7 @@ const PeriodDetail = () => {
                     <td className="py-3 px-2 text-center bg-blue-50/30 border-l border-r border-blue-100 align-middle">
                       <input
                         type="text"
+                        disabled={!isDraft}
                         inputMode="decimal"
                         value={r.business_trip_days ?? ''}
                         onKeyDown={(e) => handleNumericKeyDown(e, true)}
@@ -594,8 +767,8 @@ const PeriodDetail = () => {
                         onBlur={(e) =>
                           handleDayInputBlur(r.id, 'business_trip_days', e)
                         }
-                        className="w-[68px] bg-white border border-slate-300 text-center py-1.5 px-1 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-orange-500 focus:bg-orange-50/30 transition-colors"
-                        title="Perjalanan Bisnis (hari)"
+                        className="w-[68px] bg-white border border-slate-300 text-center py-1.5 px-1 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-orange-500 focus:bg-orange-50/30 transition-colors disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200 disabled:cursor-not-allowed"
+                        title={isDraft ? "Perjalanan Bisnis (hari)" : "Perjalanan Bisnis (Terkunci)"}
                       />
                     </td>
 
@@ -603,6 +776,7 @@ const PeriodDetail = () => {
                     <td className="py-3 px-2 text-center bg-blue-50/30 border-r border-blue-100 align-middle">
                       <input
                         type="text"
+                        disabled={!isDraft}
                         inputMode="decimal"
                         value={r.workshop_days ?? ''}
                         onKeyDown={(e) => handleNumericKeyDown(e, true)}
@@ -612,8 +786,8 @@ const PeriodDetail = () => {
                         onBlur={(e) =>
                           handleDayInputBlur(r.id, 'workshop_days', e)
                         }
-                        className="w-[68px] bg-white border border-slate-300 text-center py-1.5 px-1 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-orange-500 focus:bg-orange-50/30 transition-colors"
-                        title="Hadir Bengkel (hari)"
+                        className="w-[68px] bg-white border border-slate-300 text-center py-1.5 px-1 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-orange-500 focus:bg-orange-50/30 transition-colors disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200 disabled:cursor-not-allowed"
+                        title={isDraft ? "Hadir Bengkel (hari)" : "Hadir Bengkel (Terkunci)"}
                       />
                     </td>
 
@@ -656,12 +830,14 @@ const PeriodDetail = () => {
                     <td className="py-3 px-2 bg-amber-50/30 border-l border-amber-100 align-middle">
                       <input
                         type="text"
-                        placeholder="Lembur..."
+                        disabled={!isDraft}
+                        placeholder={isDraft ? "Lembur..." : "-"}
                         value={r.extra_income_notes || ''}
                         onChange={(e) =>
                           handleInlineChange(r.id, 'extra_income_notes', e.target.value)
                         }
-                        className="w-full min-w-[110px] bg-white border border-slate-300 px-2.5 py-1.5 rounded-lg text-slate-900 text-xs uppercase focus:outline-none focus:border-orange-500 font-sans transition-colors"
+                        className="w-full min-w-[110px] bg-white border border-slate-300 px-2.5 py-1.5 rounded-lg text-slate-900 text-xs uppercase focus:outline-none focus:border-orange-500 font-sans transition-colors disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200 disabled:cursor-not-allowed"
+                        title={isDraft ? "Catatan Tambahan" : "Catatan Tambahan (Terkunci)"}
                       />
                     </td>
 
@@ -669,6 +845,7 @@ const PeriodDetail = () => {
                     <td className="py-3 px-2 text-right bg-amber-50/30 border-r border-amber-100 align-middle">
                       <input
                         type="text"
+                        disabled={!isDraft}
                         inputMode="numeric"
                         value={r.extra_income_amount ?? ''}
                         onKeyDown={(e) => handleNumericKeyDown(e, false)}
@@ -679,7 +856,8 @@ const PeriodDetail = () => {
                           handleAmountInputBlur(r.id, 'extra_income_amount', e)
                         }
                         placeholder="0"
-                        className="w-24 bg-white border border-slate-300 px-2.5 py-1.5 rounded-lg text-right text-emerald-700 font-bold focus:outline-none focus:border-orange-500 transition-colors"
+                        className="w-24 bg-white border border-slate-300 px-2.5 py-1.5 rounded-lg text-right text-emerald-700 font-bold focus:outline-none focus:border-orange-500 transition-colors disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200 disabled:cursor-not-allowed"
+                        title={isDraft ? "Nominal Tambahan (Rp)" : "Nominal Tambahan (Terkunci)"}
                       />
                     </td>
 
@@ -692,26 +870,39 @@ const PeriodDetail = () => {
                     <td className="py-3 px-2.5 text-center font-sans whitespace-nowrap align-middle">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
-                          onClick={() => setSinglePrintRecord(r)}
-                          className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg border border-blue-200 transition-all font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
-                          title="Cetak Slip Gaji Satuan"
+                          onClick={() => handleSinglePrintClick(r)}
+                          className={`px-2.5 py-1.5 rounded-lg border transition-all font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs ${isDraft
+                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border-slate-300'
+                            : 'bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border-blue-200'
+                            }`}
+                          title={
+                            isDraft
+                              ? "Periode masih Draft - Klik untuk preview saja (Cetak terkunci)"
+                              : "Cetak Slip Gaji Satuan"
+                          }
                         >
-                          <span className="material-symbols-outlined text-sm">print</span>
+                          <span className="material-symbols-outlined text-sm">
+                            {isDraft ? 'visibility' : 'print'}
+                          </span>
                         </button>
-                        <button
-                          onClick={() => setAdjustingRecord(r)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-                          title="Adjust Rinci"
-                        >
-                          <span className="material-symbols-outlined text-base">tune</span>
-                        </button>
-                        <button
-                          onClick={() => handleDeleteRecord(r)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                          title="Hapus dari Periode"
-                        >
-                          <span className="material-symbols-outlined text-base">delete</span>
-                        </button>
+                        {isDraft && (
+                          <>
+                            <button
+                              onClick={() => setAdjustingRecord(r)}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                              title="Adjust Rinci"
+                            >
+                              <span className="material-symbols-outlined text-base">tune</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRecord(r)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                              title="Hapus dari Periode"
+                            >
+                              <span className="material-symbols-outlined text-base">delete</span>
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -731,11 +922,34 @@ const PeriodDetail = () => {
           period={period}
           allRecords={records}
           onSelectRecord={(rec) => setSinglePrintRecord(rec)}
+          isDraft={isDraft}
+        />
+      )}
+
+      {/* Modal: Salary Report Preview & Print */}
+      {isReportModalOpen && (
+        <SalaryReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          period={period}
+          records={records}
+          initialDept={selectedDept}
+        />
+      )}
+
+      {/* Modal: Import Attendance Excel */}
+      {isDraft && isImportModalOpen && (
+        <AttendanceImportModal
+          isOpen={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          period={period}
+          records={records}
+          onImportSuccess={loadData}
         />
       )}
 
       {/* Modal: Adjust Record */}
-      {adjustingRecord && (
+      {isDraft && adjustingRecord && (
         <SalaryAdjustModal
           isOpen={!!adjustingRecord}
           onClose={() => setAdjustingRecord(null)}
@@ -746,7 +960,7 @@ const PeriodDetail = () => {
       )}
 
       {/* Modal: Add Employee to Period */}
-      {isAddEmployeeOpen && createPortal(
+      {isDraft && isAddEmployeeOpen && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white border border-slate-200 rounded-xl w-full max-w-md shadow-2xl p-6">
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">

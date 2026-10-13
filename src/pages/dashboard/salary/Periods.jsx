@@ -11,6 +11,7 @@ import {
   applyAttendanceToPeriod,
 } from '../../../services/salaryStorage';
 import PeriodModal from '../../../components/dashboard/salary/PeriodModal';
+import salaryApi from '../../../services/salaryApi';
 
 const Periods = () => {
   const navigate = useNavigate();
@@ -22,9 +23,16 @@ const Periods = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState(null);
 
-  const loadPeriods = () => {
-    const list = getPeriods();
-    setPeriods(list);
+  const loadPeriods = async () => {
+    setPeriods(getPeriods());
+    try {
+      const fresh = await salaryApi.getPeriods();
+      if (fresh) {
+        setPeriods(fresh);
+      }
+    } catch (e) {
+      console.warn('Backend sync failed, using cached periods:', e);
+    }
   };
 
   useEffect(() => {
@@ -41,8 +49,27 @@ const Periods = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (periodData, attendanceRows = []) => {
+  const handleSave = async (periodData, attendanceRows = []) => {
     try {
+      const saved = await salaryApi.savePeriod(periodData);
+      if (attendanceRows && attendanceRows.length > 0) {
+        await salaryApi.applyAttendanceToPeriod(saved.id, attendanceRows);
+      }
+      setIsModalOpen(false);
+      await loadPeriods();
+      if (!periodData.id) {
+        addToast(
+          attendanceRows && attendanceRows.length > 0
+            ? `Periode berhasil dibuat & ${attendanceRows.length} data absen terimpor!`
+            : 'Periode berhasil dibuat di database. Silakan periksa data absensi karyawan.',
+          'success'
+        );
+        navigate(`/admin/salary/periods/${saved.id}`);
+      } else {
+        addToast('Data periode berhasil diperbarui di database', 'success');
+      }
+    } catch (e) {
+      console.error(e);
       const saved = savePeriod(periodData);
       if (attendanceRows && attendanceRows.length > 0) {
         applyAttendanceToPeriod(saved.id, attendanceRows);
@@ -50,19 +77,9 @@ const Periods = () => {
       setIsModalOpen(false);
       loadPeriods();
       if (!periodData.id) {
-        addToast(
-          attendanceRows && attendanceRows.length > 0
-            ? `Periode berhasil dibuat & ${attendanceRows.length} data absen terimpor!`
-            : 'Periode berhasil dibuat. Silakan periksa data absensi karyawan.',
-          'success'
-        );
         navigate(`/admin/salary/periods/${saved.id}`);
-      } else {
-        addToast('Data periode berhasil diperbarui', 'success');
       }
-    } catch (e) {
-      console.error(e);
-      addToast('Gagal menyimpan periode', 'error');
+      addToast('Periode disimpan secara lokal: ' + e.message, 'warning');
     }
   };
 
@@ -74,12 +91,14 @@ const Periods = () => {
     );
     if (confirmed) {
       try {
-        deletePeriod(p.id);
-        addToast(`Periode ${p.period_name} berhasil dihapus`, 'success');
+        await salaryApi.deletePeriod(p.id);
+        addToast(`Periode ${p.period_name} berhasil dihapus dari database`, 'success');
         loadPeriods();
       } catch (e) {
         console.error(e);
-        addToast('Gagal menghapus periode', 'error');
+        deletePeriod(p.id);
+        loadPeriods();
+        addToast('Periode dihapus: ' + e.message, 'warning');
       }
     }
   };

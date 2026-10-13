@@ -10,6 +10,7 @@ import {
 } from '../../../services/salaryStorage';
 import EmployeeModal from '../../../components/dashboard/salary/EmployeeModal';
 import DepartmentModal from '../../../components/dashboard/salary/DepartmentModal';
+import salaryApi from '../../../services/salaryApi';
 
 const Employees = () => {
   const { addToast } = useToast();
@@ -23,11 +24,27 @@ const Employees = () => {
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-  // Load employees & departments from storage
-  const loadEmployees = () => {
-    const data = getEmployees();
-    setEmployees(data);
+  // Load employees & departments with live MySQL sync
+  const loadEmployees = async () => {
+    // Render cache immediately
+    setEmployees(getEmployees());
     setDepartments(getDepartments());
+
+    // Fetch fresh data from ateka_internal MySQL
+    try {
+      const [freshEmps, freshDepts] = await Promise.all([
+        salaryApi.getEmployees(),
+        salaryApi.getDepartments(),
+      ]);
+      if (freshEmps && freshEmps.length > 0) {
+        setEmployees(freshEmps);
+      }
+      if (freshDepts && freshDepts.length > 0) {
+        setDepartments(freshDepts.map((d) => d.name));
+      }
+    } catch (e) {
+      console.warn('Backend sync failed, using cached employees:', e);
+    }
   };
 
   useEffect(() => {
@@ -44,18 +61,21 @@ const Employees = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (empData) => {
+  const handleSave = async (empData) => {
     try {
-      saveEmployee(empData);
+      await salaryApi.saveEmployee(empData);
       addToast(
-        empData.id ? 'Data karyawan berhasil diperbarui' : 'Karyawan baru berhasil ditambahkan',
+        empData.id ? 'Data karyawan berhasil diperbarui di database' : 'Karyawan baru berhasil disimpan ke database',
         'success'
       );
       setIsModalOpen(false);
       loadEmployees();
     } catch (e) {
       console.error(e);
-      addToast('Gagal menyimpan data karyawan', 'error');
+      saveEmployee(empData);
+      setIsModalOpen(false);
+      loadEmployees();
+      addToast('Data karyawan disimpan secara lokal: ' + e.message, 'warning');
     }
   };
 
@@ -67,12 +87,14 @@ const Employees = () => {
     );
     if (confirmed) {
       try {
-        deleteEmployee(emp.id);
-        addToast(`Karyawan ${emp.name} berhasil dihapus`, 'success');
+        await salaryApi.deleteEmployee(emp.id);
+        addToast(`Karyawan ${emp.name} berhasil dihapus dari database`, 'success');
         loadEmployees();
       } catch (e) {
         console.error(e);
-        addToast('Gagal menghapus karyawan', 'error');
+        deleteEmployee(emp.id);
+        loadEmployees();
+        addToast('Karyawan dihapus: ' + e.message, 'warning');
       }
     }
   };
