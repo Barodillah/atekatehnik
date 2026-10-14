@@ -58,40 +58,76 @@ $totalViews = (int) $viewsTotalStmt->fetchColumn();
 $commentsTotalStmt = $db->query("SELECT COUNT(*) FROM post_comments");
 $totalComments = (int) $commentsTotalStmt->fetchColumn();
 
-// ── 2. Chart Data: Page Views (Last 7 Days) ────────
+// ── 2. Chart Data: Dual Metric (Page Views & WA Clicks) Cumulative ────────
 
-$days = [];
-$chartData = [];
-for ($i = 6; $i >= 0; $i--) {
-    $dayLabel = date('D', strtotime("-{$i} days")); // Mon, Tue
-    $dayDate = date('Y-m-d', strtotime("-{$i} days"));
-    $days[$dayDate] = $dayLabel;
-    $chartData[$dayLabel] = ['views' => 0];
+$range = trim($_GET['range'] ?? '7');
+if ($range === '14') {
+    $numDays = 14;
+} elseif ($range === '30') {
+    $numDays = 30;
+} elseif ($range === 'month') {
+    $numDays = max(1, (int)date('j')); // Dari tgl 1 bulan ini s/d hari ini
+} else {
+    $range = '7';
+    $numDays = 7;
 }
 
-// Group page views by day
-$viewsChartStmt = $db->query("
-    SELECT DATE(viewed_at) as view_date, COUNT(*) as count 
-    FROM page_views 
-    WHERE viewed_at >= DATE_SUB(DATE(NOW()), INTERVAL 6 DAY)
-    GROUP BY view_date
-");
-$viewsChartRaw = $viewsChartStmt->fetchAll();
+$dateMap = [];
+for ($i = $numDays - 1; $i >= 0; $i--) {
+    $d = date('Y-m-d', strtotime("-{$i} days"));
+    $dateMap[$d] = [
+        'views' => 0,
+        'wa_clicks' => 0,
+    ];
+}
+$startDate = array_key_first($dateMap);
 
-foreach ($viewsChartRaw as $row) {
-    if (isset($days[$row['view_date']])) {
-        $label = $days[$row['view_date']];
-        $chartData[$label]['views'] += (int) $row['count'];
+// Query page views dari ketiga page_type: post, product, gallery
+$vStmt = $db->prepare("
+    SELECT DATE(viewed_at) as d, COUNT(*) as c
+    FROM page_views
+    WHERE page_type IN ('post', 'product', 'gallery')
+      AND viewed_at >= :start
+    GROUP BY d
+");
+$vStmt->execute([':start' => $startDate . ' 00:00:00']);
+foreach ($vStmt->fetchAll() as $row) {
+    if (isset($dateMap[$row['d']])) {
+        $dateMap[$row['d']]['views'] = (int)$row['c'];
     }
 }
 
-// Convert back to sequential array for JSON
+// Query WhatsApp CTA clicks
+$wStmt = $db->prepare("
+    SELECT DATE(clicked_at) as d, COUNT(*) as c
+    FROM wa_cta_clicks
+    WHERE clicked_at >= :start
+    GROUP BY d
+");
+$wStmt->execute([':start' => $startDate . ' 00:00:00']);
+foreach ($wStmt->fetchAll() as $row) {
+    if (isset($dateMap[$row['d']])) {
+        $dateMap[$row['d']]['wa_clicks'] = (int)$row['c'];
+    }
+}
+
+// Akumulasi total keseluruhan (Running Cumulative Total)
+$cumViews = 0;
+$cumWa = 0;
 $chartArray = [];
-foreach ($chartData as $label => $data) {
+foreach ($dateMap as $dateStr => $data) {
+    $cumViews += $data['views'];
+    $cumWa += $data['wa_clicks'];
     $chartArray[] = [
-        'day' => $label,
+        'date' => $dateStr,
+        'day' => date('D', strtotime($dateStr)),
+        'day_num' => date('j', strtotime($dateStr)),
+        'label' => date('d M', strtotime($dateStr)),
         'views' => $data['views'],
-        'total' => $data['views'],
+        'views_cumulative' => $cumViews,
+        'wa_clicks' => $data['wa_clicks'],
+        'wa_cumulative' => $cumWa,
+        'total' => $cumViews,
     ];
 }
 
@@ -169,6 +205,12 @@ jsonSuccess([
         'totalComments' => $totalComments,
     ],
     'viewChart' => $chartArray,
+    'chartSummary' => [
+        'range' => $range,
+        'days' => $numDays,
+        'periodTotalViews' => $cumViews,
+        'periodTotalWaClicks' => $cumWa,
+    ],
     'recentActivity' => $recentActivity,
     'featuredProduct' => $featuredProduct,
     'featuredPost' => $featuredPost,

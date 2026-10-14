@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
 import GeographicMap from '../../components/dashboard/GeographicMap';
+import DualMetricLineChart from '../../components/dashboard/DualMetricLineChart';
 
 const DashboardHome = () => {
   const { authFetch, user } = useAuth();
@@ -8,10 +10,32 @@ const DashboardHome = () => {
   const [loading, setLoading] = useState(true);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [toast, setToast] = useState(null);
+  const [chartRange, setChartRange] = useState('7');
+  const [isChartLoading, setIsChartLoading] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleRangeChange = async (newRange) => {
+    setChartRange(newRange);
+    setIsChartLoading(true);
+    try {
+      const res = await authFetch(`/api/dashboard_summary.php?range=${newRange}`);
+      const json = await res.json();
+      if (json.success) {
+        setData((prev) => ({
+          ...prev,
+          viewChart: json.viewChart,
+          chartSummary: json.chartSummary,
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to change chart range', err);
+    } finally {
+      setIsChartLoading(false);
+    }
   };
 
   const handleSync = async () => {
@@ -60,27 +84,14 @@ const DashboardHome = () => {
   if (!data) return <div className="p-8 text-error font-bold">Failed to load data</div>;
 
   const kpis = data.kpis || {};
-  let chart = data.viewChart || data.leadChart || [];
+  const chart = data.viewChart || [];
   const activities = data.recentActivity || [];
   const featured = data.featuredProduct || {};
   const featuredPost = data.featuredPost || {};
 
-  // Jika data view belum ada/nol, gunakan chart dummy agar chart 'aktif' dan terlihat
-  const isChartEmpty = chart.length === 0 || chart.every(c => (c.views || c.total || 0) === 0);
-  if (isChartEmpty) {
-    chart = [
-      { day: 'Mon', views: 120 },
-      { day: 'Tue', views: 250 },
-      { day: 'Wed', views: 180 },
-      { day: 'Thu', views: 320 },
-      { day: 'Fri', views: 290 },
-      { day: 'Sat', views: 450 },
-      { day: 'Sun', views: 390 },
-    ];
-  }
-
   // Formatter for relative time
   const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
     const safeDate = dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z';
     const date = new Date(safeDate);
     const seconds = Math.floor((new Date() - date) / 1000);
@@ -96,9 +107,6 @@ const DashboardHome = () => {
     if (interval >= 1) return interval + " minute" + (interval > 1 ? "s" : "") + " ago";
     return Math.floor(seconds) + " seconds ago";
   };
-
-  // Find max chart total for proper height scaling
-  const maxChartVal = Math.max(...chart.map(c => Math.max(c.total || c.views || 0, 1)), 10) * 1.2;
 
   // Icon mapping for activities
   const getIconForAction = (action, entityType) => {
@@ -204,49 +212,14 @@ const DashboardHome = () => {
       {/* Main Analytics Row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
 
-        {/* Page Views Chart */}
-        <div className="xl:col-span-2 bg-surface-container-lowest border border-surface-container-low rounded-sm p-4 md:p-8 shadow-sm">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10 gap-4">
-            <h4 className="text-base md:text-lg font-bold text-primary flex items-center gap-2">
-              <span className="w-1 h-6 bg-secondary-container"></span>
-              Page Views (Last 7 Days)
-            </h4>
-            <div className="flex gap-4 text-[10px] font-label font-bold text-outline">
-              <span className="flex items-center gap-2"><span className="w-2 h-2 bg-primary-container rounded-full"></span> VIEWS</span>
-            </div>
-          </div>
-
-          <div className="h-64 flex items-end justify-between gap-2 md:gap-4 px-2 md:px-4 mt-8">
-            {chart.map((c, i) => {
-              const val = c.views || c.total || 0;
-              const bgHeight = Math.max((val / maxChartVal) * 100, 0);
-              const isZero = val === 0;
-
-              return (
-                <div key={i} className="w-full h-full flex flex-col items-center gap-2 group relative">
-                  {/* Tooltip (moved outside overflow-hidden) */}
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none z-20 font-bold whitespace-nowrap transition-opacity shadow-lg">
-                    Views: {val}
-                  </div>
-
-                  {/* Container for the Bar */}
-                  <div className="w-full bg-surface-container px-1 md:px-0 relative flex flex-col justify-end flex-1 rounded-t-sm group-hover:bg-surface-container-high transition-colors overflow-hidden pb-1 items-center">
-
-                    {/* Explicit Number Label Always Visible */}
-                    <span className={`text-[10px] font-bold z-10 mb-1 transition-all ${isZero ? 'text-outline/50' : 'text-orange-600'}`}>
-                      {val}
-                    </span>
-
-                    {/* The Bar */}
-                    <div className={`absolute bottom-0 w-full ${isZero ? 'bg-surface-container-high h-1' : 'bg-primary-container'} rounded-t-sm transition-all duration-1000 ease-out`} style={{ height: isZero ? '4px' : `${bgHeight}%` }}></div>
-                  </div>
-                  <span className={`text-[10px] font-label uppercase ${i === chart.length - 1 ? 'text-primary font-bold' : 'text-outline'}`}>
-                    {c.day || c.month}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+        {/* Dual Metric Line Chart (Views vs WA Clicks - Cumulative / Daily) */}
+        <div className="xl:col-span-2">
+          <DualMetricLineChart
+            chartData={chart}
+            range={chartRange}
+            onRangeChange={handleRangeChange}
+            isLoading={isChartLoading}
+          />
         </div>
 
         {/* Recent Activity */}
@@ -377,9 +350,14 @@ const DashboardHome = () => {
       </div>
 
       {/* Sync Modal */}
-      {showSyncModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-surface rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+      {showSyncModal && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowSyncModal(false);
+          }}
+        >
+          <div className="bg-surface rounded-lg shadow-2xl border border-surface-container-high w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4 text-error">
                 <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center shrink-0">
@@ -393,13 +371,13 @@ const DashboardHome = () => {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowSyncModal(false)}
-                  className="px-4 py-2 text-sm font-bold text-primary hover:bg-surface-container-high rounded-sm transition-colors"
+                  className="px-4 py-2 text-sm font-bold text-primary hover:bg-surface-container-high rounded-sm transition-colors cursor-pointer"
                 >
                   BATAL
                 </button>
                 <button
                   onClick={handleSync}
-                  className="px-4 py-2 bg-error text-white text-sm font-bold rounded-sm shadow-md hover:bg-error/90 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-error text-white text-sm font-bold rounded-sm shadow-md hover:bg-error/90 transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-sm">sync</span>
                   YA, SINKRONISASI
@@ -407,20 +385,22 @@ const DashboardHome = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded shadow-lg animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-primary text-on-primary' : 'bg-error text-white'}`}>
+      {toast && createPortal(
+        <div className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded shadow-lg animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-primary text-on-primary' : 'bg-error text-white'}`}>
           <span className="material-symbols-outlined text-xl">
             {toast.type === 'success' ? 'check_circle' : 'error'}
           </span>
           <p className="text-sm font-semibold">{toast.message}</p>
-          <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+          <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80 cursor-pointer">
             <span className="material-symbols-outlined text-sm">close</span>
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
