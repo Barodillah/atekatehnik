@@ -263,12 +263,19 @@ export const getPeriodById = (id) => {
 };
 
 export const savePeriod = (period) => {
+  if (!period) return null;
   const periods = getPeriods();
   let updated;
   let savedPeriod;
   if (period.id) {
-    updated = periods.map((p) => (String(p.id) === String(period.id) ? { ...p, ...period } : p));
-    savedPeriod = updated.find((p) => String(p.id) === String(period.id));
+    const exists = periods.some((p) => String(p.id) === String(period.id));
+    if (exists) {
+      updated = periods.map((p) => (String(p.id) === String(period.id) ? { ...p, ...period } : p));
+      savedPeriod = updated.find((p) => String(p.id) === String(period.id));
+    } else {
+      savedPeriod = { ...period };
+      updated = [savedPeriod, ...periods];
+    }
   } else {
     savedPeriod = {
       ...period,
@@ -290,7 +297,7 @@ export const savePeriod = (period) => {
     console.error('Error syncing savePeriod to backend:', err);
   });
 
-  return savedPeriod;
+  return savedPeriod || period;
 };
 
 export const deletePeriod = (id) => {

@@ -192,6 +192,10 @@ try {
 
             $db->commit();
 
+            $stmtNet = $db->prepare("SELECT COALESCE(SUM(net_income), 0) FROM salary_records WHERE period_id = :id");
+            $stmtNet->execute([':id' => $newPeriodId]);
+            $totalNetPayout = (float)$stmtNet->fetchColumn();
+
             jsonSuccess([
                 'id' => $newPeriodId,
                 'period' => [
@@ -206,6 +210,7 @@ try {
                     'status'              => 'Draft',
                     'notes'               => $notes,
                     'total_employees'     => count($activeEmployees),
+                    'total_net_payout'    => $totalNetPayout,
                 ]
             ], 'Periode penggajian baru berhasil dibuat beserta seluruh daftar karyawan aktif.');
             break;
@@ -274,7 +279,26 @@ try {
                 ':id'       => $id,
             ]);
 
-            jsonSuccess([], 'Data periode penggajian berhasil diperbarui.');
+            $fetchStmt = $db->prepare("
+                SELECT p.*,
+                       (SELECT COUNT(*) FROM salary_records r WHERE r.period_id = p.id) AS total_employees,
+                       (SELECT COALESCE(SUM(r.net_income), 0) FROM salary_records r WHERE r.period_id = p.id) AS total_net_payout
+                FROM salary_periods p
+                WHERE p.id = :id
+                LIMIT 1
+            ");
+            $fetchStmt->execute([':id' => $id]);
+            $updatedPeriod = $fetchStmt->fetch();
+            if ($updatedPeriod) {
+                $updatedPeriod['id'] = (int)$updatedPeriod['id'];
+                $updatedPeriod['total_calendar_days'] = (int)$updatedPeriod['total_calendar_days'];
+                $updatedPeriod['holidays'] = (int)$updatedPeriod['holidays'];
+                $updatedPeriod['work_days'] = (float)$updatedPeriod['work_days'];
+                $updatedPeriod['total_employees'] = (int)$updatedPeriod['total_employees'];
+                $updatedPeriod['total_net_payout'] = (float)$updatedPeriod['total_net_payout'];
+            }
+
+            jsonSuccess(['period' => $updatedPeriod], 'Data periode penggajian berhasil diperbarui.');
             break;
 
         case 'DELETE':

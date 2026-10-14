@@ -24,11 +24,17 @@ const Periods = () => {
   const [editingPeriod, setEditingPeriod] = useState(null);
 
   const loadPeriods = async () => {
-    setPeriods(getPeriods());
+    const cached = getPeriods();
+    if (cached && cached.length > 0) {
+      setPeriods(cached);
+    }
     try {
       const fresh = await salaryApi.getPeriods();
       if (fresh) {
         setPeriods(fresh);
+        try {
+          localStorage.setItem('ateka_salary_periods_v2', JSON.stringify(fresh));
+        } catch (_) {}
       }
     } catch (e) {
       console.warn('Backend sync failed, using cached periods:', e);
@@ -109,11 +115,30 @@ const Periods = () => {
     return matchName || matchNotes;
   });
 
-  const getPeriodStats = (periodId) => {
-    const records = getPeriodRecords(periodId);
-    const count = records.length;
-    const totalNet = records.reduce((acc, curr) => acc + (Number(curr.net_income) || 0), 0);
-    return { count, totalNet };
+  const getPeriodStats = (p) => {
+    if (!p) return { count: 0, totalNet: 0 };
+
+    // 1. Prioritaskan jika periode memiliki data agregasi langsung dari MySQL backend
+    if (p.total_employees !== undefined && p.total_employees !== null && Number(p.total_employees) > 0) {
+      return {
+        count: Number(p.total_employees) || 0,
+        totalNet: Number(p.total_net_payout) || 0,
+      };
+    }
+
+    // 2. Cek apakah ada record di localStorage (misal offline atau baru dibuat lokal)
+    const localRecords = getPeriodRecords(p.id);
+    if (localRecords && localRecords.length > 0) {
+      const count = localRecords.length;
+      const totalNet = localRecords.reduce((acc, curr) => acc + (Number(curr.net_income) || 0), 0);
+      return { count, totalNet };
+    }
+
+    // 3. Fallback jika total_employees ada tetapi 0 (misal memang belum ada karyawan)
+    return {
+      count: Number(p.total_employees ?? p.employees_count ?? 0),
+      totalNet: Number(p.total_net_payout ?? p.total_salary ?? 0),
+    };
   };
 
   return (
@@ -193,7 +218,7 @@ const Periods = () => {
                 </tr>
               ) : (
                 filteredPeriods.map((p, idx) => {
-                  const stats = getPeriodStats(p.id);
+                  const stats = getPeriodStats(p);
                   return (
                     <tr
                       key={p.id}

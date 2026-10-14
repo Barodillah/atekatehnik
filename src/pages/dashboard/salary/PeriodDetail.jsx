@@ -298,25 +298,28 @@ const PeriodDetail = () => {
   // Handle status change for period (Draft, Published, Paid)
   const handleStatusChange = async (newStatus) => {
     if (!period || !period.id) return;
+    
+    // 1. Optimistic update: langsung perbarui status pada state agar UI tidak pernah blank
+    const nextPeriod = { ...period, status: newStatus };
+    setPeriod(nextPeriod);
+
     try {
-      await salaryApi.savePeriod({
+      // 2. Simpan ke database MySQL ateka_internal
+      const res = await salaryApi.savePeriod({
         id: period.id,
         status: newStatus,
       });
-      const updated = savePeriod({
-        ...period,
-        status: newStatus,
-      });
-      setPeriod(updated);
+      if (res && res.id) {
+        setPeriod((prev) => (prev ? { ...prev, ...res } : nextPeriod));
+      }
+
+      // 3. Simpan juga ke cache localStorage
+      savePeriod(nextPeriod);
       addToast(`Status periode berhasil diubah menjadi "${newStatus}"`, 'success');
     } catch (err) {
-      console.error(err);
-      const updated = savePeriod({
-        ...period,
-        status: newStatus,
-      });
-      setPeriod(updated);
-      addToast('Status periode diubah secara lokal', 'warning');
+      console.error('Error updating period status:', err);
+      savePeriod(nextPeriod);
+      addToast('Status periode diubah secara lokal: ' + (err.message || ''), 'warning');
     }
   };
 
@@ -398,7 +401,16 @@ const PeriodDetail = () => {
     }
   };
 
-  if (!period) return null;
+  if (!period) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center min-h-[400px] text-slate-400">
+        <span className="material-symbols-outlined text-4xl animate-spin text-orange-500 mb-3">
+          progress_activity
+        </span>
+        <p className="text-sm font-medium">Memuat data periode penggajian...</p>
+      </div>
+    );
+  }
 
   // Filtered rows
   const filteredRecords = records.filter((r) => {

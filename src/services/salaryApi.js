@@ -181,10 +181,11 @@ export const getPeriodById = async (id) => {
 
 export const savePeriod = async (periodData) => {
   if (periodData.id && (typeof periodData.id === 'number' || !isNaN(Number(periodData.id)))) {
-    return apiRequest('periods.php', {
+    const data = await apiRequest('periods.php', {
       method: 'PUT',
       body: periodData,
     });
+    return data.period;
   } else {
     const data = await apiRequest('periods.php', {
       method: 'POST',
