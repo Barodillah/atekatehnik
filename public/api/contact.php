@@ -103,7 +103,7 @@ try {
         $mail->Host = $_ENV['MAIL_HOST'] ?? 'smtp.hostinger.com';
         $mail->SMTPAuth = true;
         $mail->Username = $_ENV['MAIL_USERNAME'] ?? 'noreply@atekatehnik.com';
-        $mail->Password = $_ENV['MAIL_PASSWORD'] ?? 'Ateka.354';
+        $mail->Password = $_ENV['MAIL_PASSWORD'] ?? '';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = $_ENV['MAIL_PORT'] ?? 465;
         return $mail;
