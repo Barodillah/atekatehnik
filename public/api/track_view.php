@@ -3,10 +3,27 @@
  * Track View API — Ateka Tehnik
  *
  * POST /api/track_view.php
- * Body: { "page_type": "post"|"product", "slug": "..." }
+ * Body: {
+ *   "page_type": "post"|"product"|"gallery"|"page",
+ *   "slug": "...",
+ *   "landing_url": "...",
+ *   "utm": {
+ *     "utm_source": "...",
+ *     "utm_medium": "...",
+ *     "utm_campaign": "...",
+ *     "utm_content": "...",
+ *     "utm_term": "...",
+ *     "utm_id": "...",
+ *     "utm_source_platform": "...",
+ *     "utm_creative_format": "...",
+ *     "utm_marketing_tactic": "..."
+ *   }
+ * }
  *
  * Records a page view with full analytics:
  * IP, User-Agent parsing, Geo-location via ip-api.com
+ * Also records UTM campaign tracking to campaign_tracking table if utm_source is present.
+ * Includes 5-second server-side deduplication defense against rapid double-hits.
  */
 
 require_once __DIR__ . '/helpers.php';
@@ -19,11 +36,20 @@ $input = getJsonInput();
 $pageType = trim($input['page_type'] ?? '');
 $slug = trim($input['slug'] ?? '');
 
-if (!in_array($pageType, ['post', 'product', 'gallery'])) {
-    jsonError(400, 'page_type must be "post", "product", or "gallery".');
+if (empty($pageType)) {
+    $pageType = 'page';
 }
+
+if (!in_array($pageType, ['post', 'product', 'gallery', 'page'])) {
+    jsonError(400, 'page_type must be "post", "product", "gallery", or "page".');
+}
+
 if (empty($slug)) {
-    jsonError(400, 'slug is required.');
+    if ($pageType === 'page') {
+        $slug = 'home';
+    } else {
+        jsonError(400, 'slug is required.');
+    }
 }
 
 $db = getDB();
@@ -99,9 +125,47 @@ if (!in_array($ip, ['127.0.0.1', '::1', 'unknown', 'localhost'])) {
     $city = 'Localhost';
 }
 
-// ── Insert into Database ─────────────────────────────────────────────
+// ── Check UTM Info & Server-Side Deduplication Safeguard ─────────────
+
+$utm = $input['utm'] ?? $input;
+$utmSource = trim($utm['utm_source'] ?? '');
+$landingUrl = trim($input['landing_url'] ?? $utm['landing_url'] ?? '');
 
 try {
+    // If the exact same IP visited with identical landing_url within the last 5 seconds, debounce it
+    if (!empty($utmSource) && !empty($landingUrl)) {
+        $dupStmt = $db->prepare("
+            SELECT pv.id 
+            FROM page_views pv
+            JOIN campaign_tracking ct ON ct.page_view_id = pv.id
+            WHERE pv.ip_address = :ip 
+              AND ct.landing_url = :url
+              AND pv.viewed_at >= DATE_SUB(NOW(), INTERVAL 5 SECOND)
+            ORDER BY pv.id DESC
+            LIMIT 1
+        ");
+        $dupStmt->execute([
+            ':ip'  => $ip,
+            ':url' => mb_substr($landingUrl, 0, 500)
+        ]);
+        $existingId = $dupStmt->fetchColumn();
+
+        if ($existingId) {
+            $countStmt = $db->prepare("SELECT COUNT(*) FROM page_views WHERE page_type = :pt AND page_slug = :slug");
+            $countStmt->execute([':pt' => $pageType, ':slug' => $slug]);
+            $totalViews = (int) $countStmt->fetchColumn();
+
+            jsonSuccess([
+                'page_view_id'     => (int) $existingId,
+                'views'            => $totalViews,
+                'campaign_tracked' => true,
+                'deduplicated'     => true
+            ], 'View tracked successfully (deduplicated).');
+        }
+    }
+
+    // ── Insert into page_views ─────────────────────────────────────────
+
     $stmt = $db->prepare("
         INSERT INTO page_views (page_type, page_slug, ip_address, user_agent, browser, os, device_type, country, city, referrer)
         VALUES (:page_type, :slug, :ip, :ua, :browser, :os, :device, :country, :city, :referrer)
@@ -119,12 +183,67 @@ try {
         ':referrer'  => mb_substr($referrer, 0, 500),
     ]);
 
+    $pageViewId = (int) $db->lastInsertId();
+
+    // ── Check & Record Campaign Tracking (UTM) ───────────────────────
+    $campaignTracked = false;
+
+    if (!empty($utmSource) && $pageViewId > 0) {
+        $utmStmt = $db->prepare("
+            INSERT INTO campaign_tracking (
+                page_view_id,
+                utm_source,
+                utm_medium,
+                utm_campaign,
+                utm_content,
+                utm_term,
+                utm_id,
+                utm_source_platform,
+                utm_creative_format,
+                utm_marketing_tactic,
+                landing_url
+            ) VALUES (
+                :page_view_id,
+                :utm_source,
+                :utm_medium,
+                :utm_campaign,
+                :utm_content,
+                :utm_term,
+                :utm_id,
+                :utm_source_platform,
+                :utm_creative_format,
+                :utm_marketing_tactic,
+                :landing_url
+            )
+        ");
+
+        $utmStmt->execute([
+            ':page_view_id'         => $pageViewId,
+            ':utm_source'           => mb_substr($utmSource, 0, 100),
+            ':utm_medium'           => !empty($utm['utm_medium']) ? mb_substr(trim($utm['utm_medium']), 0, 100) : null,
+            ':utm_campaign'         => !empty($utm['utm_campaign']) ? mb_substr(trim($utm['utm_campaign']), 0, 150) : null,
+            ':utm_content'          => !empty($utm['utm_content']) ? mb_substr(trim($utm['utm_content']), 0, 255) : null,
+            ':utm_term'             => !empty($utm['utm_term']) ? mb_substr(trim($utm['utm_term']), 0, 255) : null,
+            ':utm_id'               => !empty($utm['utm_id']) ? mb_substr(trim($utm['utm_id']), 0, 100) : null,
+            ':utm_source_platform'  => !empty($utm['utm_source_platform']) ? mb_substr(trim($utm['utm_source_platform']), 0, 100) : null,
+            ':utm_creative_format'  => !empty($utm['utm_creative_format']) ? mb_substr(trim($utm['utm_creative_format']), 0, 100) : null,
+            ':utm_marketing_tactic' => !empty($utm['utm_marketing_tactic']) ? mb_substr(trim($utm['utm_marketing_tactic']), 0, 100) : null,
+            ':landing_url'          => !empty($landingUrl) ? mb_substr($landingUrl, 0, 500) : null,
+        ]);
+
+        $campaignTracked = true;
+    }
+
     // Get total view count for this page
     $countStmt = $db->prepare("SELECT COUNT(*) FROM page_views WHERE page_type = :pt AND page_slug = :slug");
     $countStmt->execute([':pt' => $pageType, ':slug' => $slug]);
     $totalViews = (int) $countStmt->fetchColumn();
 
-    jsonSuccess(['views' => $totalViews], 'View tracked successfully.');
+    jsonSuccess([
+        'page_view_id'     => $pageViewId,
+        'views'            => $totalViews,
+        'campaign_tracked' => $campaignTracked
+    ], 'View tracked successfully.');
 
 } catch (\Exception $e) {
     jsonError(500, 'Failed to track view: ' . $e->getMessage());

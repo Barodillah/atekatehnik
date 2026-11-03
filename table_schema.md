@@ -34,6 +34,23 @@
 | 5 | `role` | `varchar(50)` | YES | - | 'admin' | - |
 | 6 | `created_at` | `timestamp` | YES | - | current_timestamp() | - |
 
+## `campaign_tracking`
+
+| # | Column | Type | Nullable | Key | Default | Extra |
+|---|--------|------|----------|-----|---------|-------|
+| 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
+| 2 | `page_view_id` | `int(11)` | NO | UNI | - | FK to `page_views.id` |
+| 3 | `utm_source` | `varchar(100)` | NO | MUL | - | - |
+| 4 | `utm_medium` | `varchar(100)` | YES | MUL | NULL | - |
+| 5 | `utm_campaign` | `varchar(150)` | YES | MUL | NULL | - |
+| 6 | `utm_content` | `varchar(255)` | YES | - | NULL | - |
+| 7 | `utm_term` | `varchar(255)` | YES | - | NULL | - |
+| 8 | `utm_id` | `varchar(100)` | YES | - | NULL | - |
+| 9 | `utm_source_platform` | `varchar(100)` | YES | - | NULL | - |
+| 10 | `utm_creative_format` | `varchar(100)` | YES | - | NULL | - |
+| 11 | `utm_marketing_tactic` | `varchar(100)` | YES | - | NULL | - |
+| 12 | `landing_url` | `varchar(500)` | YES | - | NULL | - |
+
 ## `chat_messages`
 
 | # | Column | Type | Nullable | Key | Default | Extra |
@@ -81,7 +98,7 @@
 | # | Column | Type | Nullable | Key | Default | Extra |
 |---|--------|------|----------|-----|---------|-------|
 | 1 | `id` | `int(11)` | NO | PRI | - | auto_increment |
-| 2 | `page_type` | `enum('post','product','gallery')` | NO | MUL | - | - |
+| 2 | `page_type` | `enum('post','product','gallery','page')` | NO | MUL | 'page' | - |
 | 3 | `page_slug` | `varchar(255)` | NO | - | - | - |
 | 4 | `ip_address` | `varchar(45)` | NO | MUL | - | - |
 | 5 | `user_agent` | `text` | YES | - | NULL | - |

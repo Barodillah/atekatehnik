@@ -402,6 +402,11 @@ const DashboardLayout = () => {
             <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Analytics</span>
           </Link>
 
+          <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/campaigns')} to="/admin/campaigns" title="Campaign">
+            <span className="material-symbols-outlined shrink-0 text-xl">campaign</span>
+            <span className={isSidebarMinimized ? "block lg:hidden" : "block"}>Campaign</span>
+          </Link>
+
           <Link onClick={() => setIsMobileMenuOpen(false)} className={getLinkClasses('/admin/wa-clicks')} to="/admin/wa-clicks" title="WA Clicks">
             <div className="relative flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-xl">ads_click</span>
@@ -487,6 +492,7 @@ const DashboardLayout = () => {
                         location.pathname.startsWith('/admin/comments') ? "Search comments..." :
                           location.pathname.startsWith('/admin/chat-history') ? "Search chat sessions..." :
                             location.pathname.startsWith('/admin/analytics') ? "Search pages..." :
+                              location.pathname.startsWith('/admin/campaigns') ? "Search UTM campaigns..." :
                               location.pathname.startsWith('/admin/wa-clicks') ? "Search WA clicks..." :
                                 location.pathname.startsWith('/admin/logs') ? "Search logs..." :
                                   "Search data..."

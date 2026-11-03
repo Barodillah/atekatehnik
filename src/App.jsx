@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4';
+import { trackCampaignVisit } from './utils/utmTracker';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
@@ -39,6 +40,7 @@ import AdminGallery from './pages/dashboard/AdminGallery';
 import AdminGalleryForm from './pages/dashboard/AdminGalleryForm';
 import AdminComments from './pages/dashboard/Comments';
 import AdminAnalytics from './pages/dashboard/Analytics';
+import CampaignAnalytics from './pages/dashboard/CampaignAnalytics';
 import ActivityLogs from './pages/dashboard/ActivityLogs';
 import ChatHistory from './pages/dashboard/ChatHistory';
 import WaClicks from './pages/dashboard/WaClicks';
@@ -87,6 +89,9 @@ function App() {
     // Send pageview with a custom path whenever location changes
     ReactGA.send({ hitType: "pageview", page: location.pathname });
 
+    // Track UTM campaign landing if present in URL
+    trackCampaignVisit(location.pathname, location.search);
+
     // Manage dynamic canonical tag
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
@@ -96,7 +101,7 @@ function App() {
     }
     // Set canonical dynamically based on the current location
     canonicalLink.setAttribute('href', `https://atekatehnik.com${location.pathname}`);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <LanguageProvider>
@@ -154,6 +159,8 @@ function App() {
                 <Route path="comments" element={<AdminComments />} />
                 <Route path="chat-history" element={<ChatHistory />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="campaigns" element={<CampaignAnalytics />} />
+                <Route path="campaign" element={<CampaignAnalytics />} />
                 <Route path="wa-clicks" element={<WaClicks />} />
                 <Route path="logs" element={<ActivityLogs />} />
                 <Route path="*" element={<NotFound />} />
