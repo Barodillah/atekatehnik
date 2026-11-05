@@ -124,10 +124,7 @@ const RabBuilder = () => {
   const [installFee, setInstallFee] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [taxRate, setTaxRate] = useState(() => {
-    const saved = localStorage.getItem('ateka_rab_tax_rate');
-    return saved !== null ? (parseFloat(saved) || 11) : 11;
-  });
+  const [taxRate, setTaxRate] = useState(11);
   const [isEditingTaxRate, setIsEditingTaxRate] = useState(false);
   const [tempTaxRate, setTempTaxRate] = useState('');
   const [useTax, setUseTax] = useState(false);
@@ -400,8 +397,14 @@ ${defaultTerms}
 
   // Fetch existing quotation if edit mode
   useEffect(() => {
-    if (!id && location.state?.lead_id) {
-      setSelectedLead(location.state.lead_id.toString());
+    if (!id) {
+      if (location.state?.lead_id) {
+        setSelectedLead(location.state.lead_id.toString());
+      }
+      const defaultRate = null;
+      if (defaultRate !== null) {
+        setTaxRate(parseFloat(defaultRate) || 11);
+      }
     }
 
     if (id) {
@@ -427,6 +430,11 @@ ${defaultTerms}
             setDiscount(parseFloat(q.discount_amount) || 0);
             setUseTax(q.use_tax == 1);
             setTerms(q.terms_conditions || defaultTerms);
+
+            const savedRate = localStorage.getItem(`ateka_rab_tax_rate_${id}`);
+            if (savedRate !== null) {
+              setTaxRate(parseFloat(savedRate) || 11);
+            }
 
             if (q.items && q.items.length > 0) {
               setItems(q.items.map(item => ({
@@ -740,7 +748,10 @@ ${defaultTerms}
         }
 
         if (!id) {
+          localStorage.setItem(`ateka_rab_tax_rate_${data.id}`, taxRate.toString());
           navigate(`/admin/rab/edit/${data.id}`, { replace: true });
+        } else {
+          localStorage.setItem(`ateka_rab_tax_rate_${id}`, taxRate.toString());
         }
 
         setLastSavedPayloadStr(JSON.stringify(payload));
@@ -1967,7 +1978,9 @@ ${defaultTerms}
                 return;
               }
               setTaxRate(val);
-              localStorage.setItem('ateka_rab_tax_rate', val.toString());
+              if (id) {
+                localStorage.setItem(`ateka_rab_tax_rate_${id}`, val.toString());
+              }
               setIsEditingTaxRate(false);
               addToast(`Nilai PPN berhasil diubah menjadi ${val}%`, 'success');
             }} className="p-5 space-y-4">

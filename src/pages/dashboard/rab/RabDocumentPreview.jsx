@@ -29,6 +29,10 @@ const RabDocumentPreview = () => {
   const [isEditingAdvantages, setIsEditingAdvantages] = useState(false);
   const [advantagesText, setAdvantagesText] = useState('');
 
+  const [taxRate, setTaxRate] = useState(11);
+  const [isEditingTaxRate, setIsEditingTaxRate] = useState(false);
+  const [tempTaxRate, setTempTaxRate] = useState('');
+
   // Load from local storage or default text when quotationDetails changes
   useEffect(() => {
     if (quotationDetails) {
@@ -37,6 +41,11 @@ const RabDocumentPreview = () => {
         setAdvantagesText(saved);
       } else {
         setAdvantagesText(`Efisiensi tenaga kerja dengan alur sistem vertikal otomatis yang terintegrasi.\nTingkat rendemen optimal dengan meminimalkan beras patah pada proses poles.\nKomponen mesin berkualitas industri untuk durabilitas dan pemakaian jangka panjang.`);
+      }
+
+      const savedTaxRate = localStorage.getItem(`ateka_rab_tax_rate_${id}`);
+      if (savedTaxRate !== null) {
+        setTaxRate(parseFloat(savedTaxRate) || 11);
       }
     }
   }, [id, quotationDetails]);
@@ -330,15 +339,20 @@ const RabDocumentPreview = () => {
   const q = quotationDetails;
   const subtotalItems = q.items.reduce((s, i) => s + (i.qty * i.price), 0);
   const dpp = subtotalItems + q.install_fee + q.shipping_fee - q.discount;
-  const tax = q.use_tax ? Math.ceil(dpp * 0.11) : 0;
+  const tax = q.use_tax ? Math.ceil(dpp * (taxRate / 100)) : 0;
   const grandTotal = dpp + tax;
 
   const coverItems = q.items.filter(i => i.showOnCover);
   const coverRows = [];
   for (let i = 0; i < coverItems.length; i += 2) coverRows.push(coverItems.slice(i, i + 2));
 
+  const handleOpenTaxRateModal = () => {
+    setTempTaxRate(taxRate.toString());
+    setIsEditingTaxRate(true);
+  };
+
   const edit = { editStates, editValues, setEditValues, startEdit, cancelEdit, saveEdit };
-  const summaryProps = { q, subtotalItems, dpp, tax, grandTotal };
+  const summaryProps = { q, subtotalItems, dpp, tax, grandTotal, taxRate, onEditTaxRate: handleOpenTaxRateModal };
 
   // ---------- Pagination (based on measured heights) ----------
   const paper = PAPER_SIZES[paperSize];
@@ -552,6 +566,83 @@ const RabDocumentPreview = () => {
             {groupRuns(pageBlocks).map(renderRun)}
           </PageFrame>
         ))}
+      {/* Modal Edit Nilai PPN */}
+      {isEditingTaxRate && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden animate-in zoom-in duration-200">
+            <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                <span className="material-symbols-outlined text-amber-600 text-lg">edit</span>
+                Pengaturan Nilai PPN (%)
+              </h3>
+              <button 
+                onClick={() => setIsEditingTaxRate(false)} 
+                className="text-slate-400 hover:text-red-500 rounded-full p-1 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const val = parseFloat(tempTaxRate);
+              if (isNaN(val) || val < 0) {
+                addToast('Masukkan persentase PPN yang valid (>= 0)', 'warning');
+                return;
+              }
+              setTaxRate(val);
+              if (id) {
+                localStorage.setItem(`ateka_rab_tax_rate_${id}`, val.toString());
+              }
+              setIsEditingTaxRate(false);
+              addToast(`Nilai PPN berhasil diubah menjadi ${val}%`, 'success');
+            }} className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">
+                  Persentase PPN untuk Dokumen Ini
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    autoFocus
+                    value={tempTaxRate}
+                    onChange={(e) => setTempTaxRate(e.target.value)}
+                    placeholder="Contoh: 11 atau 12"
+                    className="w-full pl-3 pr-10 py-2 border border-slate-300 rounded-lg font-bold text-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-slate-500">
+                    %
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Nilai PPN disimpan khusus untuk dokumen RAB ini dan langsung memperbarui kalkulasi Grand Total serta tampilan cetak.
+                </p>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingTaxRate(false)}
+                  className="flex-1 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">save</span>
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       </div>
     </div>
   );

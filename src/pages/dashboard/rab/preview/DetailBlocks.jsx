@@ -53,7 +53,7 @@ export const RabTableRow = ({ item, number, measureId }) => (
   </tr>
 );
 
-export const SummaryBlock = ({ q, subtotalItems, dpp, tax, grandTotal }) => (
+export const SummaryBlock = ({ q, subtotalItems, dpp, tax, grandTotal, taxRate = 11, onEditTaxRate }) => (
   <>
     {/* Subtotals & Grand Total */}
     <div className="flex justify-end mb-8">
@@ -81,13 +81,27 @@ export const SummaryBlock = ({ q, subtotalItems, dpp, tax, grandTotal }) => (
           </div>
         )}
 
-        <div className="flex justify-between pt-1">
-          <span>Dasar Pengenaan Pajak:</span>
-          <span className="font-bold">{formatRupiah(dpp)}</span>
-        </div>
         {q.use_tax && (
-          <div className="flex justify-between border-b border-slate-800 pb-1">
-            <span>PPN (11%):</span>
+          <div className="flex justify-between pt-1">
+            <span>Dasar Pengenaan Pajak:</span>
+            <span className="font-bold">{formatRupiah(dpp)}</span>
+          </div>
+        )}
+        {q.use_tax && (
+          <div className="flex justify-between items-center border-b border-slate-800 pb-1">
+            <span className="flex items-center gap-1">
+              <span>PPN ({taxRate}%):</span>
+              {onEditTaxRate && (
+                <button
+                  type="button"
+                  onClick={onEditTaxRate}
+                  title="Ubah Tarif PPN"
+                  className="no-print inline-flex items-center justify-center w-4 h-4 rounded hover:bg-slate-200 text-slate-500 hover:text-amber-600 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[12px]">edit</span>
+                </button>
+              )}
+            </span>
             <span className="font-bold">{formatRupiah(tax)}</span>
           </div>
         )}
