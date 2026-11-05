@@ -197,6 +197,37 @@ const OfficialChannels = () => {
                 </div>
               </div>
 
+              {/* Fake Facebook */}
+              <div className="space-y-3 pt-4 border-t border-red-50">
+                <h3 className="font-bold text-red-900 flex items-center gap-2">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" className="w-5 h-5 object-contain grayscale-[40%]" />
+                  {t('channels.fakeFbLabel')}
+                </h3>
+                <div className="p-4 bg-white rounded-sm border-2 border-dashed border-red-300 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-red-400 mt-0.5">warning</span>
+                      <div>
+                        <p className="font-bold text-gray-800 line-through decoration-red-500 decoration-2">facebook.com/atktehnik.gondang</p>
+                        <p className="text-xs text-red-600 font-medium tracking-wide mt-0.5">{t('channels.fakeFbNote')}</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('channels.fakeFbDesc')}</p>
+                      </div>
+                    </div>
+                    <a href="https://www.facebook.com/atktehnik.gondang/" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-sm transition-colors border border-red-100 inline-flex items-center justify-center gap-1 shrink-0 w-fit">
+                      {t('channels.fakeFbVisit')} <span className="material-symbols-outlined text-xs">open_in_new</span>
+                    </a>
+                  </div>
+                  <div className="rounded-sm overflow-hidden border border-red-200 bg-red-50/40">
+                    <img
+                      src="https://atekatehnik.com/media/uploads/asset_6aec24147d3ef6.80063653.jpeg"
+                      alt="Tangkapan Layar Akun Facebook Palsu Mengaku Ateka Tehnik"
+                      className="w-full max-h-96 object-contain mx-auto"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 

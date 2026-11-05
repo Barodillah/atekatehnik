@@ -276,6 +276,10 @@ const translations = {
     "channels.fakeWebLabel": "Website Tiruan Merek Kami",
     "channels.fakeWebNote": "Menggunakan huruf 'k' - BUKAN KAMI",
     "channels.fakeWebVisit": "Kunjungi",
+    "channels.fakeFbLabel": "Akun Facebook Mengaku Ateka Tehnik",
+    "channels.fakeFbNote": "Akun tiruan tidak resmi - BUKAN KAMI",
+    "channels.fakeFbVisit": "Lihat Profil FB",
+    "channels.fakeFbDesc": "Akun ini mencatut nama dan foto bengkel/produk kami secara ilegal.",
     "channels.backHome": "Kembali ke Beranda",
 
     // Privacy Policy
@@ -708,6 +712,10 @@ const translations = {
     "channels.fakeWebLabel": "Counterfeit Brand Website",
     "channels.fakeWebNote": "Uses the letter 'k' - NOT US",
     "channels.fakeWebVisit": "Visit",
+    "channels.fakeFbLabel": "Facebook Account Claiming to be Ateka Tehnik",
+    "channels.fakeFbNote": "Counterfeit / unofficial account - NOT US",
+    "channels.fakeFbVisit": "View FB Profile",
+    "channels.fakeFbDesc": "This account uses our workshop and product materials without permission.",
     "channels.backHome": "Back to Home",
 
     // Privacy Policy

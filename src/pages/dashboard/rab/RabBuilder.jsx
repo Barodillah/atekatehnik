@@ -124,7 +124,13 @@ const RabBuilder = () => {
   const [installFee, setInstallFee] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [useTax, setUseTax] = useState(false); // PPN 11%
+  const [taxRate, setTaxRate] = useState(() => {
+    const saved = localStorage.getItem('ateka_rab_tax_rate');
+    return saved !== null ? (parseFloat(saved) || 11) : 11;
+  });
+  const [isEditingTaxRate, setIsEditingTaxRate] = useState(false);
+  const [tempTaxRate, setTempTaxRate] = useState('');
+  const [useTax, setUseTax] = useState(false);
   const [terms, setTerms] = useState(defaultTerms);
 
   // States - Tax Calculator
@@ -139,7 +145,7 @@ const RabBuilder = () => {
     const checkedItems = items.filter(item => taxCalcItemSelection[item.id]);
     const uncheckedItems = items.filter(item => !taxCalcItemSelection[item.id]);
 
-    const dpp = target / 1.11;
+    const dpp = target / (1 + (taxRate / 100));
     const fixedTotal = uncheckedItems.reduce((acc, item) => acc + (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 1), 0);
     const targetCheckedSubtotal = dpp - installFee - shippingFee + discount - fixedTotal;
 
@@ -148,7 +154,7 @@ const RabBuilder = () => {
     }
 
     const currentCheckedSubtotal = checkedItems.reduce((acc, item) => acc + (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 1), 0);
-    
+
     if (currentCheckedSubtotal <= 0 && checkedItems.length > 0) {
       return { dpp, previewItems: items, isValid: false, message: 'Subtotal item terpilih bernilai Rp 0.' };
     }
@@ -187,10 +193,10 @@ const RabBuilder = () => {
       initialSelection[item.id] = true;
     });
     setTaxCalcItemSelection(initialSelection);
-    
+
     const subTotal = items.reduce((acc, item) => acc + (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 1), 0);
     const dppVal = subTotal + installFee + shippingFee - discount;
-    const taxVal = useTax ? Math.round(dppVal * 0.11) : 0;
+    const taxVal = useTax ? Math.round(dppVal * (taxRate / 100)) : 0;
     const currentGrandTotal = dppVal + taxVal;
 
     setTaxCalcTarget(currentGrandTotal > 0 ? new Intl.NumberFormat('id-ID').format(currentGrandTotal) : '');
@@ -321,11 +327,11 @@ ${defaultTerms}
 
       const data = await response.json();
       let content = data.choices[0].message.content;
-      
+
       // Clean up potential markdown formatting
       content = content.replace(/```json/gi, '').replace(/```/g, '').trim();
       const parsedData = JSON.parse(content);
-      
+
       if (parsedData) {
         // Set Header & Cover info
         if (parsedData.title) setTitle(parsedData.title);
@@ -348,11 +354,11 @@ ${defaultTerms}
             unit: item.unit || "unit",
             price: Number(item.price) || 0,
             showOnCover: true,
-            image_url: "" 
+            image_url: ""
           }));
           setItems(prev => [...prev, ...newItems]);
         }
-        
+
         setIsAiModalOpen(false);
         setAiRawText("");
         addToast("RAB berhasil di-generate dari AI", 'success');
@@ -370,7 +376,7 @@ ${defaultTerms}
   // Derived calculations
   const subtotalItems = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
   const subtotalBeforeTax = subtotalItems + installFee + shippingFee - discount;
-  const taxAmount = useTax ? Math.ceil(subtotalBeforeTax * 0.11) : 0;
+  const taxAmount = useTax ? Math.ceil(subtotalBeforeTax * (taxRate / 100)) : 0;
   const grandTotal = subtotalBeforeTax + taxAmount;
 
   const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
@@ -397,7 +403,7 @@ ${defaultTerms}
     if (!id && location.state?.lead_id) {
       setSelectedLead(location.state.lead_id.toString());
     }
-    
+
     if (id) {
       const fetchQuotation = async () => {
         setIsLoading(true);
@@ -736,9 +742,9 @@ ${defaultTerms}
         if (!id) {
           navigate(`/admin/rab/edit/${data.id}`, { replace: true });
         }
-        
+
         setLastSavedPayloadStr(JSON.stringify(payload));
-        
+
         if (autoSave) {
           addToast("Perubahan otomatis disimpan.", 'success');
         } else {
@@ -770,7 +776,7 @@ ${defaultTerms}
 
   useEffect(() => {
     if (!id || isLoading || lastSavedPayloadStr === null) return;
-    
+
     if (currentPayloadStr === lastSavedPayloadStr) {
       setAutoSaveCountdown(0);
       return;
@@ -789,7 +795,7 @@ ${defaultTerms}
           setAutoSaveCountdown(count);
         }
       }, 1000);
-      timeoutId.intervalId = intervalId; 
+      timeoutId.intervalId = intervalId;
     }, 5000);
 
     return () => {
@@ -804,7 +810,7 @@ ${defaultTerms}
     <div className="p-4 sm:p-6 pb-32">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex items-start sm:items-center gap-3">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="mt-1 sm:mt-0 p-2 bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors flex items-center justify-center shadow-sm"
             title="Kembali"
@@ -865,7 +871,7 @@ ${defaultTerms}
                 </div>
                 <div className="relative">
                   <label className="block text-xs font-bold text-slate-600 mb-1">Pilih Klien (Lead)</label>
-                  <div 
+                  <div
                     className="w-full border border-slate-300 rounded-lg text-sm bg-white p-2 cursor-pointer flex justify-between items-center"
                     onClick={() => setIsSelectLeadOpen(!isSelectLeadOpen)}
                   >
@@ -877,23 +883,23 @@ ${defaultTerms}
                     </span>
                     <span className="material-symbols-outlined text-sm text-slate-400">expand_more</span>
                   </div>
-                  
+
                   {isSelectLeadOpen && (
                     <>
                       <div className="fixed inset-0 z-[50]" onClick={() => setIsSelectLeadOpen(false)}></div>
                       <div className="absolute z-[60] mt-1 w-full bg-white border border-slate-300 rounded-lg shadow-xl overflow-hidden">
                         <div className="p-2 border-b border-slate-100 flex gap-2">
-                           <input 
-                             type="text" 
-                             className="w-full p-2 text-xs border border-slate-300 rounded-md outline-none focus:ring-1 focus:ring-blue-500" 
-                             placeholder="Cari nama atau perusahaan..."
-                             value={searchLeadText}
-                             onChange={(e) => setSearchLeadText(e.target.value)}
-                             autoFocus
-                           />
+                          <input
+                            type="text"
+                            className="w-full p-2 text-xs border border-slate-300 rounded-md outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder="Cari nama atau perusahaan..."
+                            value={searchLeadText}
+                            onChange={(e) => setSearchLeadText(e.target.value)}
+                            autoFocus
+                          />
                         </div>
                         <ul className="max-h-60 overflow-y-auto">
-                          <li 
+                          <li
                             className="p-3 text-xs text-blue-600 font-bold hover:bg-blue-50 cursor-pointer flex items-center gap-2 border-b border-slate-100"
                             onClick={() => {
                               setIsSelectLeadOpen(false);
@@ -902,7 +908,7 @@ ${defaultTerms}
                           >
                             <span className="material-symbols-outlined text-[16px]">add_circle</span> Buat Lead Baru
                           </li>
-                          <li 
+                          <li
                             className="p-2.5 text-xs text-slate-500 font-medium hover:bg-slate-50 cursor-pointer italic text-center border-b border-slate-100"
                             onClick={() => {
                               setSelectedLead('');
@@ -911,9 +917,9 @@ ${defaultTerms}
                           >
                             -- Kosongkan Pilihan --
                           </li>
-                          {dbLeads.filter(l => (l.name+' '+l.company).toLowerCase().includes(searchLeadText.toLowerCase())).map(l => (
-                            <li 
-                              key={l.id} 
+                          {dbLeads.filter(l => (l.name + ' ' + l.company).toLowerCase().includes(searchLeadText.toLowerCase())).map(l => (
+                            <li
+                              key={l.id}
                               className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0"
                               onClick={() => {
                                 setSelectedLead(l.id.toString());
@@ -1205,14 +1211,14 @@ ${defaultTerms}
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, index) => (
-                    <tr 
-                      key={item.id} 
+                    <tr
+                      key={item.id}
                       className={`hover:bg-slate-50 group align-top ${draggedIndex === index ? 'opacity-50 bg-slate-100' : ''}`}
                       onDragOver={onItemDragOver}
                       onDrop={(e) => onItemDrop(e, index)}
                     >
                       <td className="p-3 text-center align-middle">
-                        <div 
+                        <div
                           draggable
                           onDragStart={(e) => onItemDragStart(e, index)}
                           onDragEnd={() => setDraggedIndex(null)}
@@ -1369,6 +1375,7 @@ ${defaultTerms}
                   </label>
                   <input
                     type="text"
+                    placeholder="0"
                     className="w-full border-slate-300 rounded-lg text-sm text-right focus:ring-blue-500 focus:border-blue-500"
                     value={installFee ? new Intl.NumberFormat('id-ID').format(installFee) : ''}
                     onChange={(e) => {
@@ -1384,6 +1391,7 @@ ${defaultTerms}
                   </label>
                   <input
                     type="text"
+                    placeholder="0"
                     className="w-full border-slate-300 rounded-lg text-sm text-right focus:ring-blue-500 focus:border-blue-500"
                     value={shippingFee ? new Intl.NumberFormat('id-ID').format(shippingFee) : ''}
                     onChange={(e) => {
@@ -1399,6 +1407,7 @@ ${defaultTerms}
                   </label>
                   <input
                     type="text"
+                    placeholder="0"
                     className="w-full border-slate-300 rounded-lg text-sm text-right focus:ring-blue-500 focus:border-blue-500 text-red-500"
                     value={discount ? new Intl.NumberFormat('id-ID').format(discount) : ''}
                     onChange={(e) => {
@@ -1413,8 +1422,19 @@ ${defaultTerms}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div>
                   <div className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                    Kenakan PPN 11%
-                    <button 
+                    <span>Kenakan PPN {taxRate}%</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempTaxRate(taxRate.toString());
+                        setIsEditingTaxRate(true);
+                      }}
+                      title="Edit Nilai PPN"
+                      className="w-6 h-6 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-700 flex items-center justify-center transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">edit</span>
+                    </button>
+                    <button
                       onClick={handleOpenTaxCalc}
                       title="Kalkulator Reverse PPN"
                       className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors"
@@ -1438,7 +1458,7 @@ ${defaultTerms}
                 </div>
                 {useTax && (
                   <div className="flex justify-between text-sm text-slate-600">
-                    <span>PPN (11%)</span>
+                    <span>PPN ({taxRate}%)</span>
                     <span className="font-medium">{formatRupiah(taxAmount)}</span>
                   </div>
                 )}
@@ -1553,7 +1573,7 @@ ${defaultTerms}
           </div>
         </div>
       )}
-      
+
       {/* Item Image Modal */}
       {activeImageItem && (
         <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4" onClick={() => setItemImageModalId(null)}>
@@ -1568,111 +1588,111 @@ ${defaultTerms}
               </button>
             </div>
             <div className="p-5 overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-3">
-                    {/* Option 1: Drag & Drop Upload */}
-                    <div
-                      className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer relative ${isItemDragOver ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-slate-400 bg-slate-50'}`}
-                      onDragOver={(e) => { e.preventDefault(); setIsItemDragOver(true); }}
-                      onDragLeave={(e) => { e.preventDefault(); setIsItemDragOver(false); }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        setIsItemDragOver(false);
-                        const file = e.dataTransfer.files?.[0];
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-3">
+                  {/* Option 1: Drag & Drop Upload */}
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer relative ${isItemDragOver ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-slate-400 bg-slate-50'}`}
+                    onDragOver={(e) => { e.preventDefault(); setIsItemDragOver(true); }}
+                    onDragLeave={(e) => { e.preventDefault(); setIsItemDragOver(false); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsItemDragOver(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) handleFileUpload(file, (url) => setItemImage(activeImageItem.id, url));
+                    }}
+                    onClick={() => !isUploading && itemFileInputRef.current?.click()}
+                  >
+                    <input
+                      type="file"
+                      ref={itemFileInputRef}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
                         if (file) handleFileUpload(file, (url) => setItemImage(activeImageItem.id, url));
+                        e.target.value = '';
                       }}
-                      onClick={() => !isUploading && itemFileInputRef.current?.click()}
-                    >
-                      <input
-                        type="file"
-                        ref={itemFileInputRef}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(file, (url) => setItemImage(activeImageItem.id, url));
-                          e.target.value = '';
-                        }}
-                        className="hidden"
-                        accept="image/jpeg, image/png, image/webp, image/gif"
-                      />
-                      {isUploading ? (
-                        <div className="flex flex-col items-center justify-center text-blue-600">
-                          <span className="material-symbols-outlined animate-spin mb-1">sync</span>
-                          <span className="text-xs font-bold">Mengupload...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <span className="material-symbols-outlined text-3xl text-slate-400 mb-1">cloud_upload</span>
-                          <p className="text-sm font-bold text-slate-700">Klik / Drag & Drop</p>
-                          <p className="text-xs text-slate-500 mt-1">JPG, PNG, WEBP max 2MB</p>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <div className="h-px bg-slate-200 flex-1"></div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">ATAU</span>
-                      <div className="h-px bg-slate-200 flex-1"></div>
-                    </div>
-
-                    {/* Option 2: Link */}
-                    <div>
-                      <label className="block text-[10px] text-slate-500 mb-1 uppercase tracking-wider font-bold">Tempel Link Biasa</label>
-                      <input
-                        type="text"
-                        value={activeImageItem.image_url || ''}
-                        onChange={(e) => setItemImage(activeImageItem.id, e.target.value)}
-                        placeholder="https://..."
-                        className="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <div className="h-px bg-slate-200 flex-1"></div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">ATAU</span>
-                      <div className="h-px bg-slate-200 flex-1"></div>
-                    </div>
-
-                    {/* Option 3: Collection */}
-                    <button
-                      type="button"
-                      onClick={() => openCollection(activeImageItem.id)}
-                      className="w-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-sm">collections_bookmark</span>
-                      Pilih dari Koleksi
-                    </button>
-                  </div>
-
-                  {/* Preview */}
-                  <div className="border border-slate-200 rounded-lg bg-slate-100 flex flex-col items-center justify-center p-2 min-h-[200px] overflow-hidden relative group">
-                    {activeImageItem.image_url ? (
-                      <>
-                        <img
-                          src={activeImageItem.image_url}
-                          alt="Preview Item"
-                          className="max-h-60 w-auto object-contain rounded"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://placehold.co/400x300/e2e8f0/475569?text=Gagal+Memuat+Gambar';
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setItemImage(activeImageItem.id, '')}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
-                          title="Hapus Gambar"
-                        >
-                          <span className="material-symbols-outlined text-[16px] block">delete</span>
-                        </button>
-                      </>
-                    ) : (
-                      <div className="text-center text-slate-400 flex flex-col items-center">
-                        <span className="material-symbols-outlined text-4xl mb-1 opacity-40">image</span>
-                        <span className="text-xs font-medium">Pratinjau Gambar Item</span>
+                      className="hidden"
+                      accept="image/jpeg, image/png, image/webp, image/gif"
+                    />
+                    {isUploading ? (
+                      <div className="flex flex-col items-center justify-center text-blue-600">
+                        <span className="material-symbols-outlined animate-spin mb-1">sync</span>
+                        <span className="text-xs font-bold">Mengupload...</span>
                       </div>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-3xl text-slate-400 mb-1">cloud_upload</span>
+                        <p className="text-sm font-bold text-slate-700">Klik / Drag & Drop</p>
+                        <p className="text-xs text-slate-500 mt-1">JPG, PNG, WEBP max 2MB</p>
+                      </>
                     )}
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-slate-200 flex-1"></div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">ATAU</span>
+                    <div className="h-px bg-slate-200 flex-1"></div>
+                  </div>
+
+                  {/* Option 2: Link */}
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1 uppercase tracking-wider font-bold">Tempel Link Biasa</label>
+                    <input
+                      type="text"
+                      value={activeImageItem.image_url || ''}
+                      onChange={(e) => setItemImage(activeImageItem.id, e.target.value)}
+                      placeholder="https://..."
+                      className="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-slate-200 flex-1"></div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">ATAU</span>
+                    <div className="h-px bg-slate-200 flex-1"></div>
+                  </div>
+
+                  {/* Option 3: Collection */}
+                  <button
+                    type="button"
+                    onClick={() => openCollection(activeImageItem.id)}
+                    className="w-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-sm">collections_bookmark</span>
+                    Pilih dari Koleksi
+                  </button>
                 </div>
+
+                {/* Preview */}
+                <div className="border border-slate-200 rounded-lg bg-slate-100 flex flex-col items-center justify-center p-2 min-h-[200px] overflow-hidden relative group">
+                  {activeImageItem.image_url ? (
+                    <>
+                      <img
+                        src={activeImageItem.image_url}
+                        alt="Preview Item"
+                        className="max-h-60 w-auto object-contain rounded"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://placehold.co/400x300/e2e8f0/475569?text=Gagal+Memuat+Gambar';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setItemImage(activeImageItem.id, '')}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                        title="Hapus Gambar"
+                      >
+                        <span className="material-symbols-outlined text-[16px] block">delete</span>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-center text-slate-400 flex flex-col items-center">
+                      <span className="material-symbols-outlined text-4xl mb-1 opacity-40">image</span>
+                      <span className="text-xs font-medium">Pratinjau Gambar Item</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="p-4 border-t border-slate-200 bg-slate-50 text-right">
               <button onClick={() => setItemImageModalId(null)} className="text-sm font-bold bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">
@@ -1699,7 +1719,7 @@ ${defaultTerms}
                 <span className="material-symbols-outlined text-blue-600">save</span>
                 Simpan Sebagai Template
               </h3>
-              <button 
+              <button
                 onClick={() => setIsSaveTemplateModalOpen(false)}
                 className="text-slate-400 hover:text-red-500 transition-colors p-1"
               >
@@ -1711,24 +1731,24 @@ ${defaultTerms}
                 Simpan pengaturan RAB ini sebagai template agar dapat digunakan kembali di masa mendatang tanpa harus menyusun dari awal.
               </p>
               <label className="block text-xs font-bold text-slate-600 mb-2 uppercase tracking-wider">Nama Template</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 autoFocus
                 placeholder="Contoh: RAB RMU 2 Ton/Jam Standard"
                 className="w-full border-slate-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-3"
                 value={templateNameInput}
                 onChange={(e) => setTemplateNameInput(e.target.value)}
-                onKeyDown={(e) => { if(e.key === 'Enter') confirmSaveTemplate(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') confirmSaveTemplate(); }}
               />
             </div>
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => setIsSaveTemplateModalOpen(false)}
                 className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
               >
                 Batal
               </button>
-              <button 
+              <button
                 onClick={confirmSaveTemplate}
                 disabled={!templateNameInput.trim() || isSaving}
                 className="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg shadow hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer"
@@ -1777,13 +1797,13 @@ ${defaultTerms}
                   <div className="relative">
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Ref Kapasitas</label>
                     <div className="flex flex-col gap-2">
-                      <input 
-                        name="capacity_ref" 
-                        value={leadFormData.capacity_ref} 
-                        onChange={handleLeadFormChange} 
-                        className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm font-semibold" 
-                        placeholder="Ketik kapasitas atau pilih opsi..." 
-                        type="text" 
+                      <input
+                        name="capacity_ref"
+                        value={leadFormData.capacity_ref}
+                        onChange={handleLeadFormChange}
+                        className="w-full bg-slate-50 border-b-2 border-slate-300 focus:border-blue-500 transition-colors py-3 px-4 outline-none text-sm font-semibold"
+                        placeholder="Ketik kapasitas atau pilih opsi..."
+                        type="text"
                       />
                       <div className="flex flex-wrap gap-2 mt-1">
                         {['500 Kg/Jam', '500 Kg - 1 Ton/Jam', '1 - 5 Ton/Jam', '> 5 Ton/Jam'].map((preset) => (
@@ -1791,11 +1811,10 @@ ${defaultTerms}
                             key={preset}
                             type="button"
                             onClick={() => handleLeadFormChange({ target: { name: 'capacity_ref', value: preset } })}
-                            className={`px-3 py-1.5 text-[10px] sm:text-xs rounded-full border transition-colors ${
-                              leadFormData.capacity_ref === preset
+                            className={`px-3 py-1.5 text-[10px] sm:text-xs rounded-full border transition-colors ${leadFormData.capacity_ref === preset
                                 ? 'bg-blue-500 text-white border-blue-500'
                                 : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'
-                            }`}
+                              }`}
                           >
                             {preset}
                           </button>
@@ -1870,14 +1889,14 @@ ${defaultTerms}
                   <p className="text-sm text-slate-500">Otomatisasi pembuatan item dari deskripsi atau catatan</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsAiModalOpen(false)}
                 className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
-            
+
             <div className="p-4 sm:p-6 bg-slate-50/50">
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Masukkan kebutuhan / spesifikasi (teks bebas):
@@ -1893,7 +1912,7 @@ ${defaultTerms}
                 <p>AI akan mencoba mencocokkan permintaan Anda dengan <b>Katalog Produk</b> yang ada. Jika tidak ada yang cocok, AI akan membuat item kustom.</p>
               </div>
             </div>
-            
+
             <div className="p-4 sm:p-6 border-t border-slate-100 flex justify-end gap-3 bg-white">
               <button
                 onClick={() => setIsAiModalOpen(false)}
@@ -1923,6 +1942,81 @@ ${defaultTerms}
           </div>
         </div>
       )}
+      {/* Modal Edit Nilai PPN */}
+      {isEditingTaxRate && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden animate-in zoom-in duration-200">
+            <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                <span className="material-symbols-outlined text-amber-600 text-lg">edit</span>
+                Pengaturan Nilai PPN (%)
+              </h3>
+              <button
+                onClick={() => setIsEditingTaxRate(false)}
+                className="text-slate-400 hover:text-red-500 rounded-full p-1 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const val = parseFloat(tempTaxRate);
+              if (isNaN(val) || val < 0) {
+                addToast('Masukkan persentase PPN yang valid (>= 0)', 'warning');
+                return;
+              }
+              setTaxRate(val);
+              localStorage.setItem('ateka_rab_tax_rate', val.toString());
+              setIsEditingTaxRate(false);
+              addToast(`Nilai PPN berhasil diubah menjadi ${val}%`, 'success');
+            }} className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">
+                  Persentase PPN Baru
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    autoFocus
+                    value={tempTaxRate}
+                    onChange={(e) => setTempTaxRate(e.target.value)}
+                    placeholder="Contoh: 11 atau 12"
+                    className="w-full pl-3 pr-10 py-2 border border-slate-300 rounded-lg font-bold text-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-slate-500">
+                    %
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Nilai PPN tersimpan di local storage browser Anda dan akan digunakan otomatis untuk kalkulasi DPP, Reverse PPN, dan Grand Total.
+                </p>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingTaxRate(false)}
+                  className="flex-1 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">save</span>
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Tax Calculator Modal */}
       {isTaxCalcModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
@@ -1936,10 +2030,26 @@ ${defaultTerms}
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            
+
             <div className="p-5 flex-1 overflow-y-auto max-h-[60vh]">
               <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Target Grand Total (Dengan PPN 11%)</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
+                    Target Grand Total (Dengan PPN {taxRate}%)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempTaxRate(taxRate.toString());
+                      setIsEditingTaxRate(true);
+                    }}
+                    title="Ubah Tarif PPN"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">edit</span>
+                    <span>Ubah PPN ({taxRate}%)</span>
+                  </button>
+                </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">Rp</span>
                   <input
