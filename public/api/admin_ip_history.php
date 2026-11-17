@@ -174,8 +174,16 @@ foreach ($rawViews as $v) {
 }
 
 // 3. Fetch WA clicks for this IP
+$hasTargetCols = false;
+try {
+    $colCheck = $db->query("SHOW COLUMNS FROM wa_cta_clicks LIKE 'target_number'")->fetch();
+    if ($colCheck) $hasTargetCols = true;
+} catch (\Throwable $e) {}
+
+$targetCols = $hasTargetCols ? ", COALESCE(target_number, '') as target_number, COALESCE(target_label, '') as target_label" : ", '' as target_number, '' as target_label";
+
 $waClicksStmt = $db->prepare("
-    SELECT id, source_page, source_label, referrer, clicked_at
+    SELECT id, source_page, source_label, referrer, clicked_at {$targetCols}
     FROM wa_cta_clicks
     WHERE ip_address = :ip
     ORDER BY clicked_at DESC

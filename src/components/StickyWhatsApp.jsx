@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { trackWaClick } from '../utils/trackWaClick';
+import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl } from '../utils/whatsappRotator';
 
 const StickyWhatsApp = () => {
   const location = useLocation();
@@ -26,7 +26,13 @@ const StickyWhatsApp = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
-  const WA_LINK = 'https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik.';
+  const defaultContact = getCurrentWaContact();
+  const fallbackHref = buildWaUrl(defaultContact.number);
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    handleRotatedWaClick('floating-btn', 'whatsapp');
+  };
 
   return (
     <div
@@ -35,10 +41,10 @@ const StickyWhatsApp = () => {
       }`}
     >
       <a
-        href={WA_LINK}
+        href={fallbackHref}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackWaClick('floating-btn', 'whatsapp')}
+        onClick={handleClick}
         className="flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#20bd5a] hover:scale-110 transition-transform animate-bounce group"
         title="Hubungi via WhatsApp"
       >

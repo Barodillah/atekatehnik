@@ -15,7 +15,22 @@ $db = getDB();
 $sourcePage = trim($_GET['source_page'] ?? '');
 $cityFilter = trim($_GET['city'] ?? '');
 $ipFilter = trim($_GET['ip'] ?? '');
+$csFilter = trim($_GET['cs'] ?? '');
 $q = trim($_GET['q'] ?? '');
+
+// Auto-check / migrate columns if needed
+$hasTargetCols = false;
+try {
+    $colCheck = $db->query("SHOW COLUMNS FROM wa_cta_clicks LIKE 'target_number'")->fetch();
+    if ($colCheck) {
+        $hasTargetCols = true;
+    } else {
+        $db->exec("ALTER TABLE wa_cta_clicks ADD COLUMN target_number VARCHAR(30) NULL AFTER source_label, ADD COLUMN target_label VARCHAR(50) NULL AFTER target_number");
+        $hasTargetCols = true;
+    }
+} catch (\Throwable $mE) {
+    // Continue
+}
 
 $baseWhere = "WHERE 1=1";
 $params = [];
@@ -30,8 +45,19 @@ if ($ipFilter) {
     $params[':ip'] = $ipFilter;
 }
 
+if ($csFilter && $hasTargetCols) {
+    $baseWhere .= " AND (target_label = :cs OR target_number = :cs)";
+    $params[':cs'] = $csFilter;
+}
+
 if ($q) {
-    $baseWhere .= " AND (ip_address LIKE :q1 OR city LIKE :q2 OR country LIKE :q3 OR source_page LIKE :q4 OR browser LIKE :q5 OR source_label LIKE :q6)";
+    if ($hasTargetCols) {
+        $baseWhere .= " AND (ip_address LIKE :q1 OR city LIKE :q2 OR country LIKE :q3 OR source_page LIKE :q4 OR browser LIKE :q5 OR source_label LIKE :q6 OR target_label LIKE :q7 OR target_number LIKE :q8)";
+        $params[':q7'] = "%$q%";
+        $params[':q8'] = "%$q%";
+    } else {
+        $baseWhere .= " AND (ip_address LIKE :q1 OR city LIKE :q2 OR country LIKE :q3 OR source_page LIKE :q4 OR browser LIKE :q5 OR source_label LIKE :q6)";
+    }
     $params[':q1'] = "%$q%";
     $params[':q2'] = "%$q%";
     $params[':q3'] = "%$q%";
@@ -48,8 +74,9 @@ if ($sourcePage) {
 
     // Individual clicks (limit 200 based on search or 50)
     $limit = $q ? 200 : 50;
+    $targetSelect = $hasTargetCols ? ", COALESCE(target_number, '') as target_number, COALESCE(target_label, '') as target_label" : ", '' as target_number, '' as target_label";
     $vStmt = $db->prepare("
-        SELECT source_label, ip_address, browser, os, device_type, country, city, referrer, clicked_at
+        SELECT source_label, ip_address, browser, os, device_type, country, city, referrer, clicked_at {$targetSelect}
         FROM wa_cta_clicks
         $detailWhere
         ORDER BY clicked_at DESC
@@ -147,6 +174,25 @@ $browserStmt = $db->prepare("SELECT browser, COUNT(*) as count FROM wa_cta_click
 $browserStmt->execute($params);
 $topBrowsers = $browserStmt->fetchAll();
 
+// Distribution by CS target
+$csDistribution = [];
+if ($hasTargetCols) {
+    try {
+        $csStmt = $db->prepare("
+            SELECT 
+                COALESCE(NULLIF(target_label, ''), 'Default') as label,
+                COALESCE(NULLIF(target_number, ''), '62881080634612') as number,
+                COUNT(*) as count
+            FROM wa_cta_clicks
+            $baseWhere
+            GROUP BY label, number
+            ORDER BY count DESC
+        ");
+        $csStmt->execute($params);
+        $csDistribution = $csStmt->fetchAll();
+    } catch (\Throwable $e) {}
+}
+
 // 7-day trend
 $trendStmt = $db->prepare("
     SELECT DATE(clicked_at) as click_date, COUNT(*) as count
@@ -177,8 +223,9 @@ for ($i = 6; $i >= 0; $i--) {
 
 // Recent clicks
 $limit = $q ? 200 : 50;
+$recentTargetSelect = $hasTargetCols ? ", COALESCE(target_number, '') as target_number, COALESCE(target_label, '') as target_label" : ", '' as target_number, '' as target_label";
 $recentStmt = $db->prepare("
-    SELECT source_page, source_label, ip_address, browser, os, device_type, country, city, clicked_at
+    SELECT source_page, source_label, ip_address, browser, os, device_type, country, city, clicked_at {$recentTargetSelect}
     FROM wa_cta_clicks
     $baseWhere
     ORDER BY clicked_at DESC
@@ -197,6 +244,7 @@ jsonSuccess([
     'topIps'         => $topIps,
     'topDevices'     => $topDevices,
     'topBrowsers'    => $topBrowsers,
+    'csDistribution' => $csDistribution,
     'trend'          => $trend,
     'recentClicks'   => $recentClicks,
 ]);

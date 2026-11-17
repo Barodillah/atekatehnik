@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
-import { trackWaClick } from '../utils/trackWaClick';
+import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl } from '../utils/whatsappRotator';
 
 // ── Animated Gear SVG ───────────────────────────────────────────────
 const AnimatedGear = ({ size = 80, delay = 0, reverse = false, className = '' }) => (
@@ -197,10 +197,13 @@ const ErrorPage = ({ code = 404 }) => {
             {lang === 'id' ? 'Permintaan Teknis' : 'Technical Inquiry'}
           </Link>
           <a
-            href="https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik%2C%20saya%20butuh%20bantuan."
+            href={buildWaUrl(getCurrentWaContact().number, 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik, saya butuh bantuan.')}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackWaClick('error-page', 'bantuan')}
+            onClick={(e) => {
+              e.preventDefault();
+              handleRotatedWaClick('error-page', 'bantuan', 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik, saya butuh bantuan.');
+            }}
             className="inline-flex items-center gap-2 px-8 py-3 bg-transparent text-on-surface-variant font-bold text-sm uppercase tracking-widest rounded-sm border border-outline-variant/30 hover:border-green-600 hover:text-green-600 transition-all duration-200"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

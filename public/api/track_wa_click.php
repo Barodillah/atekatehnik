@@ -18,6 +18,8 @@ $input = getJsonInput();
 
 $sourcePage = trim($input['source_page'] ?? '');
 $sourceLabel = trim($input['source_label'] ?? '');
+$targetNumber = trim($input['target_number'] ?? '');
+$targetLabel = trim($input['target_label'] ?? '');
 
 if (empty($sourcePage)) {
     jsonError(400, 'source_page is required.');
@@ -96,25 +98,57 @@ if (!in_array($ip, ['127.0.0.1', '::1', 'unknown', 'localhost'])) {
     $city = 'Localhost';
 }
 
-// ── Insert into Database ─────────────────────────────────────────────
+// ── Auto-Migration & Insert into Database ───────────────────────────
 
 try {
-    $stmt = $db->prepare("
-        INSERT INTO wa_cta_clicks (source_page, source_label, ip_address, user_agent, browser, os, device_type, country, city, referrer)
-        VALUES (:source_page, :source_label, :ip, :ua, :browser, :os, :device, :country, :city, :referrer)
-    ");
-    $stmt->execute([
-        ':source_page'  => mb_substr($sourcePage, 0, 100),
-        ':source_label' => $sourceLabel ? mb_substr($sourceLabel, 0, 255) : null,
-        ':ip'           => $ip,
-        ':ua'           => mb_substr($userAgent, 0, 500),
-        ':browser'      => $browser,
-        ':os'           => $os,
-        ':device'       => $deviceType,
-        ':country'      => $country,
-        ':city'         => $city,
-        ':referrer'     => mb_substr($referrer, 0, 500),
-    ]);
+    // Ensure target_number & target_label exist
+    try {
+        $colCheck = $db->query("SHOW COLUMNS FROM wa_cta_clicks LIKE 'target_number'")->fetch();
+        if (!$colCheck) {
+            $db->exec("ALTER TABLE wa_cta_clicks ADD COLUMN target_number VARCHAR(30) NULL AFTER source_label, ADD COLUMN target_label VARCHAR(50) NULL AFTER target_number");
+        }
+    } catch (\Throwable $mE) {
+        // Continue even if schema check fails
+    }
+
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO wa_cta_clicks (source_page, source_label, target_number, target_label, ip_address, user_agent, browser, os, device_type, country, city, referrer)
+            VALUES (:source_page, :source_label, :target_number, :target_label, :ip, :ua, :browser, :os, :device, :country, :city, :referrer)
+        ");
+        $stmt->execute([
+            ':source_page'    => mb_substr($sourcePage, 0, 100),
+            ':source_label'   => $sourceLabel ? mb_substr($sourceLabel, 0, 255) : null,
+            ':target_number'  => $targetNumber ? mb_substr($targetNumber, 0, 30) : null,
+            ':target_label'   => $targetLabel ? mb_substr($targetLabel, 0, 50) : null,
+            ':ip'             => $ip,
+            ':ua'             => mb_substr($userAgent, 0, 500),
+            ':browser'        => $browser,
+            ':os'             => $os,
+            ':device'         => $deviceType,
+            ':country'        => $country,
+            ':city'           => $city,
+            ':referrer'       => mb_substr($referrer, 0, 500),
+        ]);
+    } catch (\Throwable $insertErr) {
+        // Fallback for backward compatibility if columns somehow don't exist
+        $stmt = $db->prepare("
+            INSERT INTO wa_cta_clicks (source_page, source_label, ip_address, user_agent, browser, os, device_type, country, city, referrer)
+            VALUES (:source_page, :source_label, :ip, :ua, :browser, :os, :device, :country, :city, :referrer)
+        ");
+        $stmt->execute([
+            ':source_page'  => mb_substr($sourcePage, 0, 100),
+            ':source_label' => $sourceLabel ? mb_substr($sourceLabel, 0, 255) : null,
+            ':ip'           => $ip,
+            ':ua'           => mb_substr($userAgent, 0, 500),
+            ':browser'      => $browser,
+            ':os'           => $os,
+            ':device'       => $deviceType,
+            ':country'      => $country,
+            ':city'         => $city,
+            ':referrer'     => mb_substr($referrer, 0, 500),
+        ]);
+    }
 
     jsonSuccess([], 'Click tracked successfully.');
 

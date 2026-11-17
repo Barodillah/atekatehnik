@@ -14,6 +14,7 @@ const WaClicks = () => {
   // States for overview filtering
   const [selectedCityFilter, setSelectedCityFilter] = useState('');
   const [selectedIpFilter, setSelectedIpFilter] = useState('');
+  const [selectedCsFilter, setSelectedCsFilter] = useState(''); // '' | 'Rani' | 'Barron'
   const [locationTab, setLocationTab] = useState('cities'); // 'cities' | 'ips'
 
   // States for detailed drawer
@@ -73,7 +74,7 @@ const WaClicks = () => {
   const fetchOverview = async () => {
     setIsLoading(true);
     try {
-      const url = `/api/admin_wa_clicks.php?${selectedCityFilter ? `city=${encodeURIComponent(selectedCityFilter)}&` : ''}${selectedIpFilter ? `ip=${encodeURIComponent(selectedIpFilter)}&` : ''}${searchQuery ? `q=${encodeURIComponent(searchQuery)}` : ''}`;
+      const url = `/api/admin_wa_clicks.php?${selectedCityFilter ? `city=${encodeURIComponent(selectedCityFilter)}&` : ''}${selectedIpFilter ? `ip=${encodeURIComponent(selectedIpFilter)}&` : ''}${selectedCsFilter ? `cs=${encodeURIComponent(selectedCsFilter)}&` : ''}${searchQuery ? `q=${encodeURIComponent(searchQuery)}` : ''}`;
       const res = await authFetch(url);
       const json = await res.json();
       if (json.success) {
@@ -109,7 +110,7 @@ const WaClicks = () => {
     if (selectedSource) {
       fetchSourceDetail(selectedSource);
     }
-  }, [selectedCityFilter, selectedIpFilter, searchQuery]);
+  }, [selectedCityFilter, selectedIpFilter, selectedCsFilter, searchQuery]);
 
   // Memoized filters for IP Drawer (must be called before any early returns)
   const filteredIpViews = useMemo(() => {
@@ -277,6 +278,109 @@ const WaClicks = () => {
           </div>
         </div>
       </div>
+
+      {/* CS Rotation Distribution Cards (Rani vs Barron) */}
+      {(() => {
+        const raniCount = data.csDistribution?.find(d => d.label === 'Rani' || d.number?.includes('080634612'))?.count || 0;
+        const barronCount = data.csDistribution?.find(d => d.label === 'Barron' || d.number?.includes('5144907'))?.count || 0;
+        const totalKnown = raniCount + barronCount;
+        const raniPct = totalKnown > 0 ? Math.round((raniCount / totalKnown) * 100) : 50;
+        const barronPct = totalKnown > 0 ? (100 - raniPct) : 50;
+
+        return (
+          <div className="bg-white p-5 rounded-sm shadow-sm border border-slate-100 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-blue-950 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-green-500 text-lg">sync_alt</span>
+                  Distribusi Rotasi WhatsApp CS
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">Rotasi pembagian klik WA antara Rani & Barron secara bergantian.</p>
+              </div>
+
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-sm text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCsFilter('')}
+                  className={`px-3 py-1 rounded-sm transition-all ${!selectedCsFilter ? 'bg-white text-blue-950 shadow-xs' : 'text-slate-500 hover:text-blue-950'}`}
+                >
+                  Semua CS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCsFilter('Rani')}
+                  className={`px-3 py-1 rounded-sm transition-all ${selectedCsFilter === 'Rani' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-blue-950'}`}
+                >
+                  Rani ({raniCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCsFilter('Barron')}
+                  className={`px-3 py-1 rounded-sm transition-all ${selectedCsFilter === 'Barron' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-500 hover:text-blue-950'}`}
+                >
+                  Barron ({barronCount})
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {/* CS 1: Rani */}
+              <div
+                onClick={() => setSelectedCsFilter(selectedCsFilter === 'Rani' ? '' : 'Rani')}
+                className={`p-4 rounded-sm border transition-all cursor-pointer flex items-center justify-between ${
+                  selectedCsFilter === 'Rani'
+                    ? 'bg-blue-50/80 border-blue-400 shadow-xs'
+                    : 'bg-slate-50/50 border-slate-200/70 hover:border-blue-300 hover:bg-blue-50/30'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-black text-sm">
+                    R
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-blue-950">Rani</span>
+                      <span className="text-[10px] bg-blue-100 text-blue-700 font-bold px-1.5 py-0.2 rounded">CS 1</span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-mono mt-0.5">+62 881-0806-34612</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-black text-blue-950">{raniCount}</div>
+                  <div className="text-[10px] text-slate-400 font-semibold">{totalKnown > 0 ? `${raniPct}% dari total` : '0 klik'}</div>
+                </div>
+              </div>
+
+              {/* CS 2: Barron */}
+              <div
+                onClick={() => setSelectedCsFilter(selectedCsFilter === 'Barron' ? '' : 'Barron')}
+                className={`p-4 rounded-sm border transition-all cursor-pointer flex items-center justify-between ${
+                  selectedCsFilter === 'Barron'
+                    ? 'bg-emerald-50/80 border-emerald-400 shadow-xs'
+                    : 'bg-slate-50/50 border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/30'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">
+                    B
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-blue-950">Barron</span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.2 rounded">CS 2</span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-mono mt-0.5">+62 882-0051-44907</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-black text-blue-950">{barronCount}</div>
+                  <div className="text-[10px] text-slate-400 font-semibold">{totalKnown > 0 ? `${barronPct}% dari total` : '0 klik'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 7-Day Trend Chart */}
       <div className="bg-white rounded-sm shadow-sm border border-slate-100 overflow-hidden">
@@ -550,6 +654,7 @@ const WaClicks = () => {
               <tr>
                 <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">Source</th>
                 <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">Label</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">Tujuan CS</th>
                 <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">IP Address</th>
                 <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">Location</th>
                 <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">Device & Browser</th>
@@ -566,6 +671,23 @@ const WaClicks = () => {
                     </span>
                   </td>
                   <td className="px-6 py-3 font-medium text-xs text-blue-950 truncate max-w-[150px]">{c.source_label || '—'}</td>
+                  <td className="px-6 py-3 whitespace-nowrap">
+                    {c.target_label === 'Barron' || c.target_number?.includes('5144907') ? (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm" title={c.target_number || '+62 882-0051-44907'}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Barron
+                      </span>
+                    ) : c.target_label === 'Rani' || c.target_number?.includes('080634612') ? (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-sm" title={c.target_number || '+62 881-0806-34612'}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        Rani
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-sm">
+                        {c.target_label || c.target_number || 'Default (Rani)'}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-6 py-3 font-mono text-[11px] text-slate-600">
                     <button
                       onClick={() => handleOpenIpDrawer(c.ip_address)}
@@ -594,7 +716,7 @@ const WaClicks = () => {
               ))}
               {filteredRecentClicks.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-xs text-slate-400">Tidak ada log aktivitas ditemukan.</td>
+                  <td colSpan="7" className="px-6 py-8 text-center text-xs text-slate-400">Tidak ada log aktivitas ditemukan.</td>
                 </tr>
               )}
             </tbody>
@@ -732,6 +854,7 @@ const WaClicks = () => {
                       <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
                         <tr>
                           <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Label CTA</th>
+                          <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Tujuan CS</th>
                           <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">IP Address</th>
                           <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Lokasi</th>
                           <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">OS / Browser</th>
@@ -743,6 +866,23 @@ const WaClicks = () => {
                         {filteredDrawerClicks.map((v, i) => (
                           <tr key={i} className="hover:bg-slate-50/50 transition-colors">
                             <td className="px-5 py-3 text-xs font-bold text-blue-950 truncate max-w-[150px]">{v.source_label || '—'}</td>
+                            <td className="px-5 py-3 whitespace-nowrap">
+                              {v.target_label === 'Barron' || v.target_number?.includes('5144907') ? (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                  Barron
+                                </span>
+                              ) : v.target_label === 'Rani' || v.target_number?.includes('080634612') ? (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-sm">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                  Rani
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-sm">
+                                  {v.target_label || v.target_number || 'Default'}
+                                </span>
+                              )}
+                            </td>
                             <td className="px-5 py-3 font-mono text-[11px] text-slate-700">
                               <button
                                 onClick={() => handleOpenIpDrawer(v.ip_address)}
@@ -768,7 +908,7 @@ const WaClicks = () => {
                         ))}
                         {filteredDrawerClicks.length === 0 && (
                           <tr>
-                            <td colSpan="6" className="px-5 py-8 text-center text-xs text-slate-400">Tidak ada data yang cocok dengan pencarian atau filter.</td>
+                            <td colSpan="7" className="px-5 py-8 text-center text-xs text-slate-400">Tidak ada data yang cocok dengan pencarian atau filter.</td>
                           </tr>
                         )}
                       </tbody>
@@ -952,6 +1092,7 @@ const WaClicks = () => {
                               <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Waktu</th>
                               <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Sumber Halaman</th>
                               <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Label Tombol</th>
+                              <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Tujuan CS</th>
                               <th className="px-5 py-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Referrer</th>
                             </tr>
                           </thead>
@@ -966,12 +1107,27 @@ const WaClicks = () => {
                                   </span>
                                 </td>
                                 <td className="px-5 py-3 text-xs font-bold text-blue-950">{c.source_label || '—'}</td>
+                                <td className="px-5 py-3 whitespace-nowrap">
+                                  {c.target_label === 'Barron' || c.target_number?.includes('5144907') ? (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm">
+                                      Barron
+                                    </span>
+                                  ) : c.target_label === 'Rani' || c.target_number?.includes('080634612') ? (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-sm">
+                                      Rani
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-slate-400">
+                                      {c.target_label || 'Default'}
+                                    </span>
+                                  )}
+                                </td>
                                 <td className="px-5 py-3 text-[11px] text-slate-500 max-w-[200px] truncate" title={c.referrer}>{c.referrer || 'Direct'}</td>
                               </tr>
                             ))}
                             {filteredIpWaClicks.length === 0 && (
                               <tr>
-                                <td colSpan="4" className="px-5 py-8 text-center text-xs text-slate-400">Tidak ada log klik WhatsApp dari IP ini.</td>
+                                <td colSpan="5" className="px-5 py-8 text-center text-xs text-slate-400">Tidak ada log klik WhatsApp dari IP ini.</td>
                               </tr>
                             )}
                           </tbody>

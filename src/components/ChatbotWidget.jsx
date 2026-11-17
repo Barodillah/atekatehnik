@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Link, useLocation } from 'react-router-dom';
-import { trackWaClick } from '../utils/trackWaClick';
+import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl } from '../utils/whatsappRotator';
 
 // ── Markdown Parser ──────────────────────────────────────────────────
 const parseMarkdown = (text) => {
@@ -146,7 +146,7 @@ const ChatbotWidget = () => {
   const location = useLocation();
   const { t } = useLanguage();
 
-  const WA_LINK = 'https://wa.me/62881080634612?text=Saya%20melihat%20dari%20website%20atekatehnik.com.%20Halo%20Ateka%20Tehnik%2C%20saya%20tertarik%20dengan%20produk%20Anda.';
+  const defaultWaText = 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik, saya tertarik dengan produk Anda.';
 
   // Default quick questions if AI background generation hasn't completed
   const defaultQuickQuestions = [
@@ -533,10 +533,13 @@ Konten/Topik Terlihat: ${headings || 'Halaman Landing/General'}`;
                     {isAI && index === messages.length - 1 && (
                       <div className="flex flex-wrap gap-2 mt-3">
                         <a
-                          href={WA_LINK}
+                          href={buildWaUrl(getCurrentWaContact().number, defaultWaText)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={() => trackWaClick('chatbot', 'contact-agent')}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleRotatedWaClick('chatbot', 'contact-agent', defaultWaText);
+                          }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold bg-green-500/10 text-green-700 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all duration-200 group flex-1 justify-center sm:flex-none"
                         >
                           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
