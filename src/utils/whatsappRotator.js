@@ -21,120 +21,130 @@ export const WA_CONTACTS = [
 ];
 
 const DEFAULT_WA_TEXT = 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik.';
-const ROTATOR_STORAGE_KEY = 'ateka_wa_rotator_idx';
+
+// Kontak yang disiapkan saat page load (default: Rani)
+let preparedContact = WA_CONTACTS[0];
+let isInitialized = false;
+let initPromise = null;
 
 /**
- * Membentuk URL redirect pintar ke server (/api/wa_redirect.php).
- * Server akan membaca database klik terakhir untuk menentukan giliran CS (Rani / Barron)
- * secara global across all devices & IPs.
+ * Mengambil 1 data dari database server saat page terload:
+ * Nomor/label mana yang terakhir menerima klik WA,
+ * untuk menyiapkan kontak WA berikutnya yang harus dituju.
  */
-export const getWaRedirectUrl = (sourcePage = 'website', sourceLabel = '', customText = '', target = '') => {
-  const params = new URLSearchParams();
-  if (sourcePage) params.set('source_page', sourcePage);
-  if (sourceLabel) params.set('source_label', sourceLabel);
-  params.set('text', customText || DEFAULT_WA_TEXT);
-  if (target) params.set('target', target);
+export const initWaRotation = async () => {
+  if (initPromise) return initPromise;
 
-  return `/api/wa_redirect.php?${params.toString()}`;
+  initPromise = (async () => {
+    try {
+      const res = await fetch('/api/track_wa_click.php?action=get_next');
+      const data = await res.json();
+      if (data && data.success && data.next) {
+        const found = WA_CONTACTS.find(
+          c => c.id === data.next.id || c.number === data.next.number
+        );
+        if (found) {
+          preparedContact = found;
+        }
+      }
+    } catch (err) {
+      // Jika offline / error, tetap gunakan preparedContact default
+      console.warn('Gagal memuat status rotasi WA dari server:', err);
+    } finally {
+      isInitialized = true;
+    }
+    return preparedContact;
+  })();
+
+  return initPromise;
 };
 
+// Jalankan otomatis saat script pertama kali dimuat di browser
+if (typeof window !== 'undefined') {
+  initWaRotation();
+}
+
 /**
- * Mendapatkan kontak saat ini dari cache lokal (sebagai fallback tampilan).
+ * Mendapatkan kontak yang sedang disiapkan untuk klik berikutnya
  */
 export const getCurrentWaContact = () => {
-  let currentIdx = 0;
-  try {
-    const saved = localStorage.getItem(ROTATOR_STORAGE_KEY);
-    if (saved !== null) {
-      currentIdx = parseInt(saved, 10) % WA_CONTACTS.length;
-    }
-  } catch (e) {}
-
-  return WA_CONTACTS[currentIdx] || WA_CONTACTS[0];
+  return preparedContact || WA_CONTACTS[0];
 };
 
 /**
- * Mendapatkan kontak berikutnya secara round-robin lokal (fallback).
+ * Mengambil kontak saat ini lalu membalik antrean di memori
+ * untuk klik berikutnya jika pengunjung mengklik lebih dari 1 kali.
  */
 export const getNextWaContact = () => {
-  let nextIdx = 0;
-  try {
-    const saved = localStorage.getItem(ROTATOR_STORAGE_KEY);
-    if (saved !== null) {
-      const parsed = parseInt(saved, 10);
-      nextIdx = (parsed + 1) % WA_CONTACTS.length;
-    }
-  } catch (e) {
-    nextIdx = Math.floor(Math.random() * WA_CONTACTS.length);
-  }
-
-  try {
-    localStorage.setItem(ROTATOR_STORAGE_KEY, nextIdx.toString());
-  } catch (e) {}
-
-  return WA_CONTACTS[nextIdx] || WA_CONTACTS[0];
+  const current = preparedContact || WA_CONTACTS[0];
+  // Balikkan kontak untuk klik berikutnya
+  preparedContact = current.id === 'rani' ? WA_CONTACTS[1] : WA_CONTACTS[0];
+  return current;
 };
 
 /**
- * Membentuk URL direct wa.me / api.whatsapp.com dengan nomor dan teks pesan.
+ * Membentuk URL wa.me dengan nomor dan pesan
  */
 export const buildWaUrl = (number, text = DEFAULT_WA_TEXT) => {
-  const cleanNumber = (number || WA_CONTACTS[0].number).replace(/\D/g, '');
-  return `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(text || DEFAULT_WA_TEXT)}`;
+  const cleanNumber = (number || preparedContact.number || WA_CONTACTS[0].number).replace(/\D/g, '');
+  return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text || DEFAULT_WA_TEXT)}`;
 };
 
 /**
- * Menangani klik tombol WhatsApp bergantian berbasis SERVER DATABASE:
- * Mengarahkan ke /api/wa_redirect.php yang membaca riwayat klik terakhir di database
- * lalu langsung meneruskan ke WhatsApp CS yang bergiliran (Rani <-> Barron)
- * secara akurat meskipun pengunjung berbeda device, berbeda IP, atau private browsing.
+ * Menangani klik tombol WhatsApp bergantian:
+ * 1. Mengambil nomor CS yang sudah disiapkan dari server saat page load.
+ * 2. Mencatat ke database HANYA 1 KALI via trackWaClick.
+ * 3. Membuka URL WhatsApp langsung di tab baru.
  *
  * @param {string} sourcePage  - Misal 'floating-btn', 'hero', 'product-detail'
  * @param {string} sourceLabel - Misal nama produk, 'hubungi-langsung'
  * @param {string} customText  - Pesan pembuka WhatsApp
  */
 export const handleRotatedWaClick = (sourcePage, sourceLabel = '', customText = '') => {
-  // Update local counter as secondary fallback
-  getNextWaContact();
+  const contact = getNextWaContact();
+  const text = customText || DEFAULT_WA_TEXT;
 
-  const url = getWaRedirectUrl(sourcePage, sourceLabel, customText);
+  // Catat klik HANYA 1 KALI ke database
+  trackWaClick(sourcePage, sourceLabel, contact.number, contact.name);
 
-  // Buka URL redirect di tab baru
-  const newTab = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-    // Jika window.open diblokir oleh browser pop-up blocker, buka di window saat ini
-    window.location.href = url;
-  }
+  // Buka WhatsApp langsung
+  const url = buildWaUrl(contact.number, text);
+  window.open(url, '_blank', 'noopener,noreferrer');
 
-  return { redirected: true, url };
+  return contact;
 };
 
 /**
- * Menangani klik WhatsApp ke kontak spesifik tertentu (tanpa rotasi)
- * Digunakan jika tombol diarahkan khusus ke nomor Rani atau Barron.
- *
- * @param {string} contactNumberOrId - 'rani', 'barron', atau nomor telp
- * @param {string} sourcePage        - Misal 'contact-page'
- * @param {string} sourceLabel       - Misal 'wa-support'
- * @param {string} customText        - Pesan pembuka
+ * Menangani klik WhatsApp langsung ke nomor spesifik (misal di halaman Contact)
+ * 1. Mencatat ke database HANYA 1 KALI.
+ * 2. Membuka WhatsApp langsung.
+ * 3. Menyesuaikan preparedContact berikutnya ke nomor pasangannya.
  */
 export const handleDirectWaClick = (contactNumberOrId, sourcePage = 'contact-page', sourceLabel = '', customText = '') => {
-  const targetId = (contactNumberOrId === 'barron' || contactNumberOrId === '62882005144907') ? 'barron' : 'rani';
-  const url = getWaRedirectUrl(sourcePage, sourceLabel, customText, targetId);
+  const contact = WA_CONTACTS.find(
+    c => c.id === contactNumberOrId || c.number === contactNumberOrId
+  ) || WA_CONTACTS[0];
 
-  const newTab = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-    window.location.href = url;
-  }
+  const text = customText || DEFAULT_WA_TEXT;
 
-  return { redirected: true, target: targetId, url };
+  // Catat klik HANYA 1 KALI ke database
+  trackWaClick(sourcePage, sourceLabel, contact.number, contact.name);
+
+  // Buka WhatsApp langsung
+  const url = buildWaUrl(contact.number, text);
+  window.open(url, '_blank', 'noopener,noreferrer');
+
+  // Set giliran berikutnya ke kontak yang lain
+  preparedContact = contact.id === 'rani' ? WA_CONTACTS[1] : WA_CONTACTS[0];
+
+  return contact;
 };
 
-// Global window helpers untuk script eksternal
+// Global window helpers untuk kemudahan pemanggilan
 if (typeof window !== 'undefined') {
   window.handleRotatedWaClick = handleRotatedWaClick;
   window.handleDirectWaClick = handleDirectWaClick;
-  window.openRotatedWhatsApp = handleRotatedWaClick;
-  window.getWaRedirectUrl = getWaRedirectUrl;
+  window.initWaRotation = initWaRotation;
+  window.getCurrentWaContact = getCurrentWaContact;
   window.WA_CONTACTS = WA_CONTACTS;
 }

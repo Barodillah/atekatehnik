@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import { trackCampaignVisit } from './utils/utmTracker';
+import { initWaRotation } from './utils/whatsappRotator';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
@@ -86,6 +87,9 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
+    // Siapkan 1 data kontak WA berikutnya dari server saat page terload
+    initWaRotation();
+
     // Send pageview with a custom path whenever location changes
     ReactGA.send({ hitType: "pageview", page: location.pathname });
 

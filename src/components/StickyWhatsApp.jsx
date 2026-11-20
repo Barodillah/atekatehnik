@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl, getWaRedirectUrl } from '../utils/whatsappRotator';
+import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl } from '../utils/whatsappRotator';
 
 const StickyWhatsApp = () => {
   const location = useLocation();
@@ -26,7 +26,7 @@ const StickyWhatsApp = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
-  const fallbackHref = getWaRedirectUrl('floating-btn', 'whatsapp');
+  const fallbackHref = buildWaUrl(getCurrentWaContact().number);
 
   const handleClick = (e) => {
     e.preventDefault();

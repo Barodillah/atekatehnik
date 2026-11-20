@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
 import { trackWaClick } from '../utils/trackWaClick';
-import { handleDirectWaClick, getWaRedirectUrl } from '../utils/whatsappRotator';
+import { handleDirectWaClick, buildWaUrl } from '../utils/whatsappRotator';
 
 const Contact = () => {
     const { t, lang } = useLanguage();
@@ -220,7 +220,7 @@ const Contact = () => {
                                         <div className="flex flex-col gap-2 mt-2">
                                             <div className="flex flex-wrap items-center gap-3">
                                                 <a
-                                                    href={getWaRedirectUrl('contact-page', 'wa-support', 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik.', 'rani')}
+                                                    href={buildWaUrl('62881080634612')}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => {
@@ -239,7 +239,7 @@ const Contact = () => {
                                             </div>
                                             <div className="flex flex-wrap items-center gap-3">
                                                 <a
-                                                    href={getWaRedirectUrl('contact-page', 'wa-support', 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik.', 'barron')}
+                                                    href={buildWaUrl('62882005144907')}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => {
