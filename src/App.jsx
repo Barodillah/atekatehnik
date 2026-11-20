@@ -3,6 +3,8 @@ import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import { trackCampaignVisit } from './utils/utmTracker';
 import { initWaRotation } from './utils/whatsappRotator';
+import { ADS, isAdsConfigured } from './config/ads';
+import { installWaAnchorFallback } from './utils/waAnchorFallback';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
@@ -77,6 +79,20 @@ const PublicLayout = () => {
 
 // Initialize Google Analytics
 ReactGA.initialize("G-VPFES0SYFN");
+
+// Google Ads (AW-18044930982) — menempel pada loader react-ga4 yang sudah ada
+if (isAdsConfigured()) {
+  try {
+    ReactGA.gtag('config', ADS.conversionId, { allow_enhanced_conversions: true });
+  } catch {
+    if (typeof window.gtag === 'function') {
+      window.gtag('config', ADS.conversionId, { allow_enhanced_conversions: true });
+    }
+  }
+}
+
+// Jaring pengaman klik WA via href (Ctrl+klik / klik tengah)
+installWaAnchorFallback();
 
 import { ToastProvider } from './contexts/ToastContext';
 import { ConfirmProvider } from './contexts/ConfirmContext';

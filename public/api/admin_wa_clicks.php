@@ -20,11 +20,13 @@ $q = trim($_GET['q'] ?? '');
 
 // Auto-check / migrate columns if needed
 $hasTargetCols = false;
+$hasWaNumber = false;
 try {
-    $colCheck = $db->query("SHOW COLUMNS FROM wa_cta_clicks LIKE 'target_number'")->fetch();
-    if ($colCheck) {
-        $hasTargetCols = true;
-    } else {
+    $colStmt = $db->query("SHOW COLUMNS FROM wa_cta_clicks");
+    $allCols = $colStmt ? array_map('strtolower', $colStmt->fetchAll(PDO::FETCH_COLUMN)) : [];
+    $hasTargetCols = in_array('target_number', $allCols);
+    $hasWaNumber   = in_array('wa_number', $allCols);
+    if (!$hasTargetCols) {
         $db->exec("ALTER TABLE wa_cta_clicks ADD COLUMN target_number VARCHAR(30) NULL AFTER source_label, ADD COLUMN target_label VARCHAR(50) NULL AFTER target_number");
         $hasTargetCols = true;
     }
@@ -74,7 +76,9 @@ if ($sourcePage) {
 
     // Individual clicks (limit 200 based on search or 50)
     $limit = $q ? 200 : 50;
-    $targetSelect = $hasTargetCols ? ", COALESCE(target_number, '') as target_number, COALESCE(target_label, '') as target_label" : ", '' as target_number, '' as target_label";
+    $numField = ($hasTargetCols && $hasWaNumber) ? "COALESCE(NULLIF(target_number, ''), NULLIF(wa_number, ''), '')" : ($hasTargetCols ? "COALESCE(target_number, '')" : ($hasWaNumber ? "COALESCE(wa_number, '')" : "''"));
+    $lblField = $hasTargetCols ? "COALESCE(target_label, '')" : "''";
+    $targetSelect = ", {$numField} as target_number, {$lblField} as target_label";
     $vStmt = $db->prepare("
         SELECT source_label, ip_address, browser, os, device_type, country, city, referrer, clicked_at {$targetSelect}
         FROM wa_cta_clicks
@@ -178,10 +182,11 @@ $topBrowsers = $browserStmt->fetchAll();
 $csDistribution = [];
 if ($hasTargetCols) {
     try {
+        $numDistField = ($hasTargetCols && $hasWaNumber) ? "COALESCE(NULLIF(target_number, ''), NULLIF(wa_number, ''), '62881080634612')" : ($hasTargetCols ? "COALESCE(NULLIF(target_number, ''), '62881080634612')" : ($hasWaNumber ? "COALESCE(NULLIF(wa_number, ''), '62881080634612')" : "'62881080634612'"));
         $csStmt = $db->prepare("
             SELECT 
                 COALESCE(NULLIF(target_label, ''), 'Default') as label,
-                COALESCE(NULLIF(target_number, ''), '62881080634612') as number,
+                {$numDistField} as number,
                 COUNT(*) as count
             FROM wa_cta_clicks
             $baseWhere
@@ -223,7 +228,9 @@ for ($i = 6; $i >= 0; $i--) {
 
 // Recent clicks
 $limit = $q ? 200 : 50;
-$recentTargetSelect = $hasTargetCols ? ", COALESCE(target_number, '') as target_number, COALESCE(target_label, '') as target_label" : ", '' as target_number, '' as target_label";
+$recentNumField = ($hasTargetCols && $hasWaNumber) ? "COALESCE(NULLIF(target_number, ''), NULLIF(wa_number, ''), '')" : ($hasTargetCols ? "COALESCE(target_number, '')" : ($hasWaNumber ? "COALESCE(wa_number, '')" : "''"));
+$recentLblField = $hasTargetCols ? "COALESCE(target_label, '')" : "''";
+$recentTargetSelect = ", {$recentNumField} as target_number, {$recentLblField} as target_label";
 $recentStmt = $db->prepare("
     SELECT source_page, source_label, ip_address, browser, os, device_type, country, city, clicked_at {$recentTargetSelect}
     FROM wa_cta_clicks

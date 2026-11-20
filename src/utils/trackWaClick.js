@@ -1,13 +1,20 @@
 import { getStoredUtm } from './utmTracker';
+import { ADS, isAdsConfigured } from '../config/ads';
+import { adsGtag } from './adsGtag';
+
+// Satu key per label, dipakai bersama oleh waAnchorFallback
+const dedupeKey = () => `ateka_ads_wa_fired_${ADS.labelWaClick}`;
+
+const firedOnce = (key) => {
+  try {
+    if (sessionStorage.getItem(key)) return true;
+    sessionStorage.setItem(key, '1');
+  } catch { /* storage diblokir */ }
+  return false;
+};
 
 /**
- * Track WhatsApp CTA click — fire-and-forget POST to /api/track_wa_click.php
- * Automatically includes active UTM Campaign info if visitor arrived via ad campaign.
- *
- * @param {string} sourcePage   - Page identifier, e.g. 'product-detail', 'chatbot'
- * @param {string} sourceLabel  - Context label, e.g. product name, 'contact-agent'
- * @param {string} targetNumber - Target phone number, e.g. '62881080634612'
- * @param {string} targetLabel  - Target CS label, e.g. 'Rani', 'Barron'
+ * Track WhatsApp CTA click — POST ke /api/track_wa_click.php + konversi Google Ads.
  */
 export const trackWaClick = (sourcePage, sourceLabel = '', targetNumber = '', targetLabel = '') => {
   try {
@@ -20,6 +27,28 @@ export const trackWaClick = (sourcePage, sourceLabel = '', targetNumber = '', ta
       }
     }
 
+    // --- GA4: dikirim setiap klik (analitik) ---
+    adsGtag('event', 'wa_click', {
+      source_page: sourcePage,
+      source_label: enrichedLabel,
+      target_label: targetLabel || '',
+      target_last4: targetNumber ? String(targetNumber).slice(-4) : '',
+      utm_source: utmData?.utm_source || '(direct)',
+      utm_medium: utmData?.utm_medium || '(none)',
+      utm_campaign: utmData?.utm_campaign || '(not set)',
+    });
+
+    // --- Google Ads: konversi, sekali per sesi ---
+    if (isAdsConfigured() && ADS.labelWaClick && !firedOnce(dedupeKey())) {
+      adsGtag('event', 'conversion', {
+        send_to: `${ADS.conversionId}/${ADS.labelWaClick}`,
+        value: ADS.valueWaClick,
+        currency: ADS.currency,
+        transport_type: 'beacon',
+      });
+    }
+
+    // --- Backend internal (jangan diubah perilakunya) ---
     fetch('/api/track_wa_click.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -27,11 +56,12 @@ export const trackWaClick = (sourcePage, sourceLabel = '', targetNumber = '', ta
         source_page: sourcePage,
         source_label: enrichedLabel,
         target_number: targetNumber || null,
+        wa_number: targetNumber || null,
         target_label: targetLabel || null,
       }),
     }).catch(() => {});
   } catch {
-    // Silently ignore — tracking must never block UX
+    // Tracking tidak boleh memblokir UX
   }
 };
 

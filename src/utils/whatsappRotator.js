@@ -21,10 +21,21 @@ export const WA_CONTACTS = [
 ];
 
 const DEFAULT_WA_TEXT = 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik.';
+const STORAGE_KEY = 'ateka_wa_prepared_id';
 
-// Kontak yang disiapkan saat page load (default: Rani)
-let preparedContact = WA_CONTACTS[0];
-let isInitialized = false;
+const getInitialPrepared = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'barron') return WA_CONTACTS[1];
+    if (saved === 'rani') return WA_CONTACTS[0];
+  } catch {
+    // Abaikan jika localStorage diblokir
+  }
+  return WA_CONTACTS[0];
+};
+
+// Kontak yang disiapkan saat page load (dimulai dari cache atau default: Rani)
+let preparedContact = getInitialPrepared();
 let initPromise = null;
 
 /**
@@ -45,13 +56,16 @@ export const initWaRotation = async () => {
         );
         if (found) {
           preparedContact = found;
+          try {
+            localStorage.setItem(STORAGE_KEY, found.id);
+          } catch {
+            // Storage diblokir
+          }
         }
       }
     } catch (err) {
       // Jika offline / error, tetap gunakan preparedContact default
       console.warn('Gagal memuat status rotasi WA dari server:', err);
-    } finally {
-      isInitialized = true;
     }
     return preparedContact;
   })();
@@ -79,6 +93,11 @@ export const getNextWaContact = () => {
   const current = preparedContact || WA_CONTACTS[0];
   // Balikkan kontak untuk klik berikutnya
   preparedContact = current.id === 'rani' ? WA_CONTACTS[1] : WA_CONTACTS[0];
+  try {
+    localStorage.setItem(STORAGE_KEY, preparedContact.id);
+  } catch {
+    // Storage diblokir
+  }
   return current;
 };
 
@@ -136,6 +155,11 @@ export const handleDirectWaClick = (contactNumberOrId, sourcePage = 'contact-pag
 
   // Set giliran berikutnya ke kontak yang lain
   preparedContact = contact.id === 'rani' ? WA_CONTACTS[1] : WA_CONTACTS[0];
+  try {
+    localStorage.setItem(STORAGE_KEY, preparedContact.id);
+  } catch {
+    // Storage diblokir
+  }
 
   return contact;
 };

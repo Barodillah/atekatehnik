@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import usePageTitle from '../hooks/usePageTitle';
-import { trackWaClick } from '../utils/trackWaClick';
 import { handleDirectWaClick, buildWaUrl } from '../utils/whatsappRotator';
+import { ADS, isAdsConfigured } from '../config/ads';
+import { adsGtag } from '../utils/adsGtag';
 
 const Contact = () => {
     const { t, lang } = useLanguage();
@@ -63,6 +64,21 @@ const Contact = () => {
             });
 
             if (response.ok) {
+                // --- Google Ads: form lead terkirim ---
+                adsGtag('event', 'generate_lead', {
+                    form_id: 'contact',
+                    has_phone: Boolean(formData.phone),
+                    has_email: Boolean(formData.email),
+                    location: formData.location || '',
+                    capacity_ref: formData.capacity || '',
+                });
+                if (isAdsConfigured() && ADS.labelLeadForm) {
+                    adsGtag('event', 'conversion', {
+                        send_to: `${ADS.conversionId}/${ADS.labelLeadForm}`,
+                        value: ADS.valueLead,
+                        currency: ADS.currency,
+                    });
+                }
                 setSubmitStatus('success');
                 setFormData({
                     name: '', company: '', capacity: '', location: '', email: '', phone: '', message: ''
