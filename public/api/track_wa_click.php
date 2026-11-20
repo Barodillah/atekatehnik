@@ -2,24 +2,82 @@
 /**
  * Track WA Click API — Ateka Tehnik
  *
+ * GET  /api/track_wa_click.php?action=get_next
  * POST /api/track_wa_click.php
- * Body: { "source_page": "product-detail", "source_label": "RMU 2 Ton" }
+ * Body: { "source_page": "product-detail", "source_label": "RMU 2 Ton", "target_number": "...", "target_label": "..." }
  *
  * Records a WhatsApp CTA click with full analytics:
- * IP, User-Agent parsing, Geo-location via ip-api.com
+ * IP, User-Agent parsing, Geo-location via ip-api.com, target CS resolution.
  */
 
 require_once __DIR__ . '/helpers.php';
 
 setCorsHeaders();
+
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+$csList = [
+    'rani' => [
+        'id'      => 'rani',
+        'name'    => 'Rani',
+        'number'  => '62881080634612',
+        'display' => '+62 881-0806-34612'
+    ],
+    'barron' => [
+        'id'      => 'barron',
+        'name'    => 'Barron',
+        'number'  => '62882005144907',
+        'display' => '+62 882-0051-44907'
+    ]
+];
+
+function resolveNextCs(PDO $db, array $csList): array {
+    try {
+        $stmt = $db->query("
+            SELECT target_label, target_number 
+            FROM wa_cta_clicks 
+            WHERE target_label IS NOT NULL 
+              AND (LOWER(target_label) LIKE '%rani%' OR LOWER(target_label) LIKE '%barron%')
+            ORDER BY id DESC 
+            LIMIT 1
+        ");
+        $lastRow = $stmt ? $stmt->fetch() : null;
+
+        if ($lastRow && !empty($lastRow['target_label'])) {
+            $lastLabel = strtolower(trim($lastRow['target_label']));
+            if (strpos($lastLabel, 'rani') !== false) {
+                return ['next' => $csList['barron'], 'last_label' => 'Rani'];
+            } else {
+                return ['next' => $csList['rani'], 'last_label' => 'Barron'];
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log("Resolve next CS error: " . $e->getMessage());
+    }
+
+    return ['next' => $csList['rani'], 'last_label' => null];
+}
+
+// ── GET Method: Query Next Rotated Contact ──────────────────────────
+if ($method === 'GET') {
+    $db = getDB();
+    $result = resolveNextCs($db, $csList);
+    jsonSuccess([
+        'next'       => $result['next'],
+        'last_label' => $result['last_label'],
+        'contacts'   => array_values($csList),
+    ], 'Current rotation status retrieved.');
+}
+
+// ── POST Method: Record WhatsApp Click ──────────────────────────────
 requireMethod('POST');
 
 $input = getJsonInput();
 
-$sourcePage = trim($input['source_page'] ?? '');
-$sourceLabel = trim($input['source_label'] ?? '');
+$sourcePage   = trim($input['source_page'] ?? '');
+$sourceLabel  = trim($input['source_label'] ?? '');
 $targetNumber = trim($input['target_number'] ?? '');
-$targetLabel = trim($input['target_label'] ?? '');
+$targetLabel  = trim($input['target_label'] ?? '');
 
 if (empty($sourcePage)) {
     jsonError(400, 'source_page is required.');
@@ -27,10 +85,16 @@ if (empty($sourcePage)) {
 
 $db = getDB();
 
+// If target is not provided or set to 'auto', determine next CS from database
+if (empty($targetLabel) || $targetLabel === 'auto') {
+    $rotation = resolveNextCs($db, $csList);
+    $targetNumber = $rotation['next']['number'];
+    $targetLabel  = $rotation['next']['name'];
+}
+
 // ── Gather Analytics Data ────────────────────────────────────────────
 
 $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-// Take first IP if multiple (proxy chain)
 if (strpos($ip, ',') !== false) {
     $ip = trim(explode(',', $ip)[0]);
 }
@@ -75,15 +139,14 @@ $browser = $parsed['browser'];
 $os = $parsed['os'];
 $deviceType = $parsed['deviceType'];
 
-// ── Geo-Location via ip-api.com (free, no key needed) ────────────────
+// ── Geo-Location via ip-api.com ──────────────────────────────────────
 
 $country = '';
 $city = '';
 
-// Only lookup for non-local IPs
 if (!in_array($ip, ['127.0.0.1', '::1', 'unknown', 'localhost'])) {
     $geoUrl = "http://ip-api.com/json/{$ip}?fields=status,country,city";
-    $ctx = stream_context_create(['http' => ['timeout' => 3]]); // 3 second timeout
+    $ctx = stream_context_create(['http' => ['timeout' => 2]]);
     $geoResponse = @file_get_contents($geoUrl, false, $ctx);
 
     if ($geoResponse) {
@@ -150,7 +213,10 @@ try {
         ]);
     }
 
-    jsonSuccess([], 'Click tracked successfully.');
+    jsonSuccess([
+        'target_number' => $targetNumber,
+        'target_label'  => $targetLabel
+    ], 'Click tracked successfully.');
 
 } catch (\Exception $e) {
     jsonError(500, 'Failed to track click: ' . $e->getMessage());

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl } from '../utils/whatsappRotator';
+import { handleRotatedWaClick, getCurrentWaContact, buildWaUrl, getWaRedirectUrl } from '../utils/whatsappRotator';
 
 // Media Helper Functions
 const isYouTube = (url) => {
@@ -248,7 +248,7 @@ const HeroSection = () => {
                   <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
                 <a
-                  href={buildWaUrl(getCurrentWaContact().number, 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik, saya tertarik dengan produk Anda.')}
+                  href={getWaRedirectUrl('hero', 'hubungi-langsung', 'Saya melihat dari website atekatehnik.com. Halo Ateka Tehnik, saya tertarik dengan produk Anda.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => {
